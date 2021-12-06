@@ -1,0 +1,11 @@
+commit 421b1f54c53050a62a1c2db4e320ab6a0277f6f2
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Fri Dec 3 08:42:25 2021 +0100
+
+    Revival of DirectFB-examples
+
+commit ee6247156d30f99562fb69b7f13dd029921e64cb
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Fri Dec 3 08:37:22 2021 +0100
+
+    Initial revision
