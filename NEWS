@@ -1,0 +1,9 @@
+2.0.0
+-----
+
+Meson build system
+
+Examples only use DirectFB font/image/video providers:
+  - DGIFF (DirectFB Glyph Image File Format) font provider
+  - DFIFF (DirectFB Fast Image File Format) image provider
+  - DFVFF (DirectFB Fast Video File Format) video provider
