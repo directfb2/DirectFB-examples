@@ -1,3 +1,24 @@
+commit a506d1a0587ac72c730a707e2e72338b44ad6a9d
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Tue Jan 11 06:37:18 2022 +0100
+
+    Restore some deleted Clear()
+
+commit ca01e993f07dafc2598f70786287ef5c846537a8
+Merge: d9d1924 85143d9
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Mon Dec 6 15:51:57 2021 +0100
+
+    Merge pull request #1 from caramelli/master
+    
+    Revival of DirectFB-examples
+
+commit 85143d9a67abd66266a67c042d2eb7b9b13b8094
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Mon Dec 6 15:50:06 2021 +0100
+
+    Add ChangeLog
+
 commit f05802ab50b3f261defed7212dd20a36e26fe6d1
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Mon Dec 6 15:49:35 2021 +0100

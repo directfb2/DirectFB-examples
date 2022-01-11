@@ -334,6 +334,11 @@ static void init_application( int argc, char *argv[] )
 
      /* Clear with black. */
      surface->Clear( surface, 0x00, 0x00, 0x00, 0xff );
+     surface->Flip( surface, NULL, DSFLIP_NONE );
+     surface->Clear( surface, 0x00, 0x00, 0x00, 0xff );
+     surface->Flip( surface, NULL, DSFLIP_NONE );
+     surface->Clear( surface, 0x00, 0x00, 0x00, 0xff );
+     surface->Flip( surface, NULL, DSFLIP_NONE );
 }
 
 static void exit_application( int status )
