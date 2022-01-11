@@ -524,6 +524,7 @@ static IDirectFBSurface *load_image( const char *filename )
      provider->Release( provider );
      DFBCHECK(primary->GetPixelFormat( primary, &dsc.pixelformat ));
      DFBCHECK(dfb->CreateSurface( dfb, &dsc, &surface ));
+     surface->Clear( surface, 0, 0, 0, 0xFF );
      surface->SetBlittingFlags( surface, DSBLIT_BLEND_ALPHACHANNEL );
      surface->Blit( surface, image, NULL, 0, 0 );
      image->Release( image );
