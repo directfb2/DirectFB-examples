@@ -1,3 +1,24 @@
+commit 58742f250d317313075d301b8a5f2aa4059cb3b9
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Tue Jan 18 18:44:30 2022 +0100
+
+    Move df_fonts to DirectFB-media-samples
+
+commit b5f53c41e784eb4b7762e1642fd38783388a9cca
+Merge: ca01e99 8941d53
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Tue Jan 11 06:39:59 2022 +0100
+
+    Merge pull request #2 from caramelli/master
+    
+    Restore some deleted Clear()
+
+commit 8941d53f93622e3898c2cfa1ba4e1ee8fcc40fc1
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Tue Jan 11 06:37:58 2022 +0100
+
+    Update ChangeLog
+
 commit a506d1a0587ac72c730a707e2e72338b44ad6a9d
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Tue Jan 11 06:37:18 2022 +0100
