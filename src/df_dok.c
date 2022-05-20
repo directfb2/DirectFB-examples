@@ -41,11 +41,8 @@
 /* main interface */
 static IDirectFB *dfb = NULL;
 
-/* input device interface */
-IDirectFBInputDevice *keyboard = NULL;
-
 /* event buffer interface */
-static IDirectFBEventBuffer *key_events = NULL;
+static IDirectFBEventBuffer *event_buffer = NULL;
 
 /* primary surface */
 static IDirectFBSurface *primary = NULL;
@@ -289,7 +286,7 @@ static inline unsigned int myrand()
 
 /**************************************************************************************************/
 
-DirectFBPixelFormatNames(format_strings)
+static const DirectFBPixelFormatNames(format_strings)
 
 static DFBSurfacePixelFormat parse_pixelformat( const char *format )
 {
@@ -356,8 +353,7 @@ static void dfb_shutdown()
      if (ui_font)             ui_font->Release( ui_font );
      if (bench_font)          bench_font->Release( bench_font );
      if (primary)             primary->Release( primary );
-     if (key_events)          key_events->Release( key_events );
-     if (keyboard)            keyboard->Release( keyboard );
+     if (event_buffer)        event_buffer->Release( event_buffer );
      if (dfb)                 dfb->Release( dfb );
 }
 
@@ -365,9 +361,15 @@ static void showMessage( const char *msg )
 {
      DFBInputEvent evt;
 
-     /* process key events */
-     while (key_events->GetEvent( key_events, DFB_EVENT(&evt) ) == DFB_OK) {
-          if (evt.type == DIET_KEYPRESS) {
+     /* process event buffer */
+     while (event_buffer->GetEvent( event_buffer, DFB_EVENT(&evt) ) == DFB_OK) {
+          if (evt.buttons & DIBM_LEFT) {
+               if (event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 ) == DFB_TIMEOUT) {
+                    dfb_shutdown();
+                    exit( 42 );
+               }
+          }
+          else if (evt.type == DIET_KEYPRESS) {
                switch (evt.key_symbol) {
                     case DIKS_ESCAPE:
                     case DIKS_SMALL_Q:
@@ -392,8 +394,8 @@ static void showMessage( const char *msg )
           primary->SetColor( primary, 0xFF, 0xFF, 0xFF, 0xFF );
           primary->DrawString( primary, msg, -1, SW / 2, SH / 2, DSTF_CENTER );
 
-          key_events->Reset( key_events );
-          key_events->WaitForEvent( key_events );
+          event_buffer->Reset( event_buffer );
+          event_buffer->WaitForEvent( event_buffer );
      }
 
      primary->Clear( primary, 0, 0, 0, 0x80 );
@@ -494,8 +496,8 @@ static void showResult()
 
      primary->Flip( primary, NULL, DSFLIP_NONE );
 
-     key_events->Reset( key_events );
-     key_events->WaitForEvent( key_events );
+     event_buffer->Reset( event_buffer );
+     event_buffer->WaitForEvent( event_buffer );
 }
 
 static void showStatus( const char *msg )
@@ -1191,7 +1193,7 @@ int main( int argc, char *argv[] )
      int                      i, n;
      DFBSurfaceRenderOptions  render_options = DSRO_NONE;
      int                      demo_requested = 0;
-     DFBInputDeviceKeyState   restart = DIKS_UP;
+     DFBInputEvent            evt;
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));
@@ -1323,8 +1325,7 @@ int main( int argc, char *argv[] )
      dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
 
      /* create an event buffer for key events */
-     DFBCHECK(dfb->GetInputDevice( dfb, DIDID_KEYBOARD, &keyboard ));
-     DFBCHECK(keyboard->CreateEventBuffer( keyboard, &key_events ));
+     DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_BUTTONS | DICAPS_KEYS, DFB_FALSE, &event_buffer ));
 
      /* get the primary surface, i.e. the surface of the primary layer */
      sdsc.flags = DSDESC_CAPS;
@@ -1632,9 +1633,9 @@ run:
      if (show_results)
           showResult();
 
-     keyboard->GetKeyState( keyboard, DIKI_HOME, &restart );
+     event_buffer->GetEvent( event_buffer, DFB_EVENT(&evt) );
 
-     if (restart) {
+     if (evt.key_id == DIKI_HOME || evt.key_id == DIKI_ENTER) {
           for (i = 0; i < D_ARRAY_SIZE(demos); i++)
                demos[i].result = 0;
 

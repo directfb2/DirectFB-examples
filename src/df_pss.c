@@ -36,8 +36,7 @@
 
 /* DirectFB interfaces */
 static IDirectFB            *dfb          = NULL;
-static IDirectFBInputDevice *keyboard     = NULL;
-static IDirectFBEventBuffer *keybuffer    = NULL;
+static IDirectFBEventBuffer *event_buffer = NULL;
 static IDirectFBSurface     *primary      = NULL;
 static IDirectFBFont        *font         = NULL;
 static IDirectFBSurface     *smokey_light = NULL;
@@ -189,8 +188,7 @@ static void dfb_shutdown()
      if (smokey_light) smokey_light->Release( smokey_light );
      if (font)         font->Release( font );
      if (primary)      primary->Release( primary );
-     if (keybuffer)    keybuffer->Release( keybuffer );
-     if (keyboard)     keyboard->Release( keyboard );
+     if (event_buffer) event_buffer->Release( event_buffer );
      if (dfb)          dfb->Release( dfb );
 }
 
@@ -200,7 +198,7 @@ int main( int argc, char *argv[] )
      DFBSurfaceDescription   sdsc;
      IDirectFBImageProvider *provider;
      DirectThread           *demos_loop_thread;
-     DFBInputDeviceKeyState  quit = DIKS_UP;
+     int                     quit = 0;
 
      srand( time( NULL ) );
 
@@ -214,8 +212,7 @@ int main( int argc, char *argv[] )
      dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
 
      /* create an event buffer for key events */
-     DFBCHECK(dfb->GetInputDevice( dfb, DIDID_KEYBOARD, &keyboard ));
-     DFBCHECK(keyboard->CreateEventBuffer( keyboard, &keybuffer ));
+     DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_BUTTONS | DICAPS_KEYS, DFB_FALSE, &event_buffer ));
 
      /* get the primary surface, i.e. the surface of the primary layer */
      sdsc.flags = DSDESC_CAPS;
@@ -245,9 +242,31 @@ int main( int argc, char *argv[] )
 
      /* main loop */
      while (!quit) {
-          keybuffer->WaitForEvent( keybuffer );
+          DFBInputEvent evt;
 
-          keyboard->GetKeyState( keyboard, DIKI_ESCAPE, &quit );
+          event_buffer->WaitForEvent( event_buffer );
+
+          /* process event buffer */
+          while (event_buffer->GetEvent( event_buffer, DFB_EVENT(&evt) ) == DFB_OK) {
+               if (evt.buttons & DIBM_LEFT) {
+                    if (event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 ) == DFB_TIMEOUT) {
+                         /* quit main loop */
+                         quit = 1;
+                    }
+               }
+               else if (evt.type == DIET_KEYPRESS) {
+                    switch (evt.key_id) {
+                         case DIKI_ESCAPE:
+                         case DIKI_Q:
+                              /* quit main loop */
+                              quit = 1;
+                              break;
+
+                         default:
+                              break;
+                    }
+               }
+          }
 
           if (quit) {
                direct_thread_cancel( demos_loop_thread );

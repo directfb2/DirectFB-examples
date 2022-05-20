@@ -186,7 +186,7 @@ int main( int argc, char *argv[] )
 
           /* process event buffer */
           while (event_buffer->GetEvent( event_buffer, DFB_EVENT(&evt) ) == DFB_OK) {
-               if (evt.type == DIET_AXISMOTION) {
+               if (evt.type == DIET_AXISMOTION && (evt.flags & DIEF_AXISREL)) {
                     switch (evt.axis) {
                          case DIAI_X:
                               movx += evt.axisrel;
@@ -201,10 +201,12 @@ int main( int argc, char *argv[] )
                               break;
                     }
                }
-               else if (evt.type == DIET_BUTTONRELEASE) {
-                    /* quit main loop */
-                    dfb_shutdown();
-                    return 42;
+               else if (evt.buttons & DIBM_LEFT) {
+                    if (event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 ) == DFB_TIMEOUT) {
+                         /* quit main loop */
+                         dfb_shutdown();
+                         return 42;
+                    }
                }
                else if (evt.type == DIET_KEYPRESS) {
                     switch (DFB_LOWER_CASE( evt.key_symbol )) {

@@ -60,7 +60,7 @@ static void init_resources( int argc, char *argv[] )
      dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
 
      /* create an event buffer */
-     DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_BUTTONS | DICAPS_KEYS, DFB_FALSE, &event_buffer ));
+     DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_KEYS, DFB_FALSE, &event_buffer ));
 
      /* get the primary surface, i.e. the surface of the primary layer */
      dsc.flags = DSDESC_CAPS;
@@ -120,35 +120,7 @@ int main( int argc, char *argv[] )
 
           /* process event buffer */
           while (event_buffer->GetEvent( event_buffer, DFB_EVENT(&evt) ) == DFB_OK) {
-               if (evt.type == DIET_BUTTONPRESS) {
-                    switch (evt.button) {
-                         case DIBI_MIDDLE:
-                              /* quit main loop */
-                              quit = 1;
-                              break;
-
-                         case DIBI_LEFT:
-                              primary->Blit( primary, maskimage, NULL, 0, 0 );
-                              primary->Blit( primary, testimage, NULL, 20, 20 );
-                              primary->Blit( primary, testimage2, NULL, 319, 70 );
-                              primary->Flip( primary, NULL, DSFLIP_WAITFORSYNC );
-                              break;
-
-                         case DIBI_RIGHT: {
-                              DFBRectangle rect1 = { 319, 70, 111, 77 };
-                              DFBRectangle rect2 = { 20, 20, 128, 128 };
-                              primary->Blit( primary, maskimage, NULL, 0, 0 );
-                              primary->StretchBlit( primary, testimage, NULL, &rect1 );
-                              primary->StretchBlit( primary, testimage2, NULL, &rect2 );
-                              primary->Flip( primary, NULL, DSFLIP_WAITFORSYNC );
-                              break;
-                         }
-
-                         default:
-                              break;
-                    }
-               }
-               else if (evt.type == DIET_KEYPRESS) {
+               if (evt.type == DIET_KEYPRESS) {
                     switch (DFB_LOWER_CASE( evt.key_symbol )) {
                          case DIKS_ESCAPE:
                          case DIKS_SMALL_Q:

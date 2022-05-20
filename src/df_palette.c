@@ -34,7 +34,7 @@
 
 /* DirectFB interfaces */
 static IDirectFB            *dfb          = NULL;
-static IDirectFBEventBuffer *mouse_events = NULL;
+static IDirectFBEventBuffer *event_buffer = NULL;
 static IDirectFBSurface     *primary      = NULL;
 static IDirectFBPalette     *palette      = NULL;
 
@@ -95,7 +95,7 @@ static void dfb_shutdown()
 {
      if (palette)      palette->Release( palette );
      if (primary)      primary->Release( primary );
-     if (mouse_events) mouse_events->Release( mouse_events );
+     if (event_buffer) event_buffer->Release( event_buffer );
      if (dfb)          dfb->Release( dfb );
 }
 
@@ -110,7 +110,7 @@ int main( int argc, char *argv[] )
      DFBCHECK(DirectFBCreate( &dfb ));
 
      /* create an event buffer for button events */
-     DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_BUTTONS, DFB_FALSE, &mouse_events ));
+     DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_BUTTONS | DICAPS_KEYS, DFB_FALSE, &event_buffer ));
 
      /* get the primary surface, i.e. the surface of the primary layer */
      desc.flags       = DSDESC_CAPS | DSDESC_PIXELFORMAT;
@@ -134,11 +134,26 @@ int main( int argc, char *argv[] )
      while (1) {
           DFBInputEvent evt;
 
-          /* process button events */
-          while (mouse_events->GetEvent( mouse_events, DFB_EVENT(&evt) ) == DFB_OK) {
-               if (evt.type == DIET_BUTTONRELEASE) {
-                    dfb_shutdown();
-                    return 42;
+          /* process event buffer */
+          while (event_buffer->GetEvent( event_buffer, DFB_EVENT(&evt) ) == DFB_OK) {
+               if (evt.buttons & DIBM_LEFT) {
+                    if (event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 ) == DFB_TIMEOUT) {
+                         /* quit main loop */
+                         dfb_shutdown();
+                         return 42;
+                    }
+               }
+               else if (evt.type == DIET_KEYPRESS) {
+                    switch (evt.key_id) {
+                         case DIKI_ESCAPE:
+                         case DIKI_Q:
+                              /* quit main loop */
+                              dfb_shutdown();
+                              return 42;
+
+                         default:
+                              break;
+                    }
                }
           }
 

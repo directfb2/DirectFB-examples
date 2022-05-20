@@ -2375,7 +2375,7 @@ static void init_application( int argc, char *argv[] )
      dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
 
      /* Create an event buffer for axis and key events. */
-     ret = dfb->CreateInputEventBuffer( dfb, DICAPS_AXES | DICAPS_KEYS, DFB_FALSE, &event_buffer );
+     ret = dfb->CreateInputEventBuffer( dfb, DICAPS_ALL, DFB_FALSE, &event_buffer );
      if (ret) {
           DirectFBError( "CreateInputEventBuffer() failed", ret );
           exit_application( 3 );
@@ -2424,6 +2424,10 @@ int main( int argc, char *argv[] )
                          Rotate( -evt.axisrel * 2, 'x' );
                     else if (evt.axis == DIAI_Z)
                          Rotate( evt.axisrel * 20, 'z' );
+               }
+               else if (evt.buttons & DIBM_LEFT) {
+                    if (event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 ) == DFB_TIMEOUT)
+                         exit_application( 42 );
                }
                else if (evt.type == DIET_KEYPRESS) {
                     switch (evt.key_id) {

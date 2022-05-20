@@ -36,11 +36,8 @@
 /* main interface */
 static IDirectFB *dfb = NULL;
 
-/* input device interface */
-IDirectFBInputDevice *keyboard = NULL;
-
 /* event buffer interface */
-static IDirectFBEventBuffer *key_events = NULL;
+static IDirectFBEventBuffer *event_buffer = NULL;
 
 /* primary surface */
 static IDirectFBSurface *primary = NULL;
@@ -62,11 +59,11 @@ static char *rules[] = {
 
 static void dfb_shutdown()
 {
-     if (font)       font->Release( font );
-     if (surface)    surface->Release( surface );
-     if (primary)    primary->Release( primary );
-     if (key_events) key_events->Release( key_events );
-     if (dfb)        dfb->Release( dfb );
+     if (font)         font->Release( font );
+     if (surface)      surface->Release( surface );
+     if (primary)      primary->Release( primary );
+     if (event_buffer) event_buffer->Release( event_buffer );
+     if (dfb)          dfb->Release( dfb );
 }
 
 int main( int argc, char *argv[] )
@@ -87,8 +84,7 @@ int main( int argc, char *argv[] )
      dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
 
      /* create an event buffer for key events */
-     DFBCHECK(dfb->GetInputDevice( dfb, DIDID_KEYBOARD, &keyboard ));
-     DFBCHECK(keyboard->CreateEventBuffer( keyboard, &key_events ));
+     DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_BUTTONS | DICAPS_KEYS, DFB_FALSE, &event_buffer ));
 
      /* get the primary surface, i.e. the surface of the primary layer */
      sdsc.flags = DSDESC_CAPS;
@@ -174,9 +170,9 @@ int main( int argc, char *argv[] )
 
      sleep( 1 );
 
-     key_events->Reset( key_events );
+     event_buffer->Reset( event_buffer );
 
-     key_events->WaitForEvent( key_events );
+     event_buffer->WaitForEvent( event_buffer );
 
      dfb_shutdown();
 

@@ -77,7 +77,11 @@ int main( int argc, char *argv[] )
 
           /* Check for new events. */
           while (event_buffer->GetEvent( event_buffer, DFB_EVENT(&evt) ) == DFB_OK) {
-               if (evt.type == DIET_KEYPRESS) {
+               if (evt.buttons & DIBM_LEFT) {
+                    if (event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 ) == DFB_TIMEOUT)
+                         exit_application( 42 );
+               }
+               else if (evt.type == DIET_KEYPRESS) {
                     switch (evt.key_symbol) {
                          case DIKS_ESCAPE:
                          case DIKS_SMALL_Q:
@@ -296,7 +300,7 @@ static void init_application( int argc, char *argv[] )
      }
 
      /* Create an event buffer for key events. */
-     ret = dfb->CreateInputEventBuffer( dfb, DICAPS_KEYS, DFB_FALSE, &event_buffer );
+     ret = dfb->CreateInputEventBuffer( dfb, DICAPS_BUTTONS | DICAPS_KEYS, DFB_FALSE, &event_buffer );
      if (ret) {
           DirectFBError( "CreateInputEventBuffer() failed", ret );
           exit_application( 3 );

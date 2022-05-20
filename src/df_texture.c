@@ -588,7 +588,7 @@ int main( int argc, char *argv[] )
      dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
 
      /* Create an event buffer for axis and key events. */
-     DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_AXES | DICAPS_KEYS, DFB_FALSE, &event_buffer ));
+     DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_ALL, DFB_FALSE, &event_buffer ));
 
      /* Fill the surface description. */
      sdsc.flags = DSDESC_CAPS;
@@ -712,6 +712,12 @@ int main( int argc, char *argv[] )
 
                          default:
                               break;
+                    }
+               }
+               else if (evt.buttons & DIBM_LEFT) {
+                    if (event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 ) == DFB_TIMEOUT) {
+                         cleanup();
+                         return 42;
                     }
                }
                else if (evt.type == DIET_KEYPRESS) {

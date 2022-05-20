@@ -36,12 +36,12 @@
      } while (0)
 
 /* DirectFB interfaces */
-static IDirectFB             *dfb       = NULL;
-static IDirectFBEventBuffer  *keybuffer = NULL;
-static IDirectFBScreen       *screen    = NULL;
-static IDirectFBDisplayLayer *layer     = NULL;
-static IDirectFBSurface      *primary   = NULL;
-static IDirectFBFont         *font      = NULL;
+static IDirectFB             *dfb          = NULL;
+static IDirectFBEventBuffer  *event_buffer = NULL;
+static IDirectFBScreen       *screen       = NULL;
+static IDirectFBDisplayLayer *layer        = NULL;
+static IDirectFBSurface      *primary      = NULL;
+static IDirectFBFont         *font         = NULL;
 
 /* DirectFB surfaces */
 static IDirectFBSurface *tuximage         = NULL;
@@ -475,7 +475,7 @@ static void init_resources( int argc, char *argv[] )
      dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
 
      /* create an event buffer for key events */
-     DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_KEYS, DFB_FALSE, &keybuffer ));
+     DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_BUTTONS | DICAPS_KEYS, DFB_FALSE, &event_buffer ));
 
      /* get the primary screen */
      DFBCHECK(dfb->GetScreen( dfb, DSCID_PRIMARY, &screen ));
@@ -555,7 +555,7 @@ static void deinit_resources()
      if (primary)          primary->Release( primary );
      if (layer)            layer->Release( layer );
      if (screen)           screen->Release( screen );
-     if (keybuffer)        keybuffer->Release( keybuffer );
+     if (event_buffer)     event_buffer->Release( event_buffer );
      if (dfb)              dfb->Release( dfb );
 }
 
@@ -628,8 +628,14 @@ int main( int argc, char *argv[] )
                printf( "%s\n", fps.fps_string );
 
           /* process event buffer */
-          while (keybuffer->GetEvent( keybuffer, DFB_EVENT(&evt) ) == DFB_OK) {
-               if (evt.type == DIET_KEYPRESS) {
+          while (event_buffer->GetEvent( event_buffer, DFB_EVENT(&evt) ) == DFB_OK) {
+               if (evt.buttons & DIBM_LEFT) {
+                    if (event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 ) == DFB_TIMEOUT) {
+                         /* quit main loop */
+                         quit = 1;
+                    }
+               }
+               else if (evt.type == DIET_KEYPRESS) {
                     switch (DFB_LOWER_CASE( evt.key_symbol )) {
                          case DIKS_ESCAPE:
                          case DIKS_SMALL_Q:
