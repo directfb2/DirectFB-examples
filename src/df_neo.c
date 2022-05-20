@@ -35,9 +35,9 @@
      } while (0)
 
 /* DirectFB interfaces */
-static IDirectFB            *dfb       = NULL;
-static IDirectFBEventBuffer *keybuffer = NULL;
-static IDirectFBSurface     *primary   = NULL;
+static IDirectFB            *dfb          = NULL;
+static IDirectFBEventBuffer *event_buffer = NULL;
+static IDirectFBSurface     *primary      = NULL;
 
 /* background image */
 static IDirectFBSurface *background = NULL;
@@ -160,9 +160,9 @@ static void cleanup()
      if (primary)
           primary->Release( primary );
 
-     /* release the key event buffer */
-     if (keybuffer)
-          keybuffer->Release( keybuffer );
+     /* release the event buffer */
+     if (event_buffer)
+          event_buffer->Release( event_buffer );
 
      /* release the main interface */
      if (dfb)
@@ -192,7 +192,7 @@ int main( int argc, char *argv[] )
      dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
 
      /* create an event buffer for key events */
-     DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_KEYS, DFB_FALSE, &keybuffer ));
+     DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_BUTTONS | DICAPS_KEYS, DFB_FALSE, &event_buffer ));
 
      /* get the primary surface, i.e. the surface of the primary layer */
      dsc.flags = DSDESC_CAPS;
@@ -247,8 +247,15 @@ int main( int argc, char *argv[] )
           render( cycle_len );
 
           /* process event buffer */
-          while (keybuffer->GetEvent( keybuffer, DFB_EVENT(&evt) ) == DFB_OK) {
-               if (evt.type == DIET_KEYPRESS) {
+          while (event_buffer->GetEvent( event_buffer, DFB_EVENT(&evt) ) == DFB_OK) {
+               if (evt.buttons & DIBM_LEFT) {
+                    if (event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 ) == DFB_TIMEOUT) {
+                         /* quit main loop */
+                         cleanup();
+                         return 42;
+                    }
+               }
+               else if (evt.type == DIET_KEYPRESS) {
                     switch (evt.key_id) {
                          case DIKI_ESCAPE:
                          case DIKI_Q:

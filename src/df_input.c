@@ -38,7 +38,7 @@
 static IDirectFB *dfb = NULL;
 
 /* event buffer interface */
-static IDirectFBEventBuffer *events = NULL;
+static IDirectFBEventBuffer *event_buffer = NULL;
 
 /* primary surface */
 static IDirectFBSurface *primary = NULL;
@@ -305,7 +305,7 @@ static void show_mouse_buttons( DFBInputEvent *evt )
 
 static void show_mouse_event( DFBInputEvent *evt )
 {
-     char buf[32];
+     char       buf[32];
      static int adjusted_mouse_x = 0;
      static int adjusted_mouse_y = 0;
 
@@ -488,7 +488,7 @@ static void show_event( const char *device_name, DFBInputDeviceTypeFlags device_
           case DIET_BUTTONPRESS:
           case DIET_BUTTONRELEASE:
           case DIET_AXISMOTION:
-               if (device_type & DIDTF_MOUSE ) {
+               if (device_type & DIDTF_MOUSE) {
                     primary->Blit( primary, mouse_image, NULL, 40, 40 );
                     show_mouse_event( evt );
                }
@@ -587,7 +587,7 @@ static void dfb_shutdown()
      if (font_normal)    font_normal->Release( font_normal );
      if (font_small)     font_small->Release( font_small );
      if (primary)        primary->Release( primary );
-     if (events)         events->Release( events );
+     if (event_buffer)   event_buffer->Release( event_buffer );
      if (dfb)            dfb->Release( dfb );
 }
 
@@ -638,7 +638,7 @@ int main( int argc, char *argv[] )
      dfb->EnumInputDevices( dfb, enum_input_device, &devices );
 
      /* create an event buffer for all devices */
-     DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_ALL, DFB_FALSE, &events ));
+     DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_ALL, DFB_FALSE, &event_buffer ));
 
      /* get the primary surface, i.e. the surface of the primary layer */
      sdsc.flags = DSDESC_CAPS;
@@ -680,9 +680,9 @@ int main( int argc, char *argv[] )
 
      sleep( 1 );
 
-     events->Reset( events );
+     event_buffer->Reset( event_buffer );
 
-     if (events->WaitForEventWithTimeout( events, 10, 0 ) == DFB_TIMEOUT) {
+     if (event_buffer->WaitForEventWithTimeout( event_buffer, 10, 0 ) == DFB_TIMEOUT) {
           primary->Clear( primary, 0, 0, 0, 0 );
           primary->DrawString( primary, "Timed out.", -1, screen_width / 2, screen_height / 2, DSTF_CENTER );
           primary->Flip( primary, NULL, DSFLIP_NONE );
@@ -696,7 +696,7 @@ int main( int argc, char *argv[] )
                DFBInputEvent evt;
 
                /* process event buffer */
-               while (events->GetEvent( events, DFB_EVENT(&evt) ) == DFB_OK) {
+               while (event_buffer->GetEvent( event_buffer, DFB_EVENT(&evt) ) == DFB_OK) {
                     const char              *device_name;
                     DFBInputDeviceTypeFlags  device_type;
                     DeviceInfo              *devs = devices;
@@ -737,8 +737,12 @@ int main( int argc, char *argv[] )
                          break;
                     last_symbol = evt.key_symbol;
                }
-
-               events->WaitForEvent( events );
+               else if (evt.buttons & DIBM_LEFT) {
+                    if (event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 ) == DFB_TIMEOUT)
+                         break;
+               }
+               else
+                    event_buffer->WaitForEvent( event_buffer );
           }
      }
 

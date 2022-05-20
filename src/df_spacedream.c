@@ -376,7 +376,7 @@ static void init_resources( int argc, char *argv[] )
      dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
 
      /* create an event buffer for axis and key events. */
-     DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_AXES | DICAPS_KEYS, DFB_FALSE, &event_buffer ));
+     DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_ALL, DFB_FALSE, &event_buffer ));
 
      /* get the primary surface, i.e. the surface of the primary layer */
      dsc.flags = DSDESC_CAPS;
@@ -454,7 +454,13 @@ int main( int argc, char *argv[] )
 
           /* process event buffer */
           while (event_buffer->GetEvent( event_buffer, DFB_EVENT(&evt) ) == DFB_OK) {
-               if (evt.type == DIET_KEYPRESS) {
+               if (evt.buttons & DIBM_LEFT) {
+                    if (event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 ) == DFB_TIMEOUT) {
+                         /* quit main loop */
+                         quit = 1;
+                    }
+               }
+               else if (evt.type == DIET_KEYPRESS) {
                     switch (evt.key_id) {
                          case DIKI_ESCAPE:
                          case DIKI_Q:

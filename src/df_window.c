@@ -246,10 +246,6 @@ int main( int argc, char *argv[] )
                                         upper->LowerToBottom( upper );
                                         upper = (upper == window1) ? window2 : window1;
                                         break;
-                                   case DIBI_RIGHT:
-                                        /* quit main loop */
-                                        quit = 1;
-                                        break;
                                    default:
                                         break;
                               }
@@ -327,9 +323,17 @@ int main( int argc, char *argv[] )
 
           if (active) {
                if (grabbed == DIBM_LEFT) {
-                    active->Move( active, endx - startx, endy - starty );
-                    startx = endx;
-                    starty = endy;
+                    if (startx == endx && starty == endy) {
+                         if (event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 ) == DFB_TIMEOUT) {
+                              /* quit main loop */
+                              quit = 1;
+                         }
+                    }
+                    else {
+                         active->Move( active, endx - startx, endy - starty );
+                         startx = endx;
+                         starty = endy;
+                    }
                }
                else if (grabbed == DIBM_RIGHT) {
                     active->SetOpacity( active, sin( direct_clock_get_millis() / 300.0 ) * 85 + 170 );
