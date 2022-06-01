@@ -1,3 +1,24 @@
+commit 771dfbb23e5ceeb268e4370fc7d97f1cb6f4a672
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Wed Jun 1 12:35:46 2022 +0200
+
+    Add support for multi-touch input device
+
+commit 86f0c96309f84abccbc7e913b97de5441caa2b36
+Merge: 43c1324 38d1b02
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Fri May 20 20:40:09 2022 +0200
+
+    Merge pull request #4 from caramelli/master
+    
+    Long press on left mouse button to quit examples
+
+commit 38d1b02613b9c8ebe1cc9333b7ed4dba70bd6180
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Fri May 20 20:37:55 2022 +0200
+
+    Update ChangeLog
+
 commit 986632689a5d576da02640d0ddfbae76d7743f1d
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Fri May 20 20:37:31 2022 +0200

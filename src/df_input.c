@@ -65,7 +65,21 @@ static int mouse_x_max = -1, mouse_y_max = -1;
 static int joy_axis[8];
 
 /* command line options */
-static const char *fontfile = DATADIR"/decker.dgiff";
+static const char *fontfile  = DATADIR"/decker.dgiff";
+static int         max_slots = 1;
+
+/* slot struct */
+typedef struct {
+    bool pressure;
+    int  x;
+    int  y;
+} Slot;
+
+#ifdef HAVE_MT
+#define DFB_EVENT_SLOT_ID(e) e->slot_id
+#else
+#define DFB_EVENT_SLOT_ID(e) 0
+#endif
 
 /**************************************************************************************************/
 
@@ -303,9 +317,10 @@ static void show_mouse_buttons( DFBInputEvent *evt )
      primary->DrawString( primary, str, -1, screen_width - 40 - w, y + 32, DSTF_LEFT );
 }
 
-static void show_mouse_event( DFBInputEvent *evt )
+static void show_mouse_event( Slot *device_slots, DFBInputEvent *evt )
 {
      char       buf[32];
+     int        i;
      static int adjusted_mouse_x = 0;
      static int adjusted_mouse_y = 0;
 
@@ -363,9 +378,13 @@ static void show_mouse_event( DFBInputEvent *evt )
                adjusted_mouse_x = CLAMP( mouse_x, 0, screen_width  - 1 );
                adjusted_mouse_y = CLAMP( mouse_y, 0, screen_height - 1 );
           }
+
+          device_slots[DFB_EVENT_SLOT_ID(evt)].x = adjusted_mouse_x;
+          device_slots[DFB_EVENT_SLOT_ID(evt)].y = adjusted_mouse_y;
      }
      else { /* DIET_BUTTONPRESS or DIET_BUTTONRELEASE */
           snprintf( buf, sizeof(buf), "Button %u", evt->button );
+          device_slots[DFB_EVENT_SLOT_ID(evt)].pressure = evt->type == DIET_BUTTONPRESS ? true : false;
      }
 
      if (*buf) {
@@ -373,9 +392,13 @@ static void show_mouse_event( DFBInputEvent *evt )
           primary->DrawString( primary, buf, -1, 40, screen_height - 40, DSTF_LEFT );
      }
 
-     primary->SetColor( primary, 0x70, 0x80, 0xE0, 0xFF );
-     primary->FillRectangle( primary, adjusted_mouse_x, 0, 1, screen_height );
-     primary->FillRectangle( primary, 0, adjusted_mouse_y, screen_width, 1 );
+     for (i = 0; i < max_slots; i++) {
+          if (!i || device_slots[i].pressure) {
+               primary->SetColor( primary, 0x70, 0x80, 0xE0, 0xFF );
+               primary->FillRectangle( primary, device_slots[i].x, 0, 1, screen_height );
+               primary->FillRectangle( primary, 0, device_slots[i].y, screen_width, 1 );
+          }
+     }
 }
 
 /**************************************************************************************************/
@@ -468,7 +491,8 @@ static void show_joystick_event( DFBInputEvent *evt )
 
 /**************************************************************************************************/
 
-static void show_event( const char *device_name, DFBInputDeviceTypeFlags device_type, DFBInputEvent *evt )
+static void show_event( const char *device_name, DFBInputDeviceTypeFlags device_type, Slot *device_slots,
+                        DFBInputEvent *evt )
 {
      char buf[128];
 
@@ -488,9 +512,9 @@ static void show_event( const char *device_name, DFBInputDeviceTypeFlags device_
           case DIET_BUTTONPRESS:
           case DIET_BUTTONRELEASE:
           case DIET_AXISMOTION:
-               if (device_type & DIDTF_MOUSE) {
+               if ((device_type & DIDTF_MOUSE) && device_slots) {
                     primary->Blit( primary, mouse_image, NULL, 40, 40 );
-                    show_mouse_event( evt );
+                    show_mouse_event( device_slots, evt );
                }
                else if (device_type & DIDTF_JOYSTICK) {
                     primary->Blit( primary, joystick_image, NULL, 40, 40 );
@@ -535,6 +559,7 @@ static IDirectFBSurface *load_image( const char *filename )
 typedef struct _DeviceInfo {
      DFBInputDeviceID           device_id;
      DFBInputDeviceDescription  desc;
+     Slot                      *slots;
      struct _DeviceInfo        *next;
 } DeviceInfo;
 
@@ -543,10 +568,28 @@ static DFBEnumerationResult enum_input_device( DFBInputDeviceID device_id, DFBIn
      DeviceInfo **devices = data;
      DeviceInfo  *device;
 
+#ifdef HAVE_MT
+     /* set input device configuration */
+     if ((desc.type & DIDTF_MOUSE) && (max_slots > 1)) {
+          IDirectFBInputDevice *mouse;
+          DFBInputDeviceConfig  config;
+
+          DFBCHECK(dfb->GetInputDevice( dfb, device_id, &mouse ));
+
+          config.flags     = DIDCONF_MAX_SLOTS;
+          config.max_slots = max_slots;
+
+          mouse->SetConfiguration( mouse, &config );
+
+          mouse->Release( mouse );
+     }
+ #endif
+
      device = malloc( sizeof(DeviceInfo) );
 
      device->device_id = device_id;
      device->desc      = desc;
+     device->slots     = calloc( max_slots, sizeof(Slot) );;
      device->next      = *devices;
 
      *devices = device;
@@ -578,6 +621,18 @@ static DFBInputDeviceTypeFlags get_device_type( DeviceInfo *devices, DFBInputDev
      return DIDTF_NONE;
 }
 
+static Slot *get_device_slots( DeviceInfo *devices, DFBInputDeviceID device_id )
+{
+     while (devices) {
+          if (devices->device_id == device_id)
+               return devices->slots;
+
+          devices = devices->next;
+     }
+
+     return NULL;
+}
+
 static void dfb_shutdown()
 {
      if (joystick_image) joystick_image->Release( joystick_image );
@@ -597,6 +652,7 @@ static void print_usage()
      printf( "Usage: df_input [options]\n\n" );
      printf( "Options:\n\n" );
      printf( "  --font <filename>  Use the specified font file.\n" );
+     printf( "  --slots <num>      Number of possible touch contacts.\n" );
      printf( "  --help             Print usage information.\n" );
      printf( "  --dfb-help         Output DirectFB usage information.\n\n" );
 }
@@ -620,6 +676,10 @@ int main( int argc, char *argv[] )
                }
                else if (strcmp( argv[n] + 2, "font" ) == 0 && ++n < argc && argv[n]) {
                     fontfile = argv[n];
+                    continue;
+               }
+               else if (strcmp( argv[n] + 2, "slots" ) == 0 && ++n < argc && argv[n]) {
+                    max_slots = atoi( argv[n] );
                     continue;
                }
           }
@@ -699,6 +759,7 @@ int main( int argc, char *argv[] )
                while (event_buffer->GetEvent( event_buffer, DFB_EVENT(&evt) ) == DFB_OK) {
                     const char              *device_name;
                     DFBInputDeviceTypeFlags  device_type;
+                    Slot                    *device_slots;
                     DeviceInfo              *devs = devices;
 
                     /* check if a new device is connected */
@@ -713,6 +774,7 @@ int main( int argc, char *argv[] )
                          /* clear the old list */
                          while (devices) {
                               DeviceInfo *next = devices->next;
+                              free( devices->slots );
                               free( devices );
                               devices = next;
                          }
@@ -723,10 +785,11 @@ int main( int argc, char *argv[] )
 
                     primary->Clear( primary, 0, 0, 0, 0 );
 
-                    device_name = get_device_name( devices, evt.device_id );
-                    device_type = get_device_type( devices, evt.device_id );
+                    device_name  = get_device_name ( devices, evt.device_id );
+                    device_type  = get_device_type ( devices, evt.device_id );
+                    device_slots = get_device_slots( devices, evt.device_id );
 
-                    show_event( device_name, device_type, &evt );
+                    show_event( device_name, device_type, device_slots, &evt );
 
                     primary->Flip( primary, NULL, DSFLIP_NONE );
                }
@@ -748,6 +811,7 @@ int main( int argc, char *argv[] )
 
      while (devices) {
           DeviceInfo *next = devices->next;
+          free( devices->slots );
           free( devices );
           devices = next;
      }

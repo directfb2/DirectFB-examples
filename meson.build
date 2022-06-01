@@ -27,5 +27,21 @@ add_global_arguments('-DDATADIR="@0@"'.format(examplesdatadir), language: 'c')
 directfb_dep = dependency('directfb')
 libm_dep = meson.get_compiler('c').find_library('m')
 
+message('Checking for multi-touch support')
+code = '''
+          #include <directfb.h>
+          int main()
+          {
+            DFBInputEvent evt = { .slot_id = 0 };
+            return 0;
+          }
+       '''
+if meson.get_compiler('c').compiles(code, dependencies: directfb_dep)
+  message('multi-touch support found')
+  add_global_arguments('-DHAVE_MT', language: 'c')
+else
+  message('multi-touch support not found')
+endif
+
 subdir('data')
 subdir('src')
