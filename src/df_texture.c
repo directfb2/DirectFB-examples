@@ -57,6 +57,19 @@ static IDirectFBSurface *texture = NULL;
 /* screen width and height */
 static int screen_width, screen_height;
 
+/* triple buffering */
+static bool triple = false;
+
+/* absolute coordinates */
+static int axisabs_x[2] = { -1, -1 };
+static int axisabs_y[2] = { -1, -1 };
+
+#ifdef HAVE_MT
+#define DFB_EVENT_SLOT_ID(e) e.slot_id
+#else
+#define DFB_EVENT_SLOT_ID(e) 0
+#endif
+
 /**************************************************************************************************/
 
 typedef struct {
@@ -590,9 +603,40 @@ int main( int argc, char *argv[] )
      /* Create an event buffer for axis and key events. */
      DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_ALL, DFB_FALSE, &event_buffer ));
 
+#ifdef HAVE_MT
+     /* Set multi-touch configuration. */
+     IDirectFBInputDevice *mouse;
+     if (dfb->GetInputDevice( dfb, DIDID_MOUSE, &mouse ) == DFB_OK) {
+          DFBInputDeviceConfig config;
+
+          config.flags     = DIDCONF_MAX_SLOTS;
+          config.max_slots = 2;
+
+          mouse->SetConfiguration( mouse, &config );
+
+          mouse->Release( mouse );
+     }
+#endif
+
+     /* Check if triple buffering is supported. */
+     IDirectFBDisplayLayer *layer;
+     if (dfb->GetDisplayLayer( dfb, DLID_PRIMARY, &layer ) == DFB_OK) {
+          DFBDisplayLayerConfig      config;
+          DFBDisplayLayerConfigFlags ret_failed;
+
+          config.flags      = DLCONF_BUFFERMODE;
+          config.buffermode = DLBM_TRIPLE;
+
+          layer->TestConfiguration( layer, &config, &ret_failed );
+          if (ret_failed == DLCONF_NONE)
+               triple = true;
+
+          layer->Release( layer );
+     }
+
      /* Fill the surface description. */
      sdsc.flags = DSDESC_CAPS;
-     sdsc.caps  = DSCAPS_PRIMARY | DSCAPS_DOUBLE;
+     sdsc.caps  = DSCAPS_PRIMARY | (triple ? DSCAPS_TRIPLE : DSCAPS_DOUBLE);
 
      /* Get the primary surface, i.e. the surface of the primary layer. */
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &primary ));
@@ -707,6 +751,48 @@ int main( int argc, char *argv[] )
 
                               if (evt.buttons & DIBM_RIGHT)
                                    veScale( 1.0f, 1.0f + evt.axisrel * 0.01f, 1.0f );
+
+                              break;
+
+                         default:
+                              break;
+                    }
+               }
+               else if (evt.type == DIET_BUTTONRELEASE) {
+                    axisabs_x[DFB_EVENT_SLOT_ID(evt)] = -1;
+                    axisabs_y[DFB_EVENT_SLOT_ID(evt)] = -1;
+               }
+               else if (evt.type == DIET_AXISMOTION && (evt.flags & DIEF_AXISABS)) {
+                    switch (evt.axis) {
+                         case DIAI_X:
+                              if (evt.buttons & DIBM_LEFT) {
+                                   if (axisabs_x[0] >= 0 && axisabs_x[1] >= 0)
+                                        veScale( 1.0f + SIGN( ABS( evt.axisabs - axisabs_x[!DFB_EVENT_SLOT_ID(evt)] ) -
+                                                              ABS( axisabs_x[1] - axisabs_x[0] ) ) * 0.01f,
+                                                 1.0f, 1.0f );
+                                   else if ((axisabs_x[0] >= 0 && !DFB_EVENT_SLOT_ID(evt)) ||
+                                            (axisabs_x[1] >= 0 &&  DFB_EVENT_SLOT_ID(evt)))
+                                        veTranslate( (evt.axisabs - axisabs_x[DFB_EVENT_SLOT_ID(evt)]) * 0.01f,
+                                                     0.0f, 0.0f );
+
+                                   axisabs_x[DFB_EVENT_SLOT_ID(evt)] = evt.axisabs;
+                              }
+
+                              break;
+
+                         case DIAI_Y:
+                              if (evt.buttons & DIBM_LEFT) {
+                                   if (axisabs_y[0] >= 0 && axisabs_y[1] >= 0)
+                                        veScale( 1.0f,
+                                                 1.0f + SIGN( ABS( evt.axisabs - axisabs_y[!DFB_EVENT_SLOT_ID(evt)] ) -
+                                                              ABS( axisabs_y[1] - axisabs_y[0] ) ) * 0.01f, 1.0f );
+                                   else if ((axisabs_y[0] >= 0 && !DFB_EVENT_SLOT_ID(evt)) ||
+                                            (axisabs_y[1] >= 0 &&  DFB_EVENT_SLOT_ID(evt)))
+                                        veTranslate( 0.0f, 0.0f,
+                                                     (evt.axisabs - axisabs_y[DFB_EVENT_SLOT_ID(evt)]) * 0.01f );
+
+                                   axisabs_y[DFB_EVENT_SLOT_ID(evt)] = evt.axisabs;
+                              }
 
                               break;
 

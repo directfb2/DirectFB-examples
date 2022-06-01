@@ -66,7 +66,7 @@ static int DESTINATION_MASK_HEIGHT;
 #define YSPRITESIZE 60
 
 /* triple buffering */
-static bool triple;
+static bool triple = false;
 
 /* command line options */
 static bool alpha        = false;
