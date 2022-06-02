@@ -1,3 +1,24 @@
+commit 27f0ca6007d7017510ceeb2e11db38ae7acd1112
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Thu Jun 2 15:00:48 2022 +0200
+
+    df_input: Display slot id
+
+commit 40f7c4aa8a47c2da56d095cb0d36f3d5e041ca3b
+Merge: 86f0c96 17e0424
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Wed Jun 1 12:41:55 2022 +0200
+
+    Merge pull request #5 from caramelli/master
+    
+    Add support for multi-touch input device
+
+commit 17e042412de2928428b2b0d44e188d07bda4fdf1
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Wed Jun 1 12:35:59 2022 +0200
+
+    Update ChangeLog
+
 commit 771dfbb23e5ceeb268e4370fc7d97f1cb6f4a672
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Wed Jun 1 12:35:46 2022 +0200

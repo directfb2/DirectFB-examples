@@ -487,7 +487,8 @@ int main( int argc, char *argv[] )
                          default:
                               break;
                     }
-               } else if (evt.type == DIET_KEYRELEASE) {
+               }
+               else if (evt.type == DIET_KEYRELEASE) {
                     switch (evt.key_id) {
                          case DIKI_LEFT:
                          case DIKI_RIGHT:
@@ -502,7 +503,8 @@ int main( int argc, char *argv[] )
                          default:
                               break;
                     }
-               } else if (evt.type == DIET_AXISMOTION && (evt.flags & DIEF_AXISREL)) {
+               }
+               else if (evt.type == DIET_AXISMOTION && (evt.flags & DIEF_AXISREL)) {
                     switch (evt.axis) {
                          case DIAI_X:
                               matrix_rotate( camera, Y, -evt.axisrel / 80.0f );

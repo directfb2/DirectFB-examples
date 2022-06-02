@@ -758,10 +758,6 @@ int main( int argc, char *argv[] )
                               break;
                     }
                }
-               else if (evt.type == DIET_BUTTONRELEASE) {
-                    axisabs_x[DFB_EVENT_SLOT_ID(evt)] = -1;
-                    axisabs_y[DFB_EVENT_SLOT_ID(evt)] = -1;
-               }
                else if (evt.type == DIET_AXISMOTION && (evt.flags & DIEF_AXISABS)) {
                     switch (evt.axis) {
                          case DIAI_X:
@@ -799,6 +795,10 @@ int main( int argc, char *argv[] )
                          default:
                               break;
                     }
+               }
+               else if (evt.type == DIET_BUTTONRELEASE) {
+                    axisabs_x[DFB_EVENT_SLOT_ID(evt)] = -1;
+                    axisabs_y[DFB_EVENT_SLOT_ID(evt)] = -1;
                }
                else if (evt.buttons & DIBM_LEFT) {
                     if (event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 ) == DFB_TIMEOUT) {
