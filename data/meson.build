@@ -25,6 +25,8 @@ examplesdata = [
   'biglogo.dfiff',
   'card.dfiff',
   'colorkeyed.dfiff',
+  'cursor_red.dfiff',
+  'cursor_yellow.dfiff',
   'decker.dgiff',
   'destination_mask.dfiff',
   'dfblogo.dfiff',

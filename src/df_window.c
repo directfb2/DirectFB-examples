@@ -40,8 +40,10 @@ static IDirectFB             *dfb             = NULL;
 static IDirectFBDisplayLayer *layer           = NULL;
 static IDirectFBWindow       *window1         = NULL;
 static IDirectFBSurface      *window_surface1 = NULL;
+static IDirectFBSurface      *cursor_surface1 = NULL;
 static IDirectFBWindow       *window2         = NULL;
 static IDirectFBSurface      *window_surface2 = NULL;
+static IDirectFBSurface      *cursor_surface2 = NULL;
 static IDirectFBEventBuffer  *event_buffer    = NULL;
 static IDirectFBFont         *font            = NULL;
 
@@ -52,8 +54,10 @@ static void dfb_shutdown()
 {
      if (font)            font->Release( font );
      if (event_buffer)    event_buffer->Release( event_buffer );
+     if (cursor_surface2) cursor_surface2->Release( cursor_surface2 );
      if (window_surface2) window_surface2->Release( window_surface2 );
      if (window2)         window2->Release( window2 );
+     if (cursor_surface1) cursor_surface1->Release( cursor_surface1 );
      if (window_surface1) window_surface1->Release( window_surface1 );
      if (window1)         window1->Release( window1 );
      if (layer)           layer->Release( layer );
@@ -70,6 +74,7 @@ int main( int argc, char *argv[] )
 {
      int                     fontheight;
      DFBFontDescription      fdsc;
+     DFBSurfaceDescription   sdsc;
      DFBWindowDescription    wdsc;
      DFBWindowID             id1;
      IDirectFBImageProvider *provider;
@@ -129,12 +134,20 @@ int main( int argc, char *argv[] )
      wdsc.height = 145;
 
      DFBCHECK(layer->CreateWindow( layer, &wdsc, &window1 ));
+
      DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/dfblogo.dfiff", &provider ));
      DFBCHECK(window1->GetSurface( window1, &window_surface1 ));
      provider->RenderTo( provider, window_surface1, NULL );
      window_surface1->SetDrawingFlags( window_surface1, DSDRAW_SRC_PREMULTIPLY );
      window_surface1->SetColor( window_surface1, 0xFF, 0x20, 0x20, 0x90 );
      window_surface1->DrawRectangle( window_surface1, 0, 0, wdsc.width, wdsc.height );
+     provider->Release( provider );
+
+     DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/cursor_red.dfiff", &provider ));
+     provider->GetSurfaceDescription( provider, &sdsc );
+     DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &cursor_surface1 ) );
+     provider->RenderTo( provider, cursor_surface1, NULL );
+     DFBCHECK(window1->SetCursorShape( window1, cursor_surface1, 0, 0 ));
      provider->Release( provider );
 
      /* create window2. */
@@ -144,12 +157,20 @@ int main( int argc, char *argv[] )
      wdsc.height = 200;
 
      DFBCHECK(layer->CreateWindow( layer, &wdsc, &window2 ));
+
      DFBCHECK(window2->GetSurface( window2, &window_surface2 ));
      window_surface2->SetDrawingFlags( window_surface2, DSDRAW_SRC_PREMULTIPLY );
      window_surface2->SetColor( window_surface2, 0x00, 0x30, 0x10, 0xC0 );
      window_surface2->DrawRectangle( window_surface2, 0, 0, wdsc.width, wdsc.height );
      window_surface2->SetColor( window_surface2, 0x80, 0xA0, 0x00, 0x90 );
      window_surface2->FillRectangle( window_surface2, 1, 1, wdsc.width - 2, wdsc.height - 2 );
+
+     DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/cursor_yellow.dfiff", &provider ));
+     provider->GetSurfaceDescription( provider, &sdsc );
+     DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &cursor_surface2 ) );
+     provider->RenderTo( provider, cursor_surface2, NULL );
+     DFBCHECK(window2->SetCursorShape( window2, cursor_surface2, 0, 0 ));
+     provider->Release( provider );
 
      /* create an event buffer */
      DFBCHECK(window1->CreateEventBuffer( window1, &event_buffer ));
