@@ -1,3 +1,24 @@
+commit 53ccb2d47441692be60e0c9f51adf20bd5846a7c
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Wed Jun 29 18:52:22 2022 +0200
+
+    df_window: Restore cursor shape per window
+
+commit faf40489b3702499fb7552b580c2d8076a1171b2
+Merge: 40f7c4a b460920
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Thu Jun 2 15:12:40 2022 +0200
+
+    Merge pull request #6 from caramelli/master
+    
+    df_input: Display slot id
+
+commit b4609206a9922bfb352b0d8fabc7a2f628986840
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Thu Jun 2 15:01:03 2022 +0200
+
+    Update ChangeLog
+
 commit 27f0ca6007d7017510ceeb2e11db38ae7acd1112
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Thu Jun 2 15:00:48 2022 +0200
