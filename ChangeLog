@@ -1,3 +1,24 @@
+commit 6ffbe1376c32f9dfb981787155df40a0d9c5c5ba
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Tue Aug 9 03:13:17 2022 +0200
+
+    df_window: Set cursor flags
+
+commit 6cf3ac289cfcffeda3804d4abdd7e2480132417d
+Merge: faf4048 d373193
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Wed Jun 29 18:55:39 2022 +0200
+
+    Merge pull request #7 from caramelli/master
+    
+    df_window: Restore cursor shape per window
+
+commit d3731931d1044a10918ea7cb437b40c7c96dc168
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Wed Jun 29 18:53:19 2022 +0200
+
+    Update ChangeLog
+
 commit 53ccb2d47441692be60e0c9f51adf20bd5846a7c
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Wed Jun 29 18:52:22 2022 +0200
