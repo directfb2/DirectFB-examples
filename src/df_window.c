@@ -147,6 +147,7 @@ int main( int argc, char *argv[] )
      provider->GetSurfaceDescription( provider, &sdsc );
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &cursor_surface1 ) );
      provider->RenderTo( provider, cursor_surface1, NULL );
+     DFBCHECK(window1->SetCursorFlags( window1, DWCF_NONE ));
      DFBCHECK(window1->SetCursorShape( window1, cursor_surface1, 0, 0 ));
      provider->Release( provider );
 
@@ -169,6 +170,7 @@ int main( int argc, char *argv[] )
      provider->GetSurfaceDescription( provider, &sdsc );
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &cursor_surface2 ) );
      provider->RenderTo( provider, cursor_surface2, NULL );
+     DFBCHECK(window1->SetCursorFlags( window2, DWCF_NONE ));
      DFBCHECK(window2->SetCursorShape( window2, cursor_surface2, 0, 0 ));
      provider->Release( provider );
 
@@ -190,13 +192,13 @@ int main( int argc, char *argv[] )
      /* window1 settings */
      window1->GetID( window1, &id1 );
 
-     window1->RequestFocus( window1 );
-
      window1->RaiseToTop( window1 );
 
      upper = window1;
 
      window1->SetOpacity( window1, 0xFF );
+
+     window1->RequestFocus( window1 );
 
      /* window2 settings */
      window_surface2->SetColor( window_surface2, 0xCF, 0xBF, 0xFF, 0xFF );
@@ -258,6 +260,7 @@ int main( int argc, char *argv[] )
                          case DWET_BUTTONUP:
                               switch (evt.button) {
                                    case DIBI_LEFT:
+                                   case DIBI_RIGHT:
                                         if (grabbed && !evt.buttons) {
                                              window->UngrabPointer( window );
                                              grabbed = 0;
