@@ -1,3 +1,24 @@
+commit e2747e64e07a7db558e5c705dc758f15fbf63f49
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Wed Aug 10 10:50:18 2022 +0200
+
+    df_window: Press 'I' to set/unset invisible cursor
+
+commit c08e01c1599e09044722bfc87b6115e5d7e52a31
+Merge: 6cf3ac2 0f5ed31
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Tue Aug 9 03:55:19 2022 +0200
+
+    Merge pull request #8 from caramelli/master
+    
+    df_window: Set cursor flags
+
+commit 0f5ed31362fed86e3129538d580d209b9ecbe9f8
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Tue Aug 9 03:13:30 2022 +0200
+
+    Update ChangeLog
+
 commit 6ffbe1376c32f9dfb981787155df40a0d9c5c5ba
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Tue Aug 9 03:13:17 2022 +0200

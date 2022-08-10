@@ -79,17 +79,19 @@ int main( int argc, char *argv[] )
      DFBWindowID             id1;
      IDirectFBImageProvider *provider;
      IDirectFBWindow        *upper;
-     IDirectFBWindow        *active    = NULL;
-     int                     rotation  = 0;
-     int                     grabbed   = 0;
-     int                     startx    = 0;
-     int                     starty    = 0;
-     int                     endx      = 0;
-     int                     endy      = 0;
-     int                     winx      = 0;
-     int                     winy      = 0;
-     int                     winupdate = 0;
-     int                     quit      = 0;
+     IDirectFBWindow        *active            = NULL;
+     bool                    invisible_cursor1 = false;
+     bool                    invisible_cursor2 = false;
+     int                     rotation          = 0;
+     int                     grabbed           = 0;
+     int                     startx            = 0;
+     int                     starty            = 0;
+     int                     endx              = 0;
+     int                     endy              = 0;
+     int                     winx              = 0;
+     int                     winy              = 0;
+     int                     winupdate         = 0;
+     int                     quit              = 0;
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));
@@ -170,7 +172,7 @@ int main( int argc, char *argv[] )
      provider->GetSurfaceDescription( provider, &sdsc );
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &cursor_surface2 ) );
      provider->RenderTo( provider, cursor_surface2, NULL );
-     DFBCHECK(window1->SetCursorFlags( window2, DWCF_NONE ));
+     DFBCHECK(window2->SetCursorFlags( window2, DWCF_NONE ));
      DFBCHECK(window2->SetCursorShape( window2, cursor_surface2, 0, 0 ));
      provider->Release( provider );
 
@@ -329,12 +331,27 @@ int main( int argc, char *argv[] )
                                    /* quit main loop */
                                    quit = 1;
                                    break;
+
+                              case DIKS_SMALL_I:
+                                   if (active == window1) {
+                                        invisible_cursor1 = !invisible_cursor1;
+                                        window1->SetCursorFlags( window1,
+                                                                 invisible_cursor1 ? DWCF_INVISIBLE : DWCF_NONE );
+                                   }
+                                   else {
+                                        invisible_cursor2 = !invisible_cursor2;
+                                        window2->SetCursorFlags( window2,
+                                                                 invisible_cursor2 ? DWCF_INVISIBLE : DWCF_NONE );
+                                   }
+                                   break;
+
                               case DIKS_SMALL_R:
                                    if (active) {
                                         rotation = (rotation + 90) % 360;
                                         active->SetRotation( active, rotation );
                                    }
                                    break;
+
                               default:
                                    break;
                          }
