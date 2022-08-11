@@ -38,6 +38,7 @@
 /* DirectFB interfaces */
 static IDirectFB             *dfb             = NULL;
 static IDirectFBDisplayLayer *layer           = NULL;
+static IDirectFBSurface      *cursor_surface  = NULL;
 static IDirectFBWindow       *window1         = NULL;
 static IDirectFBSurface      *window_surface1 = NULL;
 static IDirectFBSurface      *cursor_surface1 = NULL;
@@ -60,7 +61,16 @@ static void dfb_shutdown()
      if (cursor_surface1) cursor_surface1->Release( cursor_surface1 );
      if (window_surface1) window_surface1->Release( window_surface1 );
      if (window1)         window1->Release( window1 );
-     if (layer)           layer->Release( layer );
+     if (layer) {
+          layer->SetCooperativeLevel( layer, DLSCL_ADMINISTRATIVE );
+          layer->SetCursorOpacity( layer, 0xFF );
+          if (cursor_surface) {
+               layer->SetCursorShape( layer, NULL, 0, 0 );
+               cursor_surface->Release( cursor_surface );
+          }
+          layer->SetCooperativeLevel( layer, DLSCL_SHARED );
+          layer->Release( layer );
+     }
      if (dfb)             dfb->Release( dfb );
 }
 
@@ -119,6 +129,18 @@ int main( int argc, char *argv[] )
      /* get the primary display layer */
      DFBCHECK(dfb->GetDisplayLayer( dfb, DLID_PRIMARY, &layer ));
 
+     /* set cursor shape for the primary display layer */
+     if (getenv( "DEFAULT_CURSOR" )) {
+          DFBCHECK(dfb->CreateImageProvider( dfb, getenv( "DEFAULT_CURSOR" ), &provider ));
+          provider->GetSurfaceDescription( provider, &sdsc );
+          DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &cursor_surface ));
+          provider->RenderTo( provider, cursor_surface, NULL );
+          layer->SetCooperativeLevel( layer, DLSCL_ADMINISTRATIVE );
+          DFBCHECK(layer->SetCursorShape( layer, cursor_surface, 0, 0 ));
+          layer->SetCooperativeLevel( layer, DLSCL_SHARED );
+          provider->Release( provider );
+     }
+
      /* fill the window description. */
      wdsc.flags        = DWDESC_CAPS | DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_SURFACE_CAPS;
      wdsc.caps         = DWCAPS_ALPHACHANNEL;
@@ -147,7 +169,7 @@ int main( int argc, char *argv[] )
 
      DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/cursor_red.dfiff", &provider ));
      provider->GetSurfaceDescription( provider, &sdsc );
-     DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &cursor_surface1 ) );
+     DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &cursor_surface1 ));
      provider->RenderTo( provider, cursor_surface1, NULL );
      DFBCHECK(window1->SetCursorFlags( window1, DWCF_NONE ));
      DFBCHECK(window1->SetCursorShape( window1, cursor_surface1, 0, 0 ));
@@ -170,7 +192,7 @@ int main( int argc, char *argv[] )
 
      DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/cursor_yellow.dfiff", &provider ));
      provider->GetSurfaceDescription( provider, &sdsc );
-     DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &cursor_surface2 ) );
+     DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &cursor_surface2 ));
      provider->RenderTo( provider, cursor_surface2, NULL );
      DFBCHECK(window2->SetCursorFlags( window2, DWCF_NONE ));
      DFBCHECK(window2->SetCursorShape( window2, cursor_surface2, 0, 0 ));
@@ -343,6 +365,12 @@ int main( int argc, char *argv[] )
                                         window2->SetCursorFlags( window2,
                                                                  invisible_cursor2 ? DWCF_INVISIBLE : DWCF_NONE );
                                    }
+                                   break;
+
+                              case DIKS_SMALL_O:
+                                   layer->SetCooperativeLevel( layer, DLSCL_ADMINISTRATIVE );
+                                   layer->SetCursorOpacity( layer, sin( direct_clock_get_millis() / 300.0 ) * 85 + 170 );
+                                   layer->SetCooperativeLevel( layer, DLSCL_SHARED );
                                    break;
 
                               case DIKS_SMALL_R:
