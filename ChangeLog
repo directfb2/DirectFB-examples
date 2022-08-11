@@ -1,3 +1,24 @@
+commit f5947d32a1934c622f0877a7ae37ac50b93291c2
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Thu Aug 11 07:15:40 2022 +0200
+
+    df_window: Set cursor shape for the primary display layer
+
+commit bb3f615babb4f3da5b74b7b54144376bc71dce40
+Merge: c08e01c 88c61b2
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Wed Aug 10 10:52:38 2022 +0200
+
+    Merge pull request #9 from caramelli/master
+    
+    df_window: Press 'I' to set/unset invisible cursor
+
+commit 88c61b29663493fb35f92a8ccdde4de0db72b078
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Wed Aug 10 10:50:32 2022 +0200
+
+    Update ChangeLog
+
 commit e2747e64e07a7db558e5c705dc758f15fbf63f49
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Wed Aug 10 10:50:18 2022 +0200
