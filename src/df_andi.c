@@ -388,7 +388,7 @@ static void initialize_direction_frames( PenguinFrame **direction_frames, int yo
           for (i = 0; i < (XTUXSIZE / XSPRITESIZE - 1) ; i++) {
                new_frame = malloc( sizeof(PenguinFrame) );
 
-               new_frame->rect.x = i * XSPRITESIZE;
+               new_frame->rect.x = XSPRITESIZE * i;
                new_frame->rect.y = YSPRITESIZE * yoffset;
                new_frame->rect.w = XSPRITESIZE;
                new_frame->rect.h = YSPRITESIZE;

@@ -82,7 +82,7 @@ static void print_usage()
 
 int main( int argc, char *argv[] )
 {
-     int                     fontheight;
+     int                     fontheight, winx, winy, winwidth, winheight;
      DFBFontDescription      fdsc;
      DFBSurfaceDescription   sdsc;
      DFBWindowDescription    wdsc;
@@ -98,8 +98,6 @@ int main( int argc, char *argv[] )
      int                     starty            = 0;
      int                     endx              = 0;
      int                     endy              = 0;
-     int                     winx              = 0;
-     int                     winy              = 0;
      int                     winupdate         = 0;
      int                     quit              = 0;
 
@@ -212,6 +210,13 @@ int main( int argc, char *argv[] )
      window_surface1->SetFont( window_surface1, font );
 
      window_surface2->SetFont( window_surface2, font );
+
+     /* move the cursor to the center of the window1 */
+     DFBCHECK(window1->GetPosition( window1, &winx, &winy ));
+     DFBCHECK(window1->GetSize( window1, &winwidth, &winheight ));
+     layer->SetCooperativeLevel( layer, DLSCL_ADMINISTRATIVE );
+     DFBCHECK(layer->WarpCursor( layer, winx + (winwidth >> 1), winy + (winheight >> 1) ));
+     layer->SetCooperativeLevel( layer, DLSCL_SHARED );
 
      /* window1 settings */
      window1->GetID( window1, &id1 );
