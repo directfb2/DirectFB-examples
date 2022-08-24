@@ -1,3 +1,39 @@
+commit ece66825b0de0c9180ac3b16b84cfb38c5d4d073
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Wed Aug 24 13:37:30 2022 +0200
+
+    df_window: Press 'P' to disable/enable cursor
+
+commit b3958f30edcd27ce6f4a526d3e6ad33a60a67245
+Merge: abd9d12 29c5a11
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Fri Aug 19 17:13:21 2022 +0200
+
+    Merge pull request #11 from caramelli/master
+    
+    df_window: at startup, move the cursor to the center of the window1
+
+commit 29c5a117706ccd4f8c32e3824cbc20e2ae4aea08
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Fri Aug 19 17:10:37 2022 +0200
+
+    df_window: at startup, move the cursor to the center of the window1
+
+commit abd9d127304c6ab50634d451c27d6aef8f33fec2
+Merge: bb3f615 1fac944
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Thu Aug 11 07:16:58 2022 +0200
+
+    Merge pull request #10 from caramelli/master
+    
+    df_window: Set cursor shape for the primary display layer
+
+commit 1fac944da6497d468604baedc9bd89b3f84c03a6
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Thu Aug 11 07:15:49 2022 +0200
+
+    Update ChangeLog
+
 commit f5947d32a1934c622f0877a7ae37ac50b93291c2
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Thu Aug 11 07:15:40 2022 +0200

@@ -92,6 +92,7 @@ int main( int argc, char *argv[] )
      IDirectFBWindow        *active            = NULL;
      bool                    invisible_cursor1 = false;
      bool                    invisible_cursor2 = false;
+     int                     cursor_enabled    = 1;
      int                     rotation          = 0;
      int                     grabbed           = 0;
      int                     startx            = 0;
@@ -375,6 +376,13 @@ int main( int argc, char *argv[] )
                               case DIKS_SMALL_O:
                                    layer->SetCooperativeLevel( layer, DLSCL_ADMINISTRATIVE );
                                    layer->SetCursorOpacity( layer, sin( direct_clock_get_millis() / 300.0 ) * 85 + 170 );
+                                   layer->SetCooperativeLevel( layer, DLSCL_SHARED );
+                                   break;
+
+                              case DIKS_SMALL_P:
+                                   cursor_enabled = !cursor_enabled;
+                                   layer->SetCooperativeLevel( layer, DLSCL_ADMINISTRATIVE );
+                                   layer->EnableCursor( layer, cursor_enabled );
                                    layer->SetCooperativeLevel( layer, DLSCL_SHARED );
                                    break;
 
