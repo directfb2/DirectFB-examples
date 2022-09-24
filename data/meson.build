@@ -41,6 +41,7 @@ examplesdata = [
   'grid.dfiff',
   'intro.dfiff',
   'joystick.dfiff',
+  'keys.dfiff',
   'laden_bike.dfiff',
   'melted.dfiff',
   'melted_rgb16.dfiff',
