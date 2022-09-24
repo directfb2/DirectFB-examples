@@ -1,3 +1,24 @@
+commit eaecc0fb1c7fc1a723255929a9c1c8802d7cabd4
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Sat Sep 24 11:31:28 2022 +0200
+
+    df_input: Update images to simplify load_image()
+
+commit a4be967abe06d1aee6f469cef584133d3ce889ff
+Merge: b3958f3 3f4a363
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Wed Aug 24 13:38:41 2022 +0200
+
+    Merge pull request #12 from caramelli/master
+    
+    df_window: Press 'P' to disable/enable cursor
+
+commit 3f4a3630293eaec503fe6070522bba2c85a32e19
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Wed Aug 24 13:37:41 2022 +0200
+
+    Update ChangeLog
+
 commit ece66825b0de0c9180ac3b16b84cfb38c5d4d073
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Wed Aug 24 13:37:30 2022 +0200
