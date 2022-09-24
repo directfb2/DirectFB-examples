@@ -510,21 +510,13 @@ static IDirectFBSurface *load_image( const char *filename )
 {
      DFBSurfaceDescription   dsc;
      IDirectFBImageProvider *provider;
-     IDirectFBSurface       *image;
      IDirectFBSurface       *surface;
 
      DFBCHECK(dfb->CreateImageProvider( dfb, filename, &provider ));
      provider->GetSurfaceDescription( provider, &dsc );
-     dsc.pixelformat = DSPF_ARGB;
-     DFBCHECK(dfb->CreateSurface( dfb, &dsc, &image ));
-     provider->RenderTo( provider, image, NULL );
-     provider->Release( provider );
-     DFBCHECK(primary->GetPixelFormat( primary, &dsc.pixelformat ));
      DFBCHECK(dfb->CreateSurface( dfb, &dsc, &surface ));
-     surface->Clear( surface, 0, 0, 0, 0xFF );
-     surface->SetBlittingFlags( surface, DSBLIT_BLEND_ALPHACHANNEL );
-     surface->Blit( surface, image, NULL, 0, 0 );
-     image->Release( image );
+     provider->RenderTo( provider, surface, NULL );
+     provider->Release( provider );
 
      return surface;
 }
@@ -689,7 +681,7 @@ int main( int argc, char *argv[] )
      DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &font_large ));
 
      /* load images */
-     keys_image     = load_image( DATADIR"/gnu-keys.dfiff" );
+     keys_image     = load_image( DATADIR"/keys.dfiff" );
      mouse_image    = load_image( DATADIR"/mouse.dfiff" );
      joystick_image = load_image( DATADIR"/joystick.dfiff" );
 
@@ -764,9 +756,11 @@ int main( int argc, char *argv[] )
                else if (evt.buttons & DIBM_LEFT) {
                     if (event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 ) == DFB_TIMEOUT)
                          break;
+                     else
+                         continue;
                }
-               else
-                    event_buffer->WaitForEvent( event_buffer );
+
+               event_buffer->WaitForEvent( event_buffer );
           }
      }
 

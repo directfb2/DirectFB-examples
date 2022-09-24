@@ -286,15 +286,15 @@ static inline unsigned int myrand()
 
 /**************************************************************************************************/
 
-static const DirectFBPixelFormatNames(format_strings)
+static const DirectFBPixelFormatNames(format_names)
 
 static DFBSurfacePixelFormat parse_pixelformat( const char *format )
 {
      int i;
 
-     for (i = 0; i < D_ARRAY_SIZE(format_strings); i++) {
-          if (!strcmp( format, format_strings[i].name ))
-               return format_strings[i].format;
+     for (i = 0; i < D_ARRAY_SIZE(format_names); i++) {
+          if (!strcmp( format, format_names[i].name ))
+               return format_names[i].format;
      }
 
      return DSPF_UNKNOWN;
