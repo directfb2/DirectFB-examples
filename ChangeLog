@@ -1,3 +1,24 @@
+commit 50d3d8de71c6fc54c1bdd61b73f9dd08a25e358b
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Thu Oct 27 03:46:32 2022 +0200
+
+    Register termination function with atexit()
+
+commit 1933b3809888ade0b7d4ee2cc13e2a37c5d412ca
+Merge: a4be967 2d77f5a
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Sat Sep 24 11:37:20 2022 +0200
+
+    Merge pull request #13 from caramelli/master
+    
+    df_input: Update images to simplify load_image()
+
+commit 2d77f5ae637990881907647cc1d6accbeecf2269
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Sat Sep 24 11:31:57 2022 +0200
+
+    Update ChangeLog
+
 commit eaecc0fb1c7fc1a723255929a9c1c8802d7cabd4
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Sat Sep 24 11:31:28 2022 +0200
