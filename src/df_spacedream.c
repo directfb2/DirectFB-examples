@@ -25,12 +25,12 @@
 #include <math.h>
 
 /* macro for a safe call to DirectFB functions */
-#define DFBCHECK(x...)                                                \
+#define DFBCHECK(x)                                                   \
      do {                                                             \
-          DFBResult err = x;                                          \
-          if (err != DFB_OK) {                                        \
+          DFBResult ret = x;                                          \
+          if (ret != DFB_OK) {                                        \
                fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ ); \
-               DirectFBErrorFatal( #x, err );                         \
+               DirectFBErrorFatal( #x, ret );                         \
           }                                                           \
      } while (0)
 
@@ -357,6 +357,18 @@ static void unload_stars()
           if (stars[i]) stars[i]->Release( stars[i] );
 }
 
+static void deinit_resources()
+{
+     if (projection) free( projection );
+     if (camera)     free( camera );
+
+     unload_stars();
+
+     if (primary)      primary->Release( primary );
+     if (event_buffer) event_buffer->Release( event_buffer );
+     if (dfb)          dfb->Release( dfb );
+}
+
 static void init_resources( int argc, char *argv[] )
 {
      DFBSurfaceDescription dsc;
@@ -372,8 +384,11 @@ static void init_resources( int argc, char *argv[] )
      /* create the main interface */
      DFBCHECK(DirectFBCreate( &dfb ));
 
+     /* register termination function */
+     atexit( deinit_resources );
+
      /* set the cooperative level to DFSCL_FULLSCREEN for exclusive access to the primary layer */
-     dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
+     DFBCHECK( dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN ));
 
      /* create an event buffer for axis and key events. */
      DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_ALL, DFB_FALSE, &event_buffer ));
@@ -392,18 +407,6 @@ static void init_resources( int argc, char *argv[] )
 
      camera     = matrix_new_identity();
      projection = matrix_new_perspective( 400 );
-}
-
-static void deinit_resources()
-{
-     if (projection) free( projection );
-     if (camera)     free( camera );
-
-     unload_stars();
-
-     if (primary)      primary->Release( primary );
-     if (event_buffer) event_buffer->Release( event_buffer );
-     if (dfb)          dfb->Release( dfb );
 }
 
 static void transform_starfield()
@@ -534,8 +537,6 @@ int main( int argc, char *argv[] )
      direct_mutex_unlock( &render_start );
      direct_thread_join( render_loop_thread );
      direct_thread_destroy( render_loop_thread );
-
-     deinit_resources();
 
      return 42;
 }

@@ -25,12 +25,12 @@
 #include <directfb_keynames.h>
 
 /* macro for a safe call to DirectFB functions */
-#define DFBCHECK(x...)                                                \
+#define DFBCHECK(x)                                                   \
      do {                                                             \
-          DFBResult err = x;                                          \
-          if (err != DFB_OK) {                                        \
+          DFBResult ret = x;                                          \
+          if (ret != DFB_OK) {                                        \
                fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ ); \
-               DirectFBErrorFatal( #x, err );                         \
+               DirectFBErrorFatal( #x, ret );                         \
           }                                                           \
      } while (0)
 
@@ -646,8 +646,11 @@ int main( int argc, char *argv[] )
      /* create the main interface */
      DFBCHECK(DirectFBCreate( &dfb ));
 
+     /* register termination function */
+     atexit( dfb_shutdown );
+
      /* set the cooperative level to DFSCL_FULLSCREEN for exclusive access to the primary layer */
-     dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
+     DFBCHECK(dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN ));
 
      /* create a list of input devices */
      dfb->EnumInputDevices( dfb, enum_input_device, &devices );
@@ -769,8 +772,6 @@ int main( int argc, char *argv[] )
           free( devices );
           devices = next;
      }
-
-     dfb_shutdown();
 
      return 42;
 }

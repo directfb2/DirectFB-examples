@@ -25,12 +25,12 @@
 #include <math.h>
 
 /* macro for a safe call to DirectFB functions */
-#define DFBCHECK(x...)                                                \
+#define DFBCHECK(x)                                                   \
      do {                                                             \
-          DFBResult err = x;                                          \
-          if (err != DFB_OK) {                                        \
+          DFBResult ret = x;                                          \
+          if (ret != DFB_OK) {                                        \
                fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ ); \
-               DirectFBErrorFatal( #x, err );                         \
+               DirectFBErrorFatal( #x, ret );                         \
           }                                                           \
      } while (0)
 
@@ -188,8 +188,11 @@ int main( int argc, char *argv[] )
      /* create the main interface */
      DFBCHECK(DirectFBCreate( &dfb ));
 
+     /* register termination function */
+     atexit( cleanup );
+
      /* set the cooperative level to DFSCL_FULLSCREEN for exclusive access to the primary layer */
-     dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
+     DFBCHECK(dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN ));
 
      /* create an event buffer for key events */
      DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_BUTTONS | DICAPS_KEYS, DFB_FALSE, &event_buffer ));
@@ -251,7 +254,6 @@ int main( int argc, char *argv[] )
                if (evt.buttons & DIBM_LEFT) {
                     if (event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 ) == DFB_TIMEOUT) {
                          /* quit main loop */
-                         cleanup();
                          return 42;
                     }
                }
@@ -260,7 +262,6 @@ int main( int argc, char *argv[] )
                          case DIKI_ESCAPE:
                          case DIKI_Q:
                               /* quit main loop */
-                              cleanup();
                               return 42;
 
                          case DIKI_UP:

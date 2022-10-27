@@ -27,12 +27,12 @@
 #include "util.h"
 
 /* macro for a safe call to DirectFB functions */
-#define DFBCHECK(x...)                                                \
+#define DFBCHECK(x)                                                   \
      do {                                                             \
-          DFBResult err = x;                                          \
-          if (err != DFB_OK) {                                        \
+          DFBResult ret = x;                                          \
+          if (ret != DFB_OK) {                                        \
                fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ ); \
-               DirectFBErrorFatal( #x, err );                         \
+               DirectFBErrorFatal( #x, ret );                         \
           }                                                           \
      } while (0)
 
@@ -597,8 +597,11 @@ int main( int argc, char *argv[] )
      /* Create the main interface. */
      DFBCHECK(DirectFBCreate( &dfb ));
 
+     /* Register termination function. */
+     atexit( cleanup );
+
      /* Set the cooperative level to DFSCL_FULLSCREEN for exclusive access to the primary layer. */
-     dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
+     DFBCHECK(dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN ));
 
      /* Create an event buffer for axis and key events. */
      DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_ALL, DFB_FALSE, &event_buffer ));
@@ -802,7 +805,6 @@ int main( int argc, char *argv[] )
                }
                else if (evt.buttons & DIBM_LEFT) {
                     if (event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 ) == DFB_TIMEOUT) {
-                         cleanup();
                          return 42;
                     }
                }
@@ -814,7 +816,6 @@ int main( int argc, char *argv[] )
                          case DIKS_BACK:
                          case DIKS_STOP:
                          case DIKS_EXIT:
-                              cleanup();
                               return 42;
 
                          default:
