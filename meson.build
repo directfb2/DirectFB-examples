@@ -18,7 +18,8 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-project('DirectFB-examples', 'c')
+project('DirectFB-examples', 'c',
+        version: '2.0.0')
 
 examplesdatadir = join_paths(get_option('prefix'), get_option('datadir'), 'directfb-examples')
 

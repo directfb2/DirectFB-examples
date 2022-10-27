@@ -144,6 +144,7 @@ static void generate_palette()
      /* Set new palette data. */
      ret = palette->SetEntries( palette, colors, 256, 0 );
      if (ret) {
+          palette->Release( palette );
           DirectFBError( "SetEntries() failed", ret );
           exit_application( 9 );
      }
@@ -169,6 +170,7 @@ static void fade_out_palette()
      /* Get palette data. */
      ret = palette->GetEntries( palette, colors, 256, 0 );
      if (ret) {
+          palette->Release( palette );
           DirectFBError( "SetEntries() failed", ret );
           return;
      }
@@ -195,6 +197,7 @@ static void fade_out_palette()
           /* Set new palette data. */
           ret = palette->SetEntries( palette, colors, 256, 0 );
           if (ret) {
+               palette->Release( palette );
                DirectFBError( "SetEntries() failed", ret );
                return;
           }

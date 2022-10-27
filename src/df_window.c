@@ -26,12 +26,12 @@
 #include <math.h>
 
 /* macro for a safe call to DirectFB functions */
-#define DFBCHECK(x...)                                                \
+#define DFBCHECK(x)                                                   \
      do {                                                             \
-          DFBResult err = x;                                          \
-          if (err != DFB_OK) {                                        \
+          DFBResult ret = x;                                          \
+          if (ret != DFB_OK) {                                        \
                fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ ); \
-               DirectFBErrorFatal( #x, err );                         \
+               DirectFBErrorFatal( #x, ret );                         \
           }                                                           \
      } while (0)
 
@@ -124,6 +124,9 @@ int main( int argc, char *argv[] )
 
      /* create the main interface */
      DFBCHECK(DirectFBCreate( &dfb ));
+
+     /* register termination function */
+     atexit( dfb_shutdown );
 
      /* get the primary display layer */
      DFBCHECK(dfb->GetDisplayLayer( dfb, DLID_PRIMARY, &layer ));
@@ -448,8 +451,6 @@ int main( int argc, char *argv[] )
                }
           }
      }
-
-     dfb_shutdown();
 
      return 42;
 }

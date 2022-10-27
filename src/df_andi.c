@@ -26,12 +26,12 @@
 #include "util.h"
 
 /* macro for a safe call to DirectFB functions */
-#define DFBCHECK(x...)                                                \
+#define DFBCHECK(x)                                                   \
      do {                                                             \
-          DFBResult err = x;                                          \
-          if (err != DFB_OK) {                                        \
+          DFBResult ret = x;                                          \
+          if (ret != DFB_OK) {                                        \
                fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ ); \
-               DirectFBErrorFatal( #x, err );                         \
+               DirectFBErrorFatal( #x, ret );                         \
           }                                                           \
      } while (0)
 
@@ -433,6 +433,26 @@ static void print_usage()
 }
 
 /*
+ * deinitializes resources and DirectFB
+ */
+static void deinit_resources()
+{
+     destroy_all_penguins();
+
+     if (coords) free( coords );
+
+     if (destination_mask) destination_mask->Release( destination_mask );
+     if (background)       background->Release( background );
+     if (tuximage)         tuximage->Release( tuximage );
+     if (font)             font->Release( font );
+     if (primary)          primary->Release( primary );
+     if (layer)            layer->Release( layer );
+     if (screen)           screen->Release( screen );
+     if (event_buffer)     event_buffer->Release( event_buffer );
+     if (dfb)              dfb->Release( dfb );
+}
+
+/*
  * set up DirectFB and load resources
  */
 static void init_resources( int argc, char *argv[] )
@@ -471,8 +491,11 @@ static void init_resources( int argc, char *argv[] )
      /* create the main interface */
      DFBCHECK(DirectFBCreate( &dfb ));
 
+     /* register termination function */
+     atexit( deinit_resources );
+
      /* set the cooperative level to DFSCL_FULLSCREEN for exclusive access to the primary layer */
-     dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
+     DFBCHECK(dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN ));
 
      /* create an event buffer for key events */
      DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_BUTTONS | DICAPS_KEYS, DFB_FALSE, &event_buffer ));
@@ -537,26 +560,6 @@ static void init_resources( int argc, char *argv[] )
      DESTINATION_MASK_WIDTH  = sdsc.width;
      DESTINATION_MASK_HEIGHT = sdsc.height;
      read_destination_mask();
-}
-
-/*
- * deinitializes resources and DirectFB
- */
-static void deinit_resources()
-{
-     destroy_all_penguins();
-
-     if (coords) free( coords );
-
-     if (destination_mask) destination_mask->Release( destination_mask );
-     if (background)       background->Release( background );
-     if (tuximage)         tuximage->Release( tuximage );
-     if (font)             font->Release( font );
-     if (primary)          primary->Release( primary );
-     if (layer)            layer->Release( layer );
-     if (screen)           screen->Release( screen );
-     if (event_buffer)     event_buffer->Release( event_buffer );
-     if (dfb)              dfb->Release( dfb );
 }
 
 int main( int argc, char *argv[] )
@@ -692,8 +695,6 @@ int main( int argc, char *argv[] )
                }
           }
      }
-
-     deinit_resources();
 
      return 42;
 }

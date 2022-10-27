@@ -23,12 +23,12 @@
 #include <directfb.h>
 
 /* macro for a safe call to DirectFB functions */
-#define DFBCHECK(x...)                                                \
+#define DFBCHECK(x)                                                   \
      do {                                                             \
-          DFBResult err = x;                                          \
-          if (err != DFB_OK) {                                        \
+          DFBResult ret = x;                                          \
+          if (ret != DFB_OK) {                                        \
                fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ ); \
-               DirectFBErrorFatal( #x, err );                         \
+               DirectFBErrorFatal( #x, ret );                         \
           }                                                           \
      } while (0)
 
@@ -41,6 +41,19 @@ static IDirectFBSurface     *primary      = NULL;
 static IDirectFBSurface *maskimage  = NULL;
 static IDirectFBSurface *testimage  = NULL;
 static IDirectFBSurface *testimage2 = NULL;
+
+/*
+ * deinitializes resources and DirectFB
+ */
+static void deinit_resources()
+{
+     if (testimage2)   testimage2->Release( testimage2 );
+     if (testimage)    testimage->Release( testimage );
+     if (maskimage)    maskimage->Release( maskimage );
+     if (primary)      primary->Release( primary );
+     if (event_buffer) event_buffer->Release( event_buffer );
+     if (dfb)          dfb->Release( dfb );
+}
 
 /*
  * set up DirectFB and load resources
@@ -56,8 +69,11 @@ static void init_resources( int argc, char *argv[] )
      /* create the main interface */
      DFBCHECK(DirectFBCreate( &dfb ));
 
+     /* register termination function */
+     atexit( deinit_resources );
+
      /* set the cooperative level to DFSCL_FULLSCREEN for exclusive access to the primary layer */
-     dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
+     DFBCHECK(dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN ));
 
      /* create an event buffer */
      DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_KEYS, DFB_FALSE, &event_buffer ));
@@ -87,19 +103,6 @@ static void init_resources( int argc, char *argv[] )
      DFBCHECK(dfb->CreateSurface( dfb, &dsc, &testimage2 ));
      provider->RenderTo( provider, testimage2, NULL );
      provider->Release( provider );
-}
-
-/*
- * deinitializes resources and DirectFB
- */
-static void deinit_resources()
-{
-     if (testimage2)   testimage2->Release( testimage2 );
-     if (testimage)    testimage->Release( testimage );
-     if (maskimage)    maskimage->Release( maskimage );
-     if (primary)      primary->Release( primary );
-     if (event_buffer) event_buffer->Release( event_buffer );
-     if (dfb)          dfb->Release( dfb );
 }
 
 int main( int argc, char *argv[] )
@@ -188,8 +191,6 @@ int main( int argc, char *argv[] )
                }
           }
      }
-
-     deinit_resources();
 
      return 42;
 }
