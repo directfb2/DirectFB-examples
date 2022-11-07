@@ -88,6 +88,7 @@ int main( int argc, char *argv[] )
      DFBWindowDescription    wdsc;
      DFBWindowID             id1;
      IDirectFBImageProvider *provider;
+     const char             *fontfile;
      IDirectFBWindow        *upper;
      IDirectFBWindow        *active            = NULL;
      bool                    invisible_cursor1 = false;
@@ -100,6 +101,7 @@ int main( int argc, char *argv[] )
      int                     endx              = 0;
      int                     endy              = 0;
      int                     winupdate         = 0;
+     DFBSurfacePixelFormat   fontformat        = DSPF_A8;
      int                     quit              = 0;
 
      /* initialize DirectFB including command line parsing */
@@ -205,10 +207,15 @@ int main( int argc, char *argv[] )
      DFBCHECK(window2->AttachEventBuffer( window2, event_buffer ));
 
      /* load font */
+#ifdef HAVE_GETFONTSURFACEFORMAT
+     DFBCHECK(dfb->GetFontSurfaceFormat( dfb, &fontformat ));
+#endif
+     fontfile = fontformat == DSPF_A8 ? DATADIR"/decker.dgiff" : DATADIR"/decker_argb.dgiff";
+
      fdsc.flags  = DFDESC_HEIGHT;
      fdsc.height = 16;
 
-     DFBCHECK(dfb->CreateFont( dfb, DATADIR"/decker.dgiff", &fdsc, &font ));
+     DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &font ));
      DFBCHECK(font->GetHeight( font, &fontheight ));
 
      window_surface1->SetFont( window_surface1, font );
