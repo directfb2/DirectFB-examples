@@ -1,3 +1,24 @@
+commit 877655dd43f63b925605556948dea9aedb300827
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Mon Nov 7 21:14:02 2022 +0100
+
+    Add ARGB DGIFF font file
+
+commit 0fded686ef966c0bbb071cf97a49f5b44ac1d140
+Merge: 1933b38 c757879
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Thu Oct 27 03:47:14 2022 +0200
+
+    Merge pull request #14 from caramelli/master
+    
+    Register termination function with atexit()
+
+commit c7578797be27c870116306801336941b3e6de9e0
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Thu Oct 27 03:46:38 2022 +0200
+
+    Update ChangeLog
+
 commit 50d3d8de71c6fc54c1bdd61b73f9dd08a25e358b
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Thu Oct 27 03:46:32 2022 +0200
