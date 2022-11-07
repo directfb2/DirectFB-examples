@@ -64,7 +64,7 @@ static bool mouse_pressure[10];
 static int joy_axis[8];
 
 /* command line options */
-static const char *fontfile  = DATADIR"/decker.dgiff";
+static const char *fontfile  = NULL;
 static int         max_slots = 1;
 
 #ifdef HAVE_MT
@@ -613,7 +613,8 @@ int main( int argc, char *argv[] )
      DFBFontDescription     fdsc;
      DFBSurfaceDescription  sdsc;
      int                    n;
-     DeviceInfo            *devices = NULL;
+     DFBSurfacePixelFormat  fontformat = DSPF_A8;
+     DeviceInfo            *devices    = NULL;
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));
@@ -672,6 +673,12 @@ int main( int argc, char *argv[] )
      mouse_pressure[0] = false;
 
      /* load fonts */
+#ifdef HAVE_GETFONTSURFACEFORMAT
+     DFBCHECK(dfb->GetFontSurfaceFormat( dfb, &fontformat ));
+#endif
+     if (!fontfile)
+          fontfile = fontformat == DSPF_A8 ? DATADIR"/decker.dgiff" : DATADIR"/decker_argb.dgiff";
+
      fdsc.flags = DFDESC_HEIGHT;
 
      fdsc.height = CLAMP( (int) (screen_width / 30.0 / 8) * 8, 8, 96 );

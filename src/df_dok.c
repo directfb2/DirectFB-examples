@@ -90,7 +90,7 @@ static DFBSurfacePixelFormat  pixelformat    = DSPF_UNKNOWN;
 static int                    do_system      = 0;
 static int                    do_dump        = 0;
 static int                    do_wait        = 0;
-static const char            *fontfile       = DATADIR"/decker.dgiff";
+static const char            *fontfile       = NULL;
 static int                    do_noaccel     = 0;
 static int                    accel_only     = 0;
 static int                    do_smooth      = 0;
@@ -225,7 +225,7 @@ static Demo demos[] = {
        0, 0, 0, "MPixel/sec", blit_colorkeyed },
      { "Blit destination colorkeyed",
        "Destination color keying is also possible...",
-       "BitBlt with Destination Color Keying", "blit-dst-colorkeyed", true,
+       "BitBlt with Destination Color Keying", "blit-dst-colorkeyed", false,
        0, 0, 0, "MPixel/sec", blit_dst_colorkeyed },
      { "Blit with format conversion",
        "What if the source surface has another format?",
@@ -1185,13 +1185,14 @@ static unsigned long long load_image( long long t )
 
 int main( int argc, char *argv[] )
 {
+     DFBInputEvent            evt;
      DFBFontDescription       fdsc;
      DFBSurfaceDescription    sdsc;
-     IDirectFBImageProvider  *provider;
      int                      i, n;
+     IDirectFBImageProvider  *provider;
+     DFBSurfacePixelFormat    fontformat     = DSPF_A8;
      DFBSurfaceRenderOptions  render_options = DSRO_NONE;
      int                      demo_requested = 0;
-     DFBInputEvent            evt;
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));
@@ -1336,16 +1337,21 @@ int main( int argc, char *argv[] )
 
      DFBCHECK(primary->GetSize( primary, &SW, &SH ));
 
-     /* load bench font */
+     /* load bench and ui fonts */
+#ifdef HAVE_GETFONTSURFACEFORMAT
+     DFBCHECK(dfb->GetFontSurfaceFormat( dfb, &fontformat ));
+#endif
+     if (!fontfile)
+          fontfile = fontformat == DSPF_A8 ? DATADIR"/decker.dgiff" : DATADIR"/decker_argb.dgiff";
+
      fdsc.flags  = DFDESC_HEIGHT;
+
      fdsc.height = 24;
 
      DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &bench_font ));
      DFBCHECK(bench_font->GetHeight( bench_font, &bench_fontheight ));
      DFBCHECK(bench_font->GetStringWidth( bench_font, "This is the DirectFB Benchmarking!!!", -1, &bench_stringwidth ));
 
-     /* load ui font */
-     fdsc.flags  = DFDESC_HEIGHT;
      fdsc.height = 16;
 
      DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &ui_font ));
