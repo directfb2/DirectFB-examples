@@ -1,3 +1,24 @@
+commit e86309b064e2bc511bdc44e0e177c878aae44370
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Sat Dec 3 08:04:11 2022 +0100
+
+    Merge df_drivertest and df_drivertest2
+
+commit 9c11f0d891fc6a0ec6a2308508238b6af5a00588
+Merge: 0fded68 205b450
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Mon Nov 7 21:18:18 2022 +0100
+
+    Merge pull request #15 from caramelli/master
+    
+    Add ARGB DGIFF font file
+
+commit 205b450cc42e1e22a88e84699acad69339147e41
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Mon Nov 7 21:14:12 2022 +0100
+
+    Update ChangeLog
+
 commit 877655dd43f63b925605556948dea9aedb300827
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Mon Nov 7 21:14:02 2022 +0100
