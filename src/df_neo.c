@@ -192,7 +192,7 @@ int main( int argc, char *argv[] )
      atexit( cleanup );
 
      /* set the cooperative level to DFSCL_FULLSCREEN for exclusive access to the primary layer */
-     DFBCHECK(dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN ));
+     dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
 
      /* create an event buffer for key events */
      DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_BUTTONS | DICAPS_KEYS, DFB_FALSE, &event_buffer ));

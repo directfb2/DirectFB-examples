@@ -603,7 +603,7 @@ int main( int argc, char *argv[] )
      atexit( cleanup );
 
      /* Set the cooperative level to DFSCL_FULLSCREEN for exclusive access to the primary layer. */
-     DFBCHECK(dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN ));
+     dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
 
      /* Create an event buffer for axis and key events. */
      DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_ALL, DFB_FALSE, &event_buffer ));

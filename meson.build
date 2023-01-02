@@ -61,5 +61,7 @@ else
   message('multi-touch support not found')
 endif
 
+fusionsound_dep = dependency('fusionsound', required: false)
+
 subdir('data')
 subdir('src')

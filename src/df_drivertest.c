@@ -96,7 +96,7 @@ static void init_resources( int argc, char *argv[], const char *bg_path, int w, 
      atexit( deinit_resources );
 
      /* set the cooperative level to DFSCL_FULLSCREEN for exclusive access to the primary layer */
-     DFBCHECK(dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN ));
+     dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
 
      /* create an event buffer */
      DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_KEYS, DFB_FALSE, &event_buffer ));
