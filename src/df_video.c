@@ -140,7 +140,7 @@ int main( int argc, char *argv[] )
      /* get the primary display layer */
      DFBCHECK(dfb->GetDisplayLayer( dfb, DLID_PRIMARY, &layer ));
 
-     DFBCHECK(layer->SetCooperativeLevel( layer, DLSCL_ADMINISTRATIVE ));
+     layer->SetCooperativeLevel( layer, DLSCL_ADMINISTRATIVE );
 
      DFBCHECK(layer->GetConfiguration( layer, &config ));
      screen_width  = config.width;

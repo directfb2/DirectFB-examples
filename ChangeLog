@@ -1,3 +1,24 @@
+commit dc2eab6217e586ce5c63e49766ebbf3a611de93a
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Mon Jan 2 10:45:57 2023 +0100
+
+    Add FusionSound examples
+
+commit 71f8ee1f1b3d7d3bbfd9a708e60b2ecca919af30
+Merge: 9c11f0d 6468596
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Sat Dec 3 08:08:28 2022 +0100
+
+    Merge pull request #16 from caramelli/master
+    
+    Merge df_drivertest and df_drivertest2
+
+commit 6468596ed5ff6cffc9997dd8c36ea004d8484368
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Sat Dec 3 08:04:28 2022 +0100
+
+    Update ChangeLog
+
 commit e86309b064e2bc511bdc44e0e177c878aae44370
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Sat Dec 3 08:04:11 2022 +0100

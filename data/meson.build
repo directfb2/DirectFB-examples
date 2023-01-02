@@ -63,4 +63,10 @@ examplesdata = [
   'wood_andi.dfiff'
 ]
 
+if fusionsound_dep.found()
+examplesdata += [
+  'test.wav'
+]
+endif
+
 install_data(examplesdata, install_dir: examplesdatadir)
