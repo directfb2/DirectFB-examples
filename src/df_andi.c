@@ -585,7 +585,7 @@ int main( int argc, char *argv[] )
 
      primary->SetDrawingFlags( primary, DSDRAW_BLEND );
 
-     fps_init( &fps  );
+     fps_init( &fps );
      idle_init( &idle );
 
      /* main loop */

@@ -313,7 +313,7 @@ static void print_usage()
      printf( "  --pixelformat <pixelformat>  Set benchmark pixelformat.\n" );
      printf( "  --system                     Do benchmarks in system memory.\n" );
      printf( "  --dump                       Dump output of each benchmark to a file.\n" );
-     printf( "  --wait                       Wait a few seconds after each benchmark.\n" );
+     printf( "  --wait <seconds>             Wait a few seconds after each benchmark.\n" );
      printf( "  --font <filename>            Use the specified font file.\n" );
      printf( "  --noaccel                    Don't use hardware acceleration.\n" );
      printf( "  --accelonly                  Only show accelerated benchmarks.\n" );
@@ -1241,8 +1241,9 @@ int main( int argc, char *argv[] )
                          do_dump = 1;
                          continue;
                     } else
-                    if (strcmp( argv[n] + 2, "wait" ) == 0) {
-                         do_wait = 1;
+                    if (strcmp( argv[n] + 2, "wait" ) == 0 && n + 1 < argc &&
+                        sscanf( argv[n+1], "%d", &do_wait ) == 1) {
+                         n++;
                          continue;
                     } else
                     if (strcmp( argv[n] + 2, "font") == 0 && n + 1 < argc ) {
@@ -1633,7 +1634,7 @@ run:
            }
 
            if (do_wait)
-                sleep( 3 );
+                sleep( do_wait );
      }
 
      /* results screen */

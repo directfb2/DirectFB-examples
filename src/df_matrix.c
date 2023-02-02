@@ -132,7 +132,7 @@ int main( int argc, char *argv[] )
      init_application( argc, argv );
 
      /* Transform coordinates to have 0,0 in the center. */
-     matrix_init( &matrix, 1, 0, 0, 1, width / 2, height / 2  );
+     matrix_init( &matrix, 1, 0, 0, 1, width / 2, height / 2 );
 
      /* Main loop. */
      while (1) {
@@ -189,7 +189,7 @@ int main( int argc, char *argv[] )
           /* Reset to initial transform after 500 frames. */
           if (++i == 500) {
                i = 0;
-               matrix_init( &matrix, 1, 0, 0, 1, width / 2, height / 2  );
+               matrix_init( &matrix, 1, 0, 0, 1, width / 2, height / 2 );
           }
 
           /* Check for new events. */

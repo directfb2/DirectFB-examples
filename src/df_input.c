@@ -527,7 +527,7 @@ typedef struct _DeviceInfo {
      struct _DeviceInfo        *next;
 } DeviceInfo;
 
-static DFBEnumerationResult enum_input_device( DFBInputDeviceID device_id, DFBInputDeviceDescription desc, void *data )
+static DFBEnumerationResult input_device_callback( DFBInputDeviceID device_id, DFBInputDeviceDescription desc, void *data )
 {
      DeviceInfo **devices = data;
      DeviceInfo  *device;
@@ -654,7 +654,7 @@ int main( int argc, char *argv[] )
      dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
 
      /* create a list of input devices */
-     dfb->EnumInputDevices( dfb, enum_input_device, &devices );
+     dfb->EnumInputDevices( dfb, input_device_callback, &devices );
 
      /* create an event buffer for all devices */
      DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_ALL, DFB_FALSE, &event_buffer ));
@@ -744,7 +744,7 @@ int main( int argc, char *argv[] )
                          }
 
                          /* recreate a list of input devices */
-                         dfb->EnumInputDevices( dfb, enum_input_device, &devices );
+                         dfb->EnumInputDevices( dfb, input_device_callback, &devices );
                     }
 
                     primary->Clear( primary, 0, 0, 0, 0 );

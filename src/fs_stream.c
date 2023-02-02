@@ -35,19 +35,14 @@
      } while (0)
 
 /* FusionSound interfaces */
-IFusionSound              *sound    = NULL;
-IFusionSoundMusicProvider *provider = NULL;
-IFusionSoundStream        *stream   = NULL;
+IFusionSound       *sound  = NULL;
+IFusionSoundStream *stream = NULL;
 
 static void cleanup()
 {
      /* Release the sound stream. */
      if (stream)
           stream->Release( stream );
-
-     /* Release the sound provider. */
-     if (provider)
-          provider->Release( provider );
 
      /* Release the main interface. */
      if (sound)
