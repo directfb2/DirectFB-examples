@@ -43,7 +43,7 @@ static void cleanup()
      if (buffer)
           buffer->Release( buffer );
 
-     /* Release the sound provider. */
+     /* Release the music provider. */
      if (provider)
           provider->Release( provider );
 
