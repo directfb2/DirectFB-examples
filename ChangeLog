@@ -1,3 +1,24 @@
+commit 9df82361426bce94c589b45d0bfdc2a852bd7083
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Thu Feb 2 06:35:04 2023 +0100
+
+    df_dok: Add <seconds> argument to --wait option
+
+commit b053b7c8e62c5a45f167f3044143c71af2412305
+Merge: 71f8ee1 795bf42
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Mon Jan 2 10:47:54 2023 +0100
+
+    Merge pull request #17 from caramelli/master
+    
+    Add FusionSound examples
+
+commit 795bf42c947bbf6de1d8c994b168b8b6a2cf6a96
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Mon Jan 2 10:46:38 2023 +0100
+
+    Update ChangeLog
+
 commit dc2eab6217e586ce5c63e49766ebbf3a611de93a
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Mon Jan 2 10:45:57 2023 +0100
