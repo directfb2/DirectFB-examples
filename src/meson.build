@@ -37,6 +37,7 @@ executable('df_video',      'df_video.c',      dependencies: [directfb_dep, libm
 executable('df_window',     'df_window.c',     dependencies: [directfb_dep, libm_dep],    install: true)
 
 if fusionsound_dep.found()
+executable('fs_advanced',   'fs_advanced.c',   dependencies: [fusionsound_dep, libm_dep], install: true)
 executable('fs_buffer',     'fs_buffer.c',     dependencies:  fusionsound_dep,            install: true)
 executable('fs_stream',     'fs_stream.c',     dependencies: [fusionsound_dep, libm_dep], install: true)
 endif

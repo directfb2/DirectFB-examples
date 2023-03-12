@@ -352,8 +352,8 @@ static void revive_penguins()
 static void read_destination_mask()
 {
      int   x, y;
-     void *ptr;
      int   pitch;
+     void *ptr;
 
      coords = calloc( DESTINATION_MASK_WIDTH * DESTINATION_MASK_HEIGHT, sizeof(int) );
 

@@ -75,8 +75,8 @@ static void fill_surface()
 {
      int   x;
      int   y;
-     void *ptr;
      int   pitch;
+     void *ptr;
      u8   *dst;
 
      DFBCHECK(primary->Lock( primary, DSLF_WRITE, &ptr, &pitch ));

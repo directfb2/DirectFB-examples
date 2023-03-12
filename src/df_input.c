@@ -75,7 +75,7 @@ static int         max_slots = 1;
 
 /**************************************************************************************************/
 
-static const DirectFBKeySymbolNames(keynames);
+static const DirectFBKeySymbolNames(symbolnames);
 static const DirectFBKeyIdentifierNames(idnames);
 
 static int compare_symbol( const void *a, const void *b )
@@ -193,7 +193,8 @@ static void show_key_event( DFBInputEvent *evt )
           primary->DrawGlyph( primary, evt->key_symbol, screen_width / 2, screen_height / 2, DSTF_LEFT );
      }
 
-     symbol_name = bsearch( &evt->key_symbol, keynames, D_ARRAY_SIZE(keynames) - 1, sizeof(keynames[0]), compare_symbol );
+     symbol_name = bsearch( &evt->key_symbol, symbolnames, D_ARRAY_SIZE(symbolnames) - 1, sizeof(symbolnames[0]),
+                            compare_symbol );
 
      primary->SetFont( primary, font_normal );
 
@@ -214,7 +215,8 @@ static void show_key_event( DFBInputEvent *evt )
 
      primary->SetFont( primary, font_normal );
 
-     id_name = bsearch( &evt->key_id, idnames, D_ARRAY_SIZE(idnames) - 1, sizeof(idnames[0]), compare_id );
+     id_name = bsearch( &evt->key_id, idnames, D_ARRAY_SIZE(idnames) - 1, sizeof(idnames[0]),
+                        compare_id );
 
      if (id_name) {
           primary->SetColor( primary, 0x60, 0x60, 0x60, 0xFF );

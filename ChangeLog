@@ -1,3 +1,24 @@
+commit f662ce69de1495c0d899f8c0aebda277f5ee72bd
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Sun Mar 12 10:42:59 2023 +0100
+
+    Add fs_advanced example
+
+commit ac3da83384bf2251772ddb9fdcb292c2069aa3e4
+Merge: b053b7c aba8911
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Thu Feb 2 06:38:06 2023 +0100
+
+    Merge pull request #18 from caramelli/master
+    
+    df_dok: Add <seconds> argument to --wait option
+
+commit aba891108a8186b3b48d8b38ab7477662aced14f
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Thu Feb 2 06:35:15 2023 +0100
+
+    Update ChangeLog
+
 commit 9df82361426bce94c589b45d0bfdc2a852bd7083
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Thu Feb 2 06:35:04 2023 +0100
