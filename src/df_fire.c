@@ -217,8 +217,8 @@ static void render_fire()
 {
      DFBResult  ret;
      int        i;
-     void      *surface_data;
      int        surface_pitch;
+     void      *surface_data;
      u8        *fire_data   = data;
      int        fire_height = height;
 

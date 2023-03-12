@@ -25,5 +25,6 @@ The following applications can be run:
 
 And if FusionSound is available:
 
-  fs_buffer     - playback of a static sound
-  fs_stream     - playback of a sine wave
+  fs_advanced   - a program testing advanced playback control
+  fs_buffer     - a static sound playback
+  fs_stream     - a sine wave playback
