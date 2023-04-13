@@ -107,9 +107,9 @@ int main( int argc, char *argv[] )
 static void generate_palette()
 {
      DFBResult         ret;
+     int               i;
      DFBColor          colors[256];
      IDirectFBPalette *palette;
-     int               i;
 
      /* Get access to the palette. */
      ret = surface->GetPalette( surface, &palette );

@@ -114,9 +114,9 @@ int main( int argc, char *argv[] )
      }
 
      if (argc > 1) {
-          if (strcmp( argv[1], "upper") == 0 )
+          if (strcmp( argv[1], "upper" ) == 0)
                stacking_id = DWSC_UPPER;
-          else if (strcmp( argv[1], "lower") == 0 )
+          else if (strcmp( argv[1], "lower" ) == 0)
                stacking_id = DWSC_LOWER;
           else {
                print_usage();

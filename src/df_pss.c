@@ -36,6 +36,7 @@
 
 /* DirectFB interfaces */
 static IDirectFB            *dfb          = NULL;
+static IDirectFBInputDevice *keyboard     = NULL;
 static IDirectFBEventBuffer *event_buffer = NULL;
 static IDirectFBSurface     *primary      = NULL;
 static IDirectFBFont        *font         = NULL;
@@ -43,6 +44,9 @@ static IDirectFBSurface     *smokey_light = NULL;
 
 /* screen width and height */
 static int xres, yres;
+
+/* quit main loop */
+static DFBInputDeviceKeyState quit = DIKS_UP;
 
 static int intro( DirectThread *thread )
 {
@@ -159,26 +163,16 @@ static int demo2( DirectThread *thread )
 }
 
 static int (*demos[])() = { intro, demo1, demo2, NULL };
+static int current_demo = 0;
 
 static void *demos_loop( DirectThread *thread, void *arg )
 {
-     int d = 0;
-
-     while (demos[d]) {
-          demos[d](thread);
-          ++d;
+     while (demos[current_demo]) {
+          demos[current_demo]( thread );
+          ++current_demo;
      }
 
-     /* clear with black */
-     primary->SetColor( primary, 0, 0, 0, 0 );
-     primary->FillRectangle( primary, 0, 0, xres, yres );
-
-     /* ending message */
-     primary->SetColor( primary, 0xff, 0xff, 0xff, 0xff );
-     primary->DrawString( primary, "The End", -1, xres / 2, yres / 2, DSTF_CENTER );
-
-     /* flip display */
-     primary->Flip( primary, NULL, DSFLIP_WAITFORSYNC );
+     quit = DIKS_DOWN;
 
      return NULL;
 }
@@ -189,6 +183,7 @@ static void dfb_shutdown()
      if (font)         font->Release( font );
      if (primary)      primary->Release( primary );
      if (event_buffer) event_buffer->Release( event_buffer );
+     if (keyboard)     keyboard->Release( keyboard );
      if (dfb)          dfb->Release( dfb );
 }
 
@@ -200,7 +195,6 @@ int main( int argc, char *argv[] )
      DirectThread           *demos_loop_thread;
      const char             *fontfile;
      DFBSurfacePixelFormat   fontformat = DSPF_A8;
-     int                     quit = 0;
 
      srand( time( NULL ) );
 
@@ -216,8 +210,9 @@ int main( int argc, char *argv[] )
      /* set the cooperative level to DFSCL_FULLSCREEN for exclusive access to the primary layer */
      dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
 
-     /* create an event buffer for key events */
-     DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_BUTTONS | DICAPS_KEYS, DFB_FALSE, &event_buffer ));
+     /* create an event buffer for keyboard events */
+     DFBCHECK(dfb->GetInputDevice( dfb, DIDID_KEYBOARD, &keyboard ));
+     DFBCHECK(keyboard->CreateEventBuffer( keyboard, &event_buffer ));
 
      /* get the primary surface, i.e. the surface of the primary layer */
      sdsc.flags = DSDESC_CAPS;
@@ -252,36 +247,31 @@ int main( int argc, char *argv[] )
 
      /* main loop */
      while (!quit) {
-          DFBInputEvent evt;
+          event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 );
 
-          event_buffer->WaitForEvent( event_buffer );
-
-          /* process event buffer */
-          while (event_buffer->GetEvent( event_buffer, DFB_EVENT(&evt) ) == DFB_OK) {
-               if (evt.buttons & DIBM_LEFT) {
-                    if (event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 ) == DFB_TIMEOUT) {
-                         /* quit main loop */
-                         quit = 1;
-                    }
-               }
-               else if (evt.type == DIET_KEYPRESS) {
-                    switch (evt.key_id) {
-                         case DIKI_ESCAPE:
-                         case DIKI_Q:
-                              /* quit main loop */
-                              quit = 1;
-                              break;
-
-                         default:
-                              break;
-                    }
-               }
-          }
+          if (!quit)
+               keyboard->GetKeyState( keyboard, DIKI_ESCAPE, &quit );
 
           if (quit) {
-               direct_thread_cancel( demos_loop_thread );
-               direct_thread_join( demos_loop_thread );
-               direct_thread_destroy( demos_loop_thread );
+               if (current_demo == D_ARRAY_SIZE(demos) - 1) {
+                    /* clear with black */
+                    primary->SetColor( primary, 0, 0, 0, 0 );
+                    primary->FillRectangle( primary, 0, 0, xres, yres );
+
+                    /* ending message */
+                    primary->SetColor( primary, 0xff, 0xff, 0xff, 0xff );
+                    primary->DrawString( primary, "The End", -1, xres / 2, yres / 2, DSTF_CENTER );
+
+                    /* flip display */
+                    primary->Flip( primary, NULL, DSFLIP_WAITFORSYNC );
+
+                    sleep( 2 );
+               }
+               else {
+                    direct_thread_cancel( demos_loop_thread );
+                    direct_thread_join( demos_loop_thread );
+                    direct_thread_destroy( demos_loop_thread );
+               }
                break;
           }
      }

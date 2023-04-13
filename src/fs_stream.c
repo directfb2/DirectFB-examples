@@ -51,8 +51,8 @@ static void cleanup()
 
 int main( int argc, char *argv[] )
 {
-     FSStreamDescription dsc;
      int                 i;
+     FSStreamDescription dsc;
      s16                 buf[16384];
 
      /* Initialize FusionSound including command line parsing. */

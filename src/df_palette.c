@@ -112,7 +112,7 @@ int main( int argc, char *argv[] )
      /* register termination function */
      atexit( dfb_shutdown );
 
-     /* create an event buffer for button events */
+     /* create an event buffer for key events */
      DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_BUTTONS | DICAPS_KEYS, DFB_FALSE, &event_buffer ));
 
      /* get the primary surface, i.e. the surface of the primary layer */

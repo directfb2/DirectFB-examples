@@ -25,6 +25,7 @@ executable('df_drivertest', 'df_drivertest.c', dependencies:  directfb_dep,     
 executable('df_fire',       'df_fire.c',       dependencies:  directfb_dep,               install: true)
 executable('df_input',      'df_input.c',      dependencies:  directfb_dep,               install: true)
 executable('df_knuckles',   'df_knuckles.c',   dependencies: [directfb_dep, libm_dep],    install: true)
+executable('df_layers',     'df_layers.c',     dependencies:  directfb_dep,               install: true)
 executable('df_matrix',     'df_matrix.c',     dependencies: [directfb_dep, libm_dep],    install: true)
 executable('df_neo',        'df_neo.c',        dependencies: [directfb_dep, libm_dep],    install: true)
 executable('df_palette',    'df_palette.c',    dependencies:  directfb_dep,               install: true)

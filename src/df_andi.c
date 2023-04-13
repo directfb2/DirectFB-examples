@@ -61,7 +61,7 @@ static int DESTINATION_MASK_HEIGHT;
 /* width of the penguin surface (more that one penguin on it) */
 #define XTUXSIZE 400
 
-/* height and width of one sprite */
+/* width and height of one sprite */
 #define XSPRITESIZE 40
 #define YSPRITESIZE 60
 

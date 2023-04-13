@@ -1,3 +1,24 @@
+commit d296b3f71ffec9471931acfb7b55b53ac6f4853c
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Thu Apr 13 06:16:03 2023 +0200
+
+    Add df_layers example
+
+commit ea5a2e66b0ae61905dc9f966bc13b3e5b9d0255a
+Merge: ac3da83 fc98ab4
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Sun Mar 12 10:47:10 2023 +0100
+
+    Merge pull request #19 from caramelli/master
+    
+    Add fs_advanced example
+
+commit fc98ab4aec05d2ba7207d8ef21241a0bffef06a8
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Sun Mar 12 10:43:06 2023 +0100
+
+    Update ChangeLog
+
 commit f662ce69de1495c0d899f8c0aebda277f5ee72bd
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Sun Mar 12 10:42:59 2023 +0100
