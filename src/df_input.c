@@ -80,10 +80,10 @@ static const DirectFBKeyIdentifierNames(idnames);
 
 static int compare_symbol( const void *a, const void *b )
 {
-     const DFBInputDeviceKeySymbol *symbol  = a;
-     const struct DFBKeySymbolName *symname = b;
+     const DFBInputDeviceKeySymbol *symbol     = a;
+     const struct DFBKeySymbolName *symbolname = b;
 
-     return *symbol - symname->symbol;
+     return *symbol - symbolname->symbol;
 }
 
 static int compare_id( const void *a, const void *b )
@@ -315,8 +315,8 @@ static void show_mouse_buttons( DFBInputEvent *evt )
 
 static void show_mouse_event( DFBInputEvent *evt )
 {
-     char buf[32];
      int  i;
+     char buf[32];
 
      show_mouse_buttons( evt );
 
@@ -529,7 +529,8 @@ typedef struct _DeviceInfo {
      struct _DeviceInfo        *next;
 } DeviceInfo;
 
-static DFBEnumerationResult input_device_callback( DFBInputDeviceID device_id, DFBInputDeviceDescription desc, void *data )
+static DFBEnumerationResult
+input_device_callback( DFBInputDeviceID device_id, DFBInputDeviceDescription desc, void *data )
 {
      DeviceInfo **devices = data;
      DeviceInfo  *device;
@@ -537,8 +538,8 @@ static DFBEnumerationResult input_device_callback( DFBInputDeviceID device_id, D
 #ifdef HAVE_MT
      /* set input device configuration */
      if ((desc.type & DIDTF_MOUSE) && (max_slots > 1)) {
-          IDirectFBInputDevice *mouse;
           DFBInputDeviceConfig  config;
+          IDirectFBInputDevice *mouse;
 
           DFBCHECK(dfb->GetInputDevice( dfb, device_id, &mouse ));
 
@@ -628,15 +629,16 @@ int main( int argc, char *argv[] )
                     print_usage();
                     return 0;
                }
-               else if (strcmp( argv[n] + 2, "font" ) == 0 && ++n < argc && argv[n]) {
-                    fontfile = argv[n];
+               else if (strcmp( argv[n] + 2, "font" ) == 0 && n + 1 < argc) {
+                    fontfile = argv[n+1];
+                    n++;
                     continue;
                }
-               else if (strcmp( argv[n] + 2, "slots" ) == 0 && ++n < argc && argv[n]) {
+               else if (strcmp( argv[n] + 2, "slots" ) == 0 && ++n < argc) {
                     max_slots = atoi( argv[n] );
                     if (max_slots > 10) {
                          print_usage();
-                         return 0;
+                         return 1;
                     }
                     continue;
                }

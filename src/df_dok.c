@@ -1141,11 +1141,11 @@ static unsigned long long stretch_blit_colorkeyed( long long t )
 
 static unsigned long long load_image( long long t )
 {
+     int                     i;
      DFBSurfaceDescription   dsc;
+     char                    buf[32];
      IDirectFBImageProvider *provider;
      IDirectFBSurface       *surface = NULL;
-     int                     i;
-     char                    buf[128];
 
      if (!imagefile || accel_only)
           return 0;
@@ -1228,7 +1228,7 @@ int main( int argc, char *argv[] )
                          n++;
                          continue;
                     } else
-                    if (strcmp( argv[n] + 2, "pixelformat") == 0 && n + 1 < argc ) {
+                    if (strcmp( argv[n] + 2, "pixelformat" ) == 0 && n + 1 < argc) {
                          pixelformat = parse_pixelformat( argv[n+1] );
                          n++;
                          continue;
@@ -1246,7 +1246,7 @@ int main( int argc, char *argv[] )
                          n++;
                          continue;
                     } else
-                    if (strcmp( argv[n] + 2, "font") == 0 && n + 1 < argc ) {
+                    if (strcmp( argv[n] + 2, "font" ) == 0 && n + 1 < argc) {
                          fontfile = argv[n+1];
                          n++;
                          continue;
@@ -1295,7 +1295,7 @@ int main( int argc, char *argv[] )
                          with_intro = 1;
                          continue;
                     } else
-                    if (strcmp( argv[n] + 2, "load-image") == 0 && ++n < argc && argv[n] ) {
+                    if (strcmp( argv[n] + 2, "load-image" ) == 0 && ++n < argc) {
                          imagefile = argv[n];
                          demo_requested = 1;
                          demos[D_ARRAY_SIZE(demos)-1].requested = 1;

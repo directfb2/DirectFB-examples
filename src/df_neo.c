@@ -147,7 +147,7 @@ static void cleanup()
      if (sub)
           sub->Release( sub );
 
-     /* release the test images */
+     /* release test images */
      for (i = 0; i < D_ARRAY_SIZE(image_names); i++)
           if (images[i])
                images[i]->Release( images[i] );
@@ -171,16 +171,15 @@ static void cleanup()
 
 int main( int argc, char *argv[] )
 {
+     int                     i;
      DFBSurfaceDescription   dsc;
      DFBRectangle            rect;
      IDirectFBImageProvider *provider;
-     int                     i;
      unsigned int            cycle_len   = CYCLE_LEN;
      unsigned int            frame_delay = FRAME_DELAY;
 
-     /* initialize the array of pointers for the test images */
-     for (i = 0; i < D_ARRAY_SIZE(image_names); i++)
-          images[i] = NULL;
+     /* initialize test images */
+     memset( images, 0, sizeof(images) );
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));
@@ -221,7 +220,7 @@ int main( int argc, char *argv[] )
      primary->Flip( primary, NULL, DSFLIP_NONE );
      primary->TileBlit( primary, background, NULL, rect.x, rect.y );
 
-     /* load the test images */
+     /* load test images */
      for (i = 0; i < D_ARRAY_SIZE(image_names); i++) {
           DFBCHECK(dfb->CreateImageProvider( dfb, image_names[i], &provider ));
           provider->GetSurfaceDescription( provider, &dsc );

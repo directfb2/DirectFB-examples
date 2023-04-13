@@ -12,6 +12,7 @@ The following applications can be run:
   df_fire       - a fire effect demo
   df_input      - a test application for input devices
   df_knuckles   - a 3D skull drawn using triangles
+  df_layers     - a program to test the different layers
   df_matrix     - a transformation matrix example
   df_neo        - a scaling animation with alpha blending / color modulation
   df_palette    - a palette example

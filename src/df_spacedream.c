@@ -319,10 +319,10 @@ static void *render_loop( DirectThread *thread, void *arg )
 
 static void load_stars()
 {
-     DFBSurfaceDescription   dsc;
-     IDirectFBImageProvider *provider;
-     char                    name[strlen( DATADIR"/star.dfiff" ) + 4];
      int                     i;
+     DFBSurfaceDescription   dsc;
+     char                    name[strlen( DATADIR"/star.dfiff" ) + 4];
+     IDirectFBImageProvider *provider;
 
      for (i = 0; i < NUM_STARS; i++) {
           sprintf( name, DATADIR"/star%d.dfiff", i+1 );
@@ -372,11 +372,9 @@ static void deinit_resources()
 static void init_resources( int argc, char *argv[] )
 {
      DFBSurfaceDescription dsc;
-     int                   i;
 
-     /* initialize the array of pointers for stars */
-     for (i = 0; i < NUM_STARS; i++)
-          stars[i] = NULL;
+     /* initialize stars */
+     memset( stars, 0, sizeof(stars) );
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));
