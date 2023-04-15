@@ -189,6 +189,7 @@ static void dfb_shutdown()
 
 int main( int argc, char *argv[] )
 {
+     DFBResult               ret;
      DFBFontDescription      fdsc;
      DFBSurfaceDescription   sdsc;
      IDirectFBImageProvider *provider;
@@ -211,8 +212,9 @@ int main( int argc, char *argv[] )
      dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
 
      /* create an event buffer for keyboard events */
-     DFBCHECK(dfb->GetInputDevice( dfb, DIDID_KEYBOARD, &keyboard ));
-     DFBCHECK(keyboard->CreateEventBuffer( keyboard, &event_buffer ));
+     ret = dfb->GetInputDevice( dfb, DIDID_KEYBOARD, &keyboard );
+     if (ret == DFB_OK)
+          DFBCHECK(keyboard->CreateEventBuffer( keyboard, &event_buffer ));
 
      /* get the primary surface, i.e. the surface of the primary layer */
      sdsc.flags = DSDESC_CAPS;
@@ -247,10 +249,12 @@ int main( int argc, char *argv[] )
 
      /* main loop */
      while (!quit) {
-          event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 );
+          if (event_buffer) {
+               event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 );
 
-          if (!quit)
-               keyboard->GetKeyState( keyboard, DIKI_ESCAPE, &quit );
+               if (!quit)
+                    keyboard->GetKeyState( keyboard, DIKI_ESCAPE, &quit );
+          }
 
           if (quit) {
                if (current_demo == D_ARRAY_SIZE(demos) - 1) {

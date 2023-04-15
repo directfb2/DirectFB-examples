@@ -1,3 +1,24 @@
+commit e0903231f8daf24669a3c43b4f1686cb7ddf013a
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Sat Apr 15 14:21:36 2023 +0200
+
+    df_layers: Add --iterations option
+
+commit 4dad7a73c0b8601707c0b18cc930d047acafeb19
+Merge: ea5a2e6 c1cf367
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Thu Apr 13 06:22:00 2023 +0200
+
+    Merge pull request #20 from caramelli/master
+    
+    Add df_layers example
+
+commit c1cf367aafe5000612af003ecd05880f88567048
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Thu Apr 13 06:16:10 2023 +0200
+
+    Update ChangeLog
+
 commit d296b3f71ffec9471931acfb7b55b53ac6f4853c
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Thu Apr 13 06:16:03 2023 +0200
