@@ -58,6 +58,7 @@ static DFBColor colors[] = {
 };
 
 /* command line options */
+static int                   iterations   = 1000;
 static int                   plane_width  = 320;
 static int                   plane_height = 240;
 static DFBSurfacePixelFormat pixelformat  = DSPF_ARGB;
@@ -184,6 +185,7 @@ static void print_usage()
      printf( "DirectFB Layers Demo\n\n" );
      printf( "Usage: df_layers [options]\n\n" );
      printf( "Options:\n\n" );
+     printf( "  --iterations <num>           Number of iterations.\n" );
      printf( "  --size <width>x<height>      Set plane size.\n" );
      printf( "  --pixelformat <pixelformat>  Set plane pixelformat.\n" );
      printf( "  --planes <num>               Number of planes.\n" );
@@ -193,6 +195,7 @@ static void print_usage()
 
 int main( int argc, char *argv[] )
 {
+     DFBResult              ret;
      int                    n;
      DFBFontDescription     fdsc;
      const char            *fontfile;
@@ -210,6 +213,11 @@ int main( int argc, char *argv[] )
                if (strcmp( argv[n] + 2, "help" ) == 0) {
                     print_usage();
                     exit( 0 );
+               }
+               else if (strcmp( argv[n] + 2, "iterations" ) == 0 && n + 1 < argc &&
+                   sscanf( argv[n+1], "%d", &iterations ) == 1) {
+                    n++;
+                    continue;
                }
                else if (strcmp( argv[n] + 2, "size" ) == 0 && n + 1 < argc &&
                         sscanf( argv[n+1], "%dx%d", &plane_width, &plane_height ) == 2) {
@@ -242,8 +250,9 @@ int main( int argc, char *argv[] )
      atexit( dfb_shutdown );
 
      /* create an event buffer for mouse events */
-     DFBCHECK(dfb->GetInputDevice( dfb, DIDID_MOUSE, &mouse ));
-     DFBCHECK(mouse->CreateEventBuffer( mouse, &event_buffer ));
+     ret = dfb->GetInputDevice( dfb, DIDID_MOUSE, &mouse );
+     if (ret == DFB_OK)
+          DFBCHECK(mouse->CreateEventBuffer( mouse, &event_buffer ));
 
      /* get the primary screen */
      DFBCHECK(dfb->GetScreen( dfb, DSCID_PRIMARY, &screen ));
@@ -265,15 +274,17 @@ int main( int argc, char *argv[] )
      screen->EnumDisplayLayers( screen, display_layer_callback, NULL );
 
      /* main loop */
-     while (1) {
-          DFBInputEvent evt;
+     while (iterations--) {
+          if (event_buffer) {
+               DFBInputEvent evt;
 
-          /* process event buffer */
-          while (event_buffer->GetEvent( event_buffer, DFB_EVENT(&evt) ) == DFB_OK) {
-               if (evt.buttons & DIBM_LEFT) {
-                    if (event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 ) == DFB_TIMEOUT) {
-                         /* quit main loop */
-                         return 42;
+               /* process event buffer */
+               while (event_buffer->GetEvent( event_buffer, DFB_EVENT(&evt) ) == DFB_OK) {
+                    if (evt.buttons & DIBM_LEFT) {
+                         if (event_buffer->WaitForEventWithTimeout( event_buffer, 2, 0 ) == DFB_TIMEOUT) {
+                              /* quit main loop */
+                              return 42;
+                         }
                     }
                }
           }
@@ -302,6 +313,5 @@ int main( int argc, char *argv[] )
           }
      }
 
-     /* shouldn't reach this */
-     return 0;
+     return 42;
 }
