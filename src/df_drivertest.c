@@ -22,6 +22,12 @@
 
 #include <directfb.h>
 
+#ifdef USE_IMAGE_HEADERS
+#include "grid.h"
+#include "laden_bike.h"
+#include "mask.h"
+#endif
+
 /* macro for a safe call to DirectFB functions */
 #define DFBCHECK(x)                                                   \
      do {                                                             \
@@ -42,8 +48,27 @@ static IDirectFBSurface *background = NULL;
 static IDirectFBSurface *testimage  = NULL;
 static IDirectFBSurface *testimage2 = NULL;
 
+/* background */
+typedef enum {
+  GRID_BG,
+  MASK_BG
+} Background;
+
+#ifdef USE_IMAGE_HEADERS
+static const void *bg_data[] = {
+     grid_data, mask_data
+};
+static unsigned int bg_length[] = {
+     sizeof(grid_data), sizeof(mask_data)
+};
+#else
+static const char *bg_names[] = {
+     "grid.dfiff", "mask.dfiff"
+};
+#endif
+
 /*
- * deinitializes resources and DirectFB
+ * deinitializes test resources
  */
 static void deinit_resources()
 {
@@ -61,30 +86,85 @@ static void deinit_resources()
           background->Release( background );
           background = NULL;
      }
-
-     if (primary) {
-          primary->Release( primary );
-          primary = NULL;
-     }
-
-     if (event_buffer) {
-          event_buffer->Release( event_buffer );
-          event_buffer = NULL;
-     }
-
-     if (dfb) {
-          dfb->Release( dfb );
-          dfb = NULL;
-     }
 }
 
 /*
- * set up DirectFB and load resources
+ * initializes test resources
  */
-static void init_resources( int argc, char *argv[], const char *bg_path, int w, int h, int w2, int h2 )
+static void init_resources( Background bg, int w, int h, int w2, int h2 )
 {
-     DFBSurfaceDescription   dsc;
-     IDirectFBImageProvider *provider;
+     DFBSurfaceDescription     sdsc;
+#ifdef USE_IMAGE_HEADERS
+     DFBDataBufferDescription  ddsc;
+     IDirectFBDataBuffer      *buffer;
+#else
+     int                       path_length;
+     char                     *imagefile;
+#endif
+     IDirectFBImageProvider   *provider;
+
+     /* load the background image */
+#ifdef USE_IMAGE_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = bg_data[bg];
+     ddsc.memory.length = bg_length[bg];
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+     path_length = strlen( DATADIR ) + 1 + strlen( bg_names[bg] ) + 1;
+     imagefile   = alloca( path_length );
+     snprintf( imagefile, path_length, DATADIR"/%s", bg_names[bg] );
+     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
+     provider->GetSurfaceDescription( provider, &sdsc );
+     DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &background ));
+     provider->RenderTo( provider, background, NULL );
+     provider->Release( provider );
+
+     /* create a surface and render an image to it */
+#ifdef USE_IMAGE_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = laden_bike_data;
+     ddsc.memory.length = sizeof(laden_bike_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+     imagefile = DATADIR"/laden_bike.dfiff";
+     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
+     provider->GetSurfaceDescription( provider, &sdsc );
+     sdsc.width  = w;
+     sdsc.height = h;
+     DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &testimage ));
+     provider->RenderTo( provider, testimage, NULL );
+     sdsc.width  = w2;
+     sdsc.height = h2;
+     DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &testimage2 ));
+     provider->RenderTo( provider, testimage2, NULL );
+     provider->Release( provider );
+}
+
+static void cleanup()
+{
+     deinit_resources();
+
+     if (primary)
+          primary->Release( primary );
+
+     if (event_buffer)
+          event_buffer->Release( event_buffer );
+
+     if (dfb)
+          dfb->Release( dfb );
+}
+
+int main( int argc, char *argv[] )
+{
+     int                     quit;
+     DFBSurfaceDescription   desc;
+     int                     clip_enabled  = 0;
+     DFBRegion               clipreg       = { 128, 128, 384 + 128 - 1, 256 + 128 - 1 };
+     DFBSurfaceBlittingFlags blittingflags = DSBLIT_NOFX;
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));
@@ -93,7 +173,7 @@ static void init_resources( int argc, char *argv[], const char *bg_path, int w, 
      DFBCHECK(DirectFBCreate( &dfb ));
 
      /* register termination function */
-     atexit( deinit_resources );
+     atexit( cleanup );
 
      /* set the cooperative level to DFSCL_FULLSCREEN for exclusive access to the primary layer */
      dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
@@ -102,40 +182,13 @@ static void init_resources( int argc, char *argv[], const char *bg_path, int w, 
      DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_KEYS, DFB_FALSE, &event_buffer ));
 
      /* get the primary surface, i.e. the surface of the primary layer */
-     dsc.flags = DSDESC_CAPS;
-     dsc.caps  = DSCAPS_PRIMARY | DSCAPS_DOUBLE;
+     desc.flags = DSDESC_CAPS;
+     desc.caps  = DSCAPS_PRIMARY | DSCAPS_DOUBLE;
 
-     DFBCHECK(dfb->CreateSurface( dfb, &dsc, &primary ));
+     DFBCHECK(dfb->CreateSurface( dfb, &desc, &primary ));
 
-     /* load the background image */
-     DFBCHECK(dfb->CreateImageProvider( dfb, bg_path, &provider ));
-     provider->GetSurfaceDescription( provider, &dsc );
-     DFBCHECK(dfb->CreateSurface( dfb, &dsc, &background ));
-     provider->RenderTo( provider, background, NULL );
-     provider->Release( provider );
-
-     /* create a surface and render an image to it */
-     DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/laden_bike.dfiff", &provider ));
-     provider->GetSurfaceDescription( provider, &dsc );
-     dsc.width  = w;
-     dsc.height = h;
-     DFBCHECK(dfb->CreateSurface( dfb, &dsc, &testimage ));
-     provider->RenderTo( provider, testimage, NULL );
-     dsc.width  = w2;
-     dsc.height = h2;
-     DFBCHECK(dfb->CreateSurface( dfb, &dsc, &testimage2 ));
-     provider->RenderTo( provider, testimage2, NULL );
-     provider->Release( provider );
-}
-
-int main( int argc, char *argv[] )
-{
-     int                     quit;
-     int                     clip_enabled  = 0;
-     DFBRegion               clipreg       = { 128, 128, 384 + 128 - 1, 256 + 128 - 1 };
-     DFBSurfaceBlittingFlags blittingflags = DSBLIT_NOFX;
-
-     init_resources( argc, argv, DATADIR"/mask.dfiff", 128, 128, 111, 77 );
+     /* test1 init */
+     init_resources( MASK_BG, 128, 128, 111, 77 );
 
      quit = 0;
      primary->Clear( primary, 0x00, 0x00, 0x00, 0xFF );
@@ -226,7 +279,8 @@ int main( int argc, char *argv[] )
 
      deinit_resources();
 
-     init_resources( argc, argv, DATADIR"/grid.dfiff", 128, 256, 192, 96 );
+     /* test2 init */
+     init_resources( GRID_BG, 128, 256, 192, 96 );
 
      quit = 0;
      primary->Clear( primary, 0x00, 0x00, 0x00, 0xFF );
@@ -299,13 +353,13 @@ int main( int argc, char *argv[] )
                               drect.y = 32;
                               drect.w = 2.5 * 64;
                               drect.h = 2.5 * 64;
-                              primary->StretchBlit( primary, testimage2, NULL, &drect );
+                              primary->StretchBlit( primary, testimage, NULL, &drect );
                               drect.x = 384;
-                              primary->StretchBlit( primary, testimage2, NULL, &drect );
+                              primary->StretchBlit( primary, testimage, NULL, &drect );
                               drect.y = 320;
-                              primary->StretchBlit( primary, testimage2, NULL, &drect );
+                              primary->StretchBlit( primary, testimage, NULL, &drect );
                               drect.x = 96;
-                              primary->StretchBlit( primary, testimage2, NULL, &drect );
+                              primary->StretchBlit( primary, testimage, NULL, &drect );
 
                               primary->Flip( primary, NULL, DSFLIP_WAITFORSYNC );
                               break;

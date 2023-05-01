@@ -24,6 +24,14 @@
 #include <directfb.h>
 #include <math.h>
 
+#ifdef USE_IMAGE_HEADERS
+#include "panel.h"
+#endif
+
+#ifdef USE_VIDEO_HEADERS
+#include "bbb.h"
+#endif
+
 /* macro for a safe call to DirectFB functions */
 #define DFBCHECK(x)                                                   \
      do {                                                             \
@@ -114,10 +122,20 @@ static void print_usage()
 
 int main( int argc, char *argv[] )
 {
-     DFBDisplayLayerConfig   config;
-     DFBSurfaceDescription   sdsc;
-     DFBWindowDescription    wdsc;
-     IDirectFBImageProvider *provider;
+     DFBDisplayLayerConfig     config;
+     DFBSurfaceDescription     sdsc;
+     DFBWindowDescription      wdsc;
+#if defined(USE_IMAGE_HEADERS) || defined(USE_VIDEO_HEADERS)
+     DFBDataBufferDescription  ddsc;
+     IDirectFBDataBuffer      *buffer;
+#endif
+#ifndef USE_IMAGE_HEADERS
+     const char               *imagefile;
+#endif
+#ifndef USE_VIDEO_HEADERS
+     const char               *videofile;
+#endif
+     IDirectFBImageProvider   *provider;
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));
@@ -147,7 +165,16 @@ int main( int argc, char *argv[] )
      screen_height = config.height;
 
      /* video window */
-     DFBCHECK(dfb->CreateVideoProvider( dfb, argc > 1 ? argv[1] : DATADIR"/bbb.dfvff", &videoprovider ));
+#ifdef USE_VIDEO_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = bbb_data;
+     ddsc.memory.length = sizeof(bbb_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateVideoProvider( buffer, &videoprovider ));
+#else
+     videofile = DATADIR"/bbb.dfvff";
+     DFBCHECK(dfb->CreateVideoProvider( dfb, argc > 1 ? argv[1] : videofile, &videoprovider ));
+#endif
      videoprovider->GetSurfaceDescription( videoprovider, &sdsc );
      wdsc.flags  = DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT;
      wdsc.posx   = 0;
@@ -161,7 +188,16 @@ int main( int argc, char *argv[] )
      videoprovider->PlayTo( videoprovider, videosurface, NULL, NULL, NULL );
 
      /* panel window */
-     DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/panel.dfiff", &provider ));
+#ifdef USE_IMAGE_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = panel_data;
+     ddsc.memory.length = sizeof(panel_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+     imagefile = DATADIR"/panel.dfiff";
+     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      wdsc.flags  = DWDESC_CAPS | DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT;
      wdsc.caps   = DWCAPS_ALPHACHANNEL;

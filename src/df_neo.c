@@ -24,6 +24,18 @@
 #include <directfb.h>
 #include <math.h>
 
+#ifdef USE_IMAGE_HEADERS
+#include "apple-red.h"
+#include "background.h"
+#include "gnome-applets.h"
+#include "gnome-calendar.h"
+#include "gnome-foot.h"
+#include "gnome-gimp.h"
+#include "gnome-gmush.h"
+#include "gnome-gsame.h"
+#include "gnu-keys.h"
+#endif
+
 /* macro for a safe call to DirectFB functions */
 #define DFBCHECK(x)                                                   \
      do {                                                             \
@@ -45,20 +57,55 @@ static int               back_width;
 static int               back_height;
 
 /* test images */
-static const char *image_names[] = {
-     DATADIR"/apple-red.dfiff",
-     DATADIR"/gnome-applets.dfiff",
-     DATADIR"/gnome-calendar.dfiff",
-     DATADIR"/gnome-foot.dfiff",
-     DATADIR"/gnome-gmush.dfiff",
-     DATADIR"/gnome-gimp.dfiff",
-     DATADIR"/gnome-gsame.dfiff",
-     DATADIR"/gnu-keys.dfiff"
-};
+typedef enum {
+  APPLE_RED,
+  GNOME_APPLETS,
+  GNOME_CALENDAR,
+  GNOME_FOOT,
+  GNOME_GMUSH,
+  GNOME_GIMP,
+  GNOME_GSAME,
+  GNU_KEYS,
+  NUM_IMAGES
+} Image;
 
-static IDirectFBSurface *images[D_ARRAY_SIZE(image_names)];
-static int               image_widths[D_ARRAY_SIZE(image_names)];
-static int               image_heights[D_ARRAY_SIZE(image_names)];
+#ifdef USE_IMAGE_HEADERS
+static const void *image_data[] = {
+     apple_red_data,
+     gnome_applets_data,
+     gnome_calendar_data,
+     gnome_foot_data,
+     gnome_gmush_data,
+     gnome_gimp_data,
+     gnome_gsame_data,
+     gnu_keys_data
+};
+static unsigned int image_length[] = {
+     sizeof(apple_red_data),
+     sizeof(gnome_applets_data),
+     sizeof(gnome_calendar_data),
+     sizeof(gnome_foot_data),
+     sizeof(gnome_gmush_data),
+     sizeof(gnome_gimp_data),
+     sizeof(gnome_gsame_data),
+     sizeof(gnu_keys_data)
+};
+#else
+static const char *image_names[] = {
+     "apple-red.dfiff",
+     "gnome-applets.dfiff",
+     "gnome-calendar.dfiff",
+     "gnome-foot.dfiff",
+     "gnome-gmush.dfiff",
+     "gnome-gimp.dfiff",
+     "gnome-gsame.dfiff",
+     "gnu-keys.dfiff"
+};
+#endif
+
+static IDirectFBSurface *images[NUM_IMAGES];
+static int               image_widths[NUM_IMAGES];
+static int               image_heights[NUM_IMAGES];
 
 /* primary subsurface */
 static IDirectFBSurface *sub = NULL;
@@ -78,7 +125,7 @@ static long frame_num = 0;
 
 static void render( unsigned int cycle_len )
 {
-     int                     i;
+     int                     n;
      float                   f;
      float                   xmid, ymid;
      float                   radius;
@@ -101,7 +148,7 @@ static void render( unsigned int cycle_len )
 
      radius = MIN( xmid, ymid ) / 2.0f;
 
-     for (i = 0; i < D_ARRAY_SIZE(image_names); i++) {
+     for (n = 0; n < NUM_IMAGES; n++) {
           float        ang;
           int          iw, ih;
           float        r;
@@ -109,17 +156,17 @@ static void render( unsigned int cycle_len )
           int          xpos, ypos;
           DFBRectangle dest;
 
-          ang = 2.0f * M_PI * i / D_ARRAY_SIZE(image_names) - f * 2.0f * M_PI;
+          ang = 2.0f * M_PI * n / NUM_IMAGES - f * 2.0f * M_PI;
 
-          iw = image_widths[i];
-          ih = image_heights[i];
+          iw = image_widths[n];
+          ih = image_heights[n];
 
           r = radius + (radius / 3.0f) * sinf( f * 2.0f * M_PI );
 
           xpos = xmid + r * cosf( ang ) - iw / 2.0f;
           ypos = ymid + r * sinf( ang ) - ih / 2.0f;
 
-          k = (i & 1) ? sinf( f * 2.0f * M_PI ) : cosf( f * 2.0f * M_PI );
+          k = (n & 1) ? sinf( f * 2.0f * M_PI ) : cosf( f * 2.0f * M_PI );
           k = 2.0f * k * k;
           k = MAX( 0.25f, k );
 
@@ -129,9 +176,9 @@ static void render( unsigned int cycle_len )
           dest.h = ih * k;
 
           sub->SetColor( sub, xpos, ypos, 255 - xpos,
-                         (i & 1) ? fabs( 255 * sinf( f * 2.0f * M_PI ) ) : fabs( 255 * cosf( f * 2.0f * M_PI ) ) );
+                         (n & 1) ? fabs( 255 * sinf( f * 2.0f * M_PI ) ) : fabs( 255 * cosf( f * 2.0f * M_PI ) ) );
 
-          sub->StretchBlit( sub, images[i], NULL, &dest );
+          sub->StretchBlit( sub, images[n], NULL, &dest );
      }
 
      primary->Flip( primary, NULL, DSFLIP_ONSYNC );
@@ -141,16 +188,16 @@ static void render( unsigned int cycle_len )
 
 static void cleanup()
 {
-     int i;
+     int n;
 
      /* release the primary subsurface */
      if (sub)
           sub->Release( sub );
 
      /* release test images */
-     for (i = 0; i < D_ARRAY_SIZE(image_names); i++)
-          if (images[i])
-               images[i]->Release( images[i] );
+     for (n = 0; n < NUM_IMAGES; n++)
+          if (images[n])
+               images[n]->Release( images[n] );
 
      /* release the background image */
      if (background)
@@ -171,12 +218,19 @@ static void cleanup()
 
 int main( int argc, char *argv[] )
 {
-     int                     i;
-     DFBSurfaceDescription   dsc;
-     DFBRectangle            rect;
-     IDirectFBImageProvider *provider;
-     unsigned int            cycle_len   = CYCLE_LEN;
-     unsigned int            frame_delay = FRAME_DELAY;
+     int                       n;
+     DFBRectangle              rect;
+     DFBSurfaceDescription     sdsc;
+#ifdef USE_IMAGE_HEADERS
+     DFBDataBufferDescription  ddsc;
+     IDirectFBDataBuffer      *buffer;
+#else
+     int                       path_length;
+     char                     *imagefile;
+#endif
+     IDirectFBImageProvider   *provider;
+     unsigned int              cycle_len   = CYCLE_LEN;
+     unsigned int              frame_delay = FRAME_DELAY;
 
      /* initialize test images */
      memset( images, 0, sizeof(images) );
@@ -197,19 +251,28 @@ int main( int argc, char *argv[] )
      DFBCHECK(dfb->CreateInputEventBuffer( dfb, DICAPS_BUTTONS | DICAPS_KEYS, DFB_FALSE, &event_buffer ));
 
      /* get the primary surface, i.e. the surface of the primary layer */
-     dsc.flags = DSDESC_CAPS;
-     dsc.caps  = DSCAPS_PRIMARY | DSCAPS_FLIPPING;
+     sdsc.flags = DSDESC_CAPS;
+     sdsc.caps  = DSCAPS_PRIMARY | DSCAPS_FLIPPING;
 
-     DFBCHECK(dfb->CreateSurface( dfb, &dsc, &primary ));
+     DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &primary ));
 
      DFBCHECK(primary->GetSize( primary, &width, &height ));
 
      /* load the background image */
-     DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/background.dfiff", &provider ));
-     provider->GetSurfaceDescription( provider, &dsc );
-     back_width  = dsc.width;
-     back_height = dsc.height;
-     DFBCHECK(dfb->CreateSurface( dfb, &dsc, &background ));
+#ifdef USE_IMAGE_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = background_data;
+     ddsc.memory.length = sizeof(background_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+     imagefile = DATADIR"/background.dfiff";
+     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
+     provider->GetSurfaceDescription( provider, &sdsc );
+     back_width  = sdsc.width;
+     back_height = sdsc.height;
+     DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &background ));
      provider->RenderTo( provider, background, NULL );
      provider->Release( provider );
 
@@ -221,13 +284,24 @@ int main( int argc, char *argv[] )
      primary->TileBlit( primary, background, NULL, rect.x, rect.y );
 
      /* load test images */
-     for (i = 0; i < D_ARRAY_SIZE(image_names); i++) {
-          DFBCHECK(dfb->CreateImageProvider( dfb, image_names[i], &provider ));
-          provider->GetSurfaceDescription( provider, &dsc );
-          image_widths[i]  = dsc.width;
-          image_heights[i] = dsc.height;
-          DFBCHECK(dfb->CreateSurface( dfb, &dsc, &images[i] ));
-          provider->RenderTo( provider, images[i], NULL );
+     for (n = 0; n < NUM_IMAGES; n++) {
+#ifdef USE_IMAGE_HEADERS
+          ddsc.flags         = DBDESC_MEMORY;
+          ddsc.memory.data   = image_data[n];
+          ddsc.memory.length = image_length[n];
+          DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+          DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+          path_length = strlen( DATADIR ) + 1 + strlen( image_names[n] ) + 1;
+          imagefile   = alloca( path_length );
+          snprintf( imagefile, path_length, DATADIR"/%s", image_names[n] );
+          DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
+          provider->GetSurfaceDescription( provider, &sdsc );
+          image_widths[n]  = sdsc.width;
+          image_heights[n] = sdsc.height;
+          DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &images[n] ));
+          provider->RenderTo( provider, images[n], NULL );
           provider->Release( provider );
      }
 

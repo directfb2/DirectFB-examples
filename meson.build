@@ -26,6 +26,7 @@ examplesdatadir = join_paths(get_option('prefix'), get_option('datadir'), 'direc
 add_global_arguments('-DDATADIR="@0@"'.format(examplesdatadir), language: 'c')
 
 directfb_dep = dependency('directfb')
+
 libm_dep = meson.get_compiler('c').find_library('m')
 
 message('Checking for GetFontSurfaceFormat() support')
@@ -59,6 +60,20 @@ if meson.get_compiler('c').compiles(code, dependencies: directfb_dep)
   add_global_arguments('-DHAVE_MT', language: 'c')
 else
   message('multi-touch support not found')
+endif
+
+if get_option('font-headers') or get_option('image-headers') or get_option('video-headers')
+  directfb_csource = find_program('directfb-csource')
+  if get_option('font-headers')
+    cat = find_program('cat')
+    add_global_arguments('-DUSE_FONT_HEADERS', language: 'c')
+  endif
+  if get_option('image-headers')
+    add_global_arguments('-DUSE_IMAGE_HEADERS', language: 'c')
+  endif
+  if get_option('video-headers')
+    add_global_arguments('-DUSE_VIDEO_HEADERS', language: 'c')
+  endif
 endif
 
 fusionsound_dep = dependency('fusionsound', required: false)

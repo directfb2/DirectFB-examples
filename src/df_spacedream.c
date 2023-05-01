@@ -24,6 +24,13 @@
 #include <directfb.h>
 #include <math.h>
 
+#ifdef USE_IMAGE_HEADERS
+#include "star1.h"
+#include "star2.h"
+#include "star3.h"
+#include "star4.h"
+#endif
+
 /* macro for a safe call to DirectFB functions */
 #define DFBCHECK(x)                                                   \
      do {                                                             \
@@ -45,6 +52,7 @@ static IDirectFBSurface *primary = NULL;
 
 /* DirectFB surfaces */
 #define NUM_STARS 4
+
 static IDirectFBSurface *stars[NUM_STARS];
 
 /* screen width and height */
@@ -278,6 +286,7 @@ typedef struct {
 } Star;
 
 #define STARFIELD_SIZE 5000
+
 static Star starfield[STARFIELD_SIZE];
 static Star t_starfield[STARFIELD_SIZE];
 
@@ -319,20 +328,30 @@ static void *render_loop( DirectThread *thread, void *arg )
 
 static void load_stars()
 {
-     int                     i;
-     DFBSurfaceDescription   dsc;
-     char                    name[strlen( DATADIR"/star.dfiff" ) + 4];
-     IDirectFBImageProvider *provider;
+     int i;
+
+#ifdef USE_IMAGE_HEADERS
+     const DFBSurfaceDescription *star_desc[] = { &star1_desc, &star2_desc, &star3_desc, &star4_desc };
 
      for (i = 0; i < NUM_STARS; i++) {
-          sprintf( name, DATADIR"/star%d.dfiff", i+1 );
+          DFBCHECK(dfb->CreateSurface( dfb, star_desc[i], &stars[i] ));
+     }
+#else
+     for (i = 0; i < NUM_STARS; i++) {
+          DFBSurfaceDescription   desc;
+          char                    filename[PATH_MAX];
+          IDirectFBImageProvider *provider;
 
-          DFBCHECK(dfb->CreateImageProvider( dfb, name, &provider ));
-          provider->GetSurfaceDescription( provider, &dsc );
-          DFBCHECK(dfb->CreateSurface( dfb, &dsc, &stars[i] ));
+          snprintf( filename, PATH_MAX, DATADIR"/star%d.dfiff", i + 1 );
+          DFBCHECK(dfb->CreateImageProvider( dfb, filename, &provider ));
+          provider->GetSurfaceDescription( provider, &desc );
+          DFBCHECK(dfb->CreateSurface( dfb, &desc, &stars[i] ));
           provider->RenderTo( provider, stars[i], NULL );
           provider->Release( provider );
+     }
+#endif
 
+     for (i = 0; i < NUM_STARS; i++) {
           stars[i]->SetSrcColorKey( stars[i], 0xFF, 0x00, 0xFF );
      }
 }

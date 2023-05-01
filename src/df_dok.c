@@ -28,6 +28,24 @@
 
 #include "util.h"
 
+#ifdef USE_FONT_HEADERS
+#include "decker.h"
+#endif
+
+#ifdef USE_IMAGE_HEADERS
+#include "biglogo.h"
+#include "card.h"
+#include "colorkeyed.h"
+#include "fish.h"
+#include "intro.h"
+#include "laden_bike.h"
+#include "melted.h"
+#include "meter.h"
+#include "rose.h"
+#include "sacred_heart.h"
+#include "swirl.h"
+#endif
+
 /* macro for a safe call to DirectFB functions */
 #define DFBCHECK(x)                                                   \
      do {                                                             \
@@ -90,7 +108,6 @@ static DFBSurfacePixelFormat  pixelformat    = DSPF_UNKNOWN;
 static int                    do_system      = 0;
 static int                    do_dump        = 0;
 static int                    do_wait        = 0;
-static const char            *fontfile       = NULL;
 static int                    do_noaccel     = 0;
 static int                    accel_only     = 0;
 static int                    do_smooth      = 0;
@@ -102,7 +119,7 @@ static int                    do_all_demos   = 0;
 static int                    output_csv     = 0;
 static int                    run_fullscreen = 0;
 static int                    with_intro     = 0;
-static const char            *imagefile      = NULL;
+static const char            *filename       = NULL;
 
 /* benchmarks */
 static unsigned long long draw_string            ( long long t );
@@ -265,7 +282,7 @@ static Demo demos[] = {
        0, 0, 0, "MPixel/sec", stretch_blit_colorkeyed },
      { "Load Image",
        "Loading image files!",
-       "Loading image files", "load-image <file>", false,
+       "Loading image files", "load-image <filename>", false,
        0, 0, 0, "MPixel/sec", load_image },
 };
 
@@ -401,14 +418,20 @@ static void showMessage( const char *msg )
 
 static void showResult()
 {
-     DFBSurfaceDescription   dsc;
-     DFBRectangle            rect;
-     IDirectFBImageProvider *provider;
-     IDirectFBSurface       *meter;
-     int                     i, y, w, h, max_string_width = 0;
-     char                    rate[32];
-     long                    max_result = 0;
-     double                  factor;
+     DFBRectangle              rect;
+     DFBSurfaceDescription     sdsc;
+#ifdef USE_IMAGE_HEADERS
+     DFBDataBufferDescription  ddsc;
+     IDirectFBDataBuffer      *buffer;
+#else
+     const char               *imagefile;
+#endif
+     IDirectFBImageProvider   *provider;
+     IDirectFBSurface         *meter;
+     int                       i, y, w, h, max_string_width = 0;
+     char                      rate[32];
+     long                      max_result = 0;
+     double                    factor;
 
      for (i = 0; i < D_ARRAY_SIZE(demos); i++) {
           if (!demos[i].requested || !demos[i].result)
@@ -420,10 +443,19 @@ static void showResult()
 
      factor = (double) (SW - 60) / max_result;
 
-     DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/meter.dfiff", &provider ));
-     provider->GetSurfaceDescription( provider, &dsc );
-     dsc.height = 8;
-     DFBCHECK(dfb->CreateSurface( dfb, &dsc, &meter ));
+#ifdef USE_IMAGE_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = meter_data;
+     ddsc.memory.length = sizeof(meter_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+     imagefile = DATADIR"/meter.dfiff";
+     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
+     provider->GetSurfaceDescription( provider, &sdsc );
+     sdsc.height = 8;
+     DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &meter ));
      provider->RenderTo( provider, meter, NULL );
      provider->Release( provider );
 
@@ -434,7 +466,7 @@ static void showResult()
 
      rect.x = 40;
      rect.y = ui_fontheight;
-     rect.h = dsc.height;
+     rect.h = sdsc.height;
 
      primary->SetColor( primary, 0x66, 0x66, 0x66, 0xFF );
 
@@ -445,14 +477,14 @@ static void showResult()
           rect.w = demos[i].result * factor;
           primary->StretchBlit( primary, meter, NULL, &rect );
           if (rect.w < SW - 60)
-               primary->DrawLine( primary, 40 + rect.w, rect.y + dsc.height, SW - 20, rect.y + dsc.height );
+               primary->DrawLine( primary, 40 + rect.w, rect.y + sdsc.height, SW - 20, rect.y + sdsc.height );
 
-          rect.y += dsc.height / 2 + ui_fontheight + 2;
+          rect.y += sdsc.height / 2 + ui_fontheight + 2;
      }
 
      meter->Release( meter );
 
-     y = ui_fontheight + dsc.height / 2;
+     y = ui_fontheight + sdsc.height / 2;
      for (i = 0; i < D_ARRAY_SIZE(demos); i++) {
           if (!demos[i].requested || !demos[i].result)
                continue;
@@ -470,13 +502,13 @@ static void showResult()
           primary->SetColor( primary, 0xAA, 0xAA, 0xAA, 0xFF );
           primary->DrawString( primary, rate, -1, SW - 20, y, DSTF_BOTTOMRIGHT );
 
-          y += dsc.height / 2 + ui_fontheight + 2;
+          y += sdsc.height / 2 + ui_fontheight + 2;
      }
 
      /* retrieve width and height */
      DFBCHECK(cardicon->GetSize( cardicon, &w, &h ));
 
-     y = ui_fontheight + dsc.height / 2;
+     y = ui_fontheight + sdsc.height / 2;
      for (i = 0; i < D_ARRAY_SIZE(demos); i++) {
           if (!demos[i].requested || !demos[i].result)
                continue;
@@ -489,7 +521,7 @@ static void showResult()
           }
           primary->Blit( primary, cardicon, NULL, SW - max_string_width - w - 25, y - h );
 
-          y += dsc.height / 2 + ui_fontheight + 2;
+          y += sdsc.height / 2 + ui_fontheight + 2;
      }
 
      primary->Flip( primary, NULL, DSFLIP_NONE );
@@ -1147,12 +1179,12 @@ static unsigned long long load_image( long long t )
      IDirectFBImageProvider *provider;
      IDirectFBSurface       *surface = NULL;
 
-     if (!imagefile || accel_only)
+     if (!filename || accel_only)
           return 0;
 
      for (i = 0; direct_clock_get_millis() < (t + DEMOTIME); i++) {
           /* create an image provider for loading the file */
-          DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+          DFBCHECK(dfb->CreateImageProvider( dfb, filename, &provider ));
 
           /* retrieve a surface description for the image */
           provider->GetSurfaceDescription( provider, &dsc );
@@ -1185,14 +1217,24 @@ static unsigned long long load_image( long long t )
 
 int main( int argc, char *argv[] )
 {
-     DFBInputEvent            evt;
-     DFBFontDescription       fdsc;
-     DFBSurfaceDescription    sdsc;
-     int                      i, n;
-     IDirectFBImageProvider  *provider;
-     DFBSurfacePixelFormat    fontformat     = DSPF_A8;
-     DFBSurfaceRenderOptions  render_options = DSRO_NONE;
-     int                      demo_requested = 0;
+     int                       i, n;
+     DFBInputEvent             evt;
+     DFBFontDescription        fdsc;
+     DFBSurfaceDescription     sdsc;
+#if defined(USE_FONT_HEADERS) || defined(USE_IMAGE_HEADERS)
+     DFBDataBufferDescription  ddsc;
+     IDirectFBDataBuffer      *buffer;
+#endif
+#ifndef USE_FONT_HEADERS
+     const char               *fontfile;
+#endif
+#ifndef USE_IMAGE_HEADERS
+     const char               *imagefile;
+#endif
+     IDirectFBImageProvider   *provider;
+     DFBSurfacePixelFormat     fontformat     = DSPF_A8;
+     DFBSurfaceRenderOptions   render_options = DSRO_NONE;
+     int                       demo_requested = 0;
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));
@@ -1246,11 +1288,6 @@ int main( int argc, char *argv[] )
                          n++;
                          continue;
                     } else
-                    if (strcmp( argv[n] + 2, "font" ) == 0 && n + 1 < argc) {
-                         fontfile = argv[n+1];
-                         n++;
-                         continue;
-                    } else
                     if (strcmp( argv[n] + 2, "noaccel" ) == 0) {
                          do_noaccel = 1;
                          continue;
@@ -1296,7 +1333,7 @@ int main( int argc, char *argv[] )
                          continue;
                     } else
                     if (strcmp( argv[n] + 2, "load-image" ) == 0 && ++n < argc) {
-                         imagefile = argv[n];
+                         filename = argv[n];
                          demo_requested = 1;
                          demos[D_ARRAY_SIZE(demos)-1].requested = 1;
                          continue;
@@ -1342,27 +1379,48 @@ int main( int argc, char *argv[] )
 #ifdef HAVE_GETFONTSURFACEFORMAT
      DFBCHECK(dfb->GetFontSurfaceFormat( dfb, &fontformat ));
 #endif
-     if (!fontfile)
-          fontfile = fontformat == DSPF_A8 ? DATADIR"/decker.dgiff" : DATADIR"/decker_argb.dgiff";
+     fdsc.flags = DFDESC_HEIGHT;
 
-     fdsc.flags  = DFDESC_HEIGHT;
+#ifdef USE_FONT_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = fontformat == DSPF_A8 ? decker_data : decker_argb_data;
+     ddsc.memory.length = fontformat == DSPF_A8 ? sizeof(decker_data) : sizeof(decker_argb_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+#else
+     fontfile = fontformat == DSPF_A8 ? DATADIR"/decker.dgiff" : DATADIR"/decker_argb.dgiff";
+#endif
 
      fdsc.height = 24;
-
+#ifdef USE_FONT_HEADERS
+     DFBCHECK(buffer->CreateFont( buffer, &fdsc, &bench_font ));
+#else
      DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &bench_font ));
+#endif
      DFBCHECK(bench_font->GetHeight( bench_font, &bench_fontheight ));
      DFBCHECK(bench_font->GetStringWidth( bench_font, "This is the DirectFB Benchmarking!!!", -1, &bench_stringwidth ));
 
      fdsc.height = 16;
-
+#ifdef USE_FONT_HEADERS
+     DFBCHECK(buffer->CreateFont( buffer, &fdsc, &ui_font ));
+#else
      DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &ui_font ));
+#endif
      DFBCHECK(ui_font->GetHeight( ui_font, &ui_fontheight ));
 
      /* clear with black */
      primary->Clear( primary, 0, 0, 0, 0x80 );
 
      /* start screen */
-     DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/biglogo.dfiff", &provider ));
+#ifdef USE_IMAGE_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = biglogo_data;
+     ddsc.memory.length = sizeof(biglogo_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+     imagefile = DATADIR"/biglogo.dfiff";
+     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width  = (SH / 8) * sdsc.width / sdsc.height;
      sdsc.height = SH / 8;
@@ -1394,7 +1452,16 @@ int main( int argc, char *argv[] )
           DFBCHECK(primary->GetPixelFormat( primary, &pixelformat ));
 
      /* card icon */
-     DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/card.dfiff", &provider ));
+#ifdef USE_IMAGE_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = card_data;
+     ddsc.memory.length = sizeof(card_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+     imagefile = DATADIR"/card.dfiff";
+     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width  = sdsc.width * (ui_fontheight - ui_fontheight / 5) / sdsc.height;
      sdsc.height = (ui_fontheight - ui_fontheight / 5);
@@ -1404,7 +1471,16 @@ int main( int argc, char *argv[] )
      provider->Release( provider );
 
      /* create a surface and render an image to it */
-     DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/swirl.dfiff", &provider ));
+#ifdef USE_IMAGE_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = swirl_data;
+     ddsc.memory.length = sizeof(swirl_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+     imagefile = DATADIR"/swirl.dfiff";
+     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX * 2;
      sdsc.height      = SY * 2;
@@ -1414,7 +1490,16 @@ int main( int argc, char *argv[] )
      provider->Release( provider );
 
      /* create a surface and render an image to it */
-     DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/rose.dfiff", &provider ));
+#ifdef USE_IMAGE_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = rose_data;
+     ddsc.memory.length = sizeof(rose_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+     imagefile = DATADIR"/rose.dfiff";
+     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX;
      sdsc.height      = SY;
@@ -1428,7 +1513,16 @@ int main( int argc, char *argv[] )
      provider->Release( provider );
 
      /* create a surface and render an image to it */
-     DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/melted.dfiff", &provider ));
+#ifdef USE_IMAGE_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = melted_data;
+     ddsc.memory.length = sizeof(melted_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+     imagefile = DATADIR"/melted.dfiff";
+     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX;
      sdsc.height      = SY;
@@ -1438,7 +1532,16 @@ int main( int argc, char *argv[] )
      provider->Release( provider );
 
      /* create a surface and render an image to it */
-     DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/colorkeyed.dfiff", &provider ));
+#ifdef USE_IMAGE_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = colorkeyed_data;
+     ddsc.memory.length = sizeof(colorkeyed_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+     imagefile = DATADIR"/colorkeyed.dfiff";
+     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX;
      sdsc.height      = SY;
@@ -1449,7 +1552,16 @@ int main( int argc, char *argv[] )
      provider->Release( provider );
 
      /* create a surface and render an image to it */
-     DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/laden_bike.dfiff", &provider ));
+#ifdef USE_IMAGE_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = laden_bike_data;
+     ddsc.memory.length = sizeof(laden_bike_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+     imagefile = DATADIR"/laden_bike.dfiff";
+     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX;
      sdsc.height      = SY;
@@ -1459,7 +1571,16 @@ int main( int argc, char *argv[] )
      provider->Release( provider );
 
      /* create a surface and render an image to it */
-     DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/sacred_heart.dfiff", &provider ));
+#ifdef USE_IMAGE_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = sacred_heart_data;
+     ddsc.memory.length = sizeof(sacred_heart_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+     imagefile = DATADIR"/sacred_heart.dfiff";
+     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX;
      sdsc.height      = SY;
@@ -1469,7 +1590,16 @@ int main( int argc, char *argv[] )
      provider->Release( provider );
 
      /* create a surface and render an image to it */
-     DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/fish.dfiff", &provider ));
+#ifdef USE_IMAGE_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = fish_data;
+     ddsc.memory.length = sizeof(fish_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+     imagefile = DATADIR"/fish.dfiff";
+     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX;
      sdsc.height      = SY;
@@ -1480,7 +1610,16 @@ int main( int argc, char *argv[] )
 
      /* intro screen */
      if (with_intro) {
-          DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/intro.dfiff", &provider ));
+#ifdef USE_IMAGE_HEADERS
+          ddsc.flags         = DBDESC_MEMORY;
+          ddsc.memory.data   = intro_data;
+          ddsc.memory.length = sizeof(intro_data);
+          DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+          DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+          imagefile = DATADIR"/intro.dfiff";
+          DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
           provider->GetSurfaceDescription( provider, &sdsc );
           sdsc.width  = SW;
           sdsc.height = run_fullscreen ? SH : SH + ui_fontheight;
