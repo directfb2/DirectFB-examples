@@ -23,6 +23,14 @@
 #include <direct/util.h>
 #include <directfb.h>
 
+#ifdef USE_FONT_HEADERS
+#include "decker.h"
+#endif
+
+#ifdef USE_IMAGE_HEADERS
+#include "wood_andi.h"
+#endif
+
 /* macro for a safe call to DirectFB functions */
 #define DFBCHECK(x)                                                   \
      do {                                                             \
@@ -68,12 +76,21 @@ static void dfb_shutdown()
 
 int main( int argc, char *argv[] )
 {
-     DFBSurfaceDescription   sdsc;
-     DFBFontDescription      fdsc;
-     int                     i, step;
-     IDirectFBImageProvider *provider;
-     const char             *fontfile;
-     DFBSurfacePixelFormat   fontformat = DSPF_A8;
+     int                       i, step;
+     DFBFontDescription        fdsc;
+     DFBSurfaceDescription     sdsc;
+#if defined(USE_FONT_HEADERS) || defined(USE_IMAGE_HEADERS)
+     DFBDataBufferDescription  ddsc;
+     IDirectFBDataBuffer      *buffer;
+#endif
+#ifndef USE_FONT_HEADERS
+     const char               *fontfile;
+#endif
+#ifndef USE_IMAGE_HEADERS
+     const char               *imagefile;
+#endif
+     IDirectFBImageProvider   *provider;
+     DFBSurfacePixelFormat     fontformat = DSPF_A8;
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));
@@ -108,7 +125,16 @@ int main( int argc, char *argv[] )
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &surface ));
 
      /* create an image provider for loading the background image. */
-     DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/wood_andi.dfiff", &provider ));
+#ifdef USE_IMAGE_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = wood_andi_data;
+     ddsc.memory.length = sizeof(wood_andi_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+     imagefile = DATADIR"/wood_andi.dfiff";
+     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
 
      /* render the image to the temporary surface. */
      provider->RenderTo( provider, surface, NULL );
@@ -128,12 +154,19 @@ int main( int argc, char *argv[] )
 #ifdef HAVE_GETFONTSURFACEFORMAT
      DFBCHECK(dfb->GetFontSurfaceFormat( dfb, &fontformat ));
 #endif
-     fontfile = fontformat == DSPF_A8 ? DATADIR"/decker.dgiff" : DATADIR"/decker_argb.dgiff";
-
      fdsc.flags  = DFDESC_HEIGHT;
      fdsc.height = CLAMP( (int) (screen_width / 32.0 / 8) * 8, 8, 96 );
 
+#ifdef USE_FONT_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = fontformat == DSPF_A8 ? decker_data : decker_argb_data;
+     ddsc.memory.length = fontformat == DSPF_A8 ? sizeof(decker_data) : sizeof(decker_argb_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font ));
+#else
+     fontfile = fontformat == DSPF_A8 ? DATADIR"/decker.dgiff" : DATADIR"/decker_argb.dgiff";
      DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &font ));
+#endif
 
      surface->SetFont( surface, font );
 

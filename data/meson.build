@@ -18,55 +18,116 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
-examplesdata = [
-  'apple-red.dfiff',
-  'background.dfiff',
-  'bbb.dfvff',
-  'biglogo.dfiff',
-  'card.dfiff',
-  'colorkeyed.dfiff',
-  'cursor_red.dfiff',
-  'cursor_yellow.dfiff',
-  'decker.dgiff',
-  'decker_argb.dgiff',
-  'destination_mask.dfiff',
-  'dfblogo.dfiff',
-  'fish.dfiff',
-  'gnome-applets.dfiff',
-  'gnome-calendar.dfiff',
-  'gnome-foot.dfiff',
-  'gnome-gimp.dfiff',
-  'gnome-gmush.dfiff',
-  'gnome-gsame.dfiff',
-  'gnu-keys.dfiff',
-  'grid.dfiff',
-  'intro.dfiff',
-  'joystick.dfiff',
-  'keys.dfiff',
-  'laden_bike.dfiff',
-  'mask.dfiff',
-  'melted.dfiff',
-  'meter.dfiff',
-  'mouse.dfiff',
-  'panel.dfiff',
-  'rose.dfiff',
-  'sacred_heart.dfiff',
-  'smokey_light.dfiff',
-  'star1.dfiff',
-  'star2.dfiff',
-  'star3.dfiff',
-  'star4.dfiff',
-  'swirl.dfiff',
-  'texture.dfiff',
-  'tux.dfiff',
-  'tux_alpha.dfiff',
-  'wood_andi.dfiff'
+examplesdata = []
+
+dsdesc_names = [
+  'star1',
+  'star2',
+  'star3',
+  'star4'
 ]
 
-if fusionsound_dep.found()
-examplesdata += [
-  'test.wav'
+rawdata_names = [
+  'apple-red',
+  'background',
+  'biglogo',
+  'card',
+  'colorkeyed',
+  'cursor_red',
+  'cursor_yellow',
+  'destination_mask',
+  'dfblogo',
+  'fish',
+  'gnome-applets',
+  'gnome-calendar',
+  'gnome-foot',
+  'gnome-gimp',
+  'gnome-gmush',
+  'gnome-gsame',
+  'gnu-keys',
+  'grid',
+  'intro',
+  'joystick',
+  'keys',
+  'laden_bike',
+  'mask',
+  'melted',
+  'meter',
+  'mouse',
+  'panel',
+  'rose',
+  'sacred_heart',
+  'smokey_light',
+  'swirl',
+  'texture',
+  'tux',
+  'tux_alpha',
+  'wood_andi'
 ]
+
+dsdesc_hdr = []
+rawdata_hdr = []
+
+if get_option('font-headers')
+  decker_a8_data_hdr = custom_target('decker_a8',
+                                     input: 'decker.dgiff',
+                                     output: 'decker_a8.h',
+                                     capture: true,
+                                     command: [directfb_csource, '--raw', '--name=decker', '@INPUT@'])
+
+  decker_argb_data_hdr = custom_target('decker_argb',
+                                       input: 'decker_argb.dgiff',
+                                       output: 'decker_argb.h',
+                                       capture: true,
+                                       command: [directfb_csource, '--raw', '--name=decker_argb', '@INPUT@'])
+
+  rawdata_hdr += custom_target('decker',
+                               input: [decker_a8_data_hdr, decker_argb_data_hdr],
+                               output: 'decker.h',
+                               capture: true,
+                               command: [cat, '@INPUT0@', '@INPUT1@'])
+else
+    examplesdata += ['decker.dgiff', 'decker_argb.dgiff']
+endif
+
+if get_option('image-headers')
+  foreach dsdesc_name : dsdesc_names
+    dsdesc_hdr += custom_target(dsdesc_name,
+                                input: dsdesc_name + '.dfiff',
+                                output: dsdesc_name + '.h',
+                                capture: true,
+                                command: [directfb_csource, '--name=@0@'.format(dsdesc_name), '@INPUT@'])
+  endforeach
+
+  foreach rawdata_name : rawdata_names
+    rawdata_hdr += custom_target(rawdata_name,
+                                 input: rawdata_name + '.dfiff',
+                                 output: rawdata_name + '.h',
+                                 capture: true,
+                                 command: [directfb_csource, '--raw', '--name=@0@'.format(rawdata_name), '@INPUT@'])
+  endforeach
+else
+  foreach name : dsdesc_names
+    examplesdata += name + '.dfiff'
+  endforeach
+
+  foreach name : rawdata_names
+    examplesdata += name + '.dfiff'
+  endforeach
+endif
+
+if get_option('video-headers')
+  rawdata_hdr += custom_target('bbb',
+                               input: 'bbb.dfvff',
+                               output: 'bbb.h',
+                               capture: true,
+                               command: [directfb_csource, '--raw', '--name=bbb', '@INPUT@'])
+else
+  examplesdata += 'bbb.dfvff'
+endif
+
+if fusionsound_dep.found()
+  examplesdata += 'test.wav'
 endif
 
 install_data(examplesdata, install_dir: examplesdatadir)

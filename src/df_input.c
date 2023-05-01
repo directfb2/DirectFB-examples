@@ -24,6 +24,16 @@
 #include <directfb.h>
 #include <directfb_keynames.h>
 
+#ifdef USE_FONT_HEADERS
+#include "decker.h"
+#endif
+
+#ifdef USE_IMAGE_HEADERS
+#include "joystick.h"
+#include "keys.h"
+#include "mouse.h"
+#endif
+
 /* macro for a safe call to DirectFB functions */
 #define DFBCHECK(x)                                                   \
      do {                                                             \
@@ -49,9 +59,27 @@ static IDirectFBFont *font_normal = NULL;
 static IDirectFBFont *font_large  = NULL;
 
 /* images */
-static IDirectFBSurface *keys_image     = NULL;
-static IDirectFBSurface *mouse_image    = NULL;
-static IDirectFBSurface *joystick_image = NULL;
+typedef enum {
+  JOYSTICK,
+  KEYS,
+  MOUSE,
+  NUM_IMAGES
+} Image;
+
+#ifdef USE_IMAGE_HEADERS
+static const void *image_data[] = {
+     joystick_data, keys_data, mouse_data
+};
+static unsigned int image_length[] = {
+     sizeof(joystick_data), sizeof(keys_data), sizeof(mouse_data)
+};
+#else
+static const char *image_names[] = {
+     "joystick.dfiff", "keys.dfiff", "mouse.dfiff"
+};
+#endif
+
+static IDirectFBSurface *images[NUM_IMAGES] = { NULL, NULL, NULL };
 
 /* screen width and height */
 static int screen_width, screen_height;
@@ -64,8 +92,7 @@ static bool mouse_pressure[10];
 static int joy_axis[8];
 
 /* command line options */
-static const char *fontfile  = NULL;
-static int         max_slots = 1;
+static int max_slots = 1;
 
 #ifdef HAVE_MT
 #define DFB_EVENT_SLOT_ID(e) e->slot_id
@@ -480,7 +507,7 @@ static void show_event( const char *device_name, DFBInputDeviceTypeFlags device_
      switch (evt->type) {
           case DIET_KEYPRESS:
           case DIET_KEYRELEASE:
-               primary->Blit( primary, keys_image, NULL, 40, 40 );
+               primary->Blit( primary, images[KEYS], NULL, 40, 40 );
                show_key_event( evt );
                break;
 
@@ -488,11 +515,11 @@ static void show_event( const char *device_name, DFBInputDeviceTypeFlags device_
           case DIET_BUTTONRELEASE:
           case DIET_AXISMOTION:
                if (device_type & DIDTF_MOUSE) {
-                    primary->Blit( primary, mouse_image, NULL, 40, 40 );
+                    primary->Blit( primary, images[MOUSE], NULL, 40, 40 );
                     show_mouse_event( evt );
                }
                else if (device_type & DIDTF_JOYSTICK) {
-                    primary->Blit( primary, joystick_image, NULL, 40, 40 );
+                    primary->Blit( primary, images[JOYSTICK], NULL, 40, 40 );
                     show_joystick_event( evt );
                }
                else {
@@ -506,21 +533,6 @@ static void show_event( const char *device_name, DFBInputDeviceTypeFlags device_
           default:
                break;
      }
-}
-
-static IDirectFBSurface *load_image( const char *filename )
-{
-     DFBSurfaceDescription   dsc;
-     IDirectFBImageProvider *provider;
-     IDirectFBSurface       *surface;
-
-     DFBCHECK(dfb->CreateImageProvider( dfb, filename, &provider ));
-     provider->GetSurfaceDescription( provider, &dsc );
-     DFBCHECK(dfb->CreateSurface( dfb, &dsc, &surface ));
-     provider->RenderTo( provider, surface, NULL );
-     provider->Release( provider );
-
-     return surface;
 }
 
 typedef struct _DeviceInfo {
@@ -589,9 +601,12 @@ static DFBInputDeviceTypeFlags get_device_type( DeviceInfo *devices, DFBInputDev
 
 static void dfb_shutdown()
 {
-     if (joystick_image) joystick_image->Release( joystick_image );
-     if (mouse_image)    mouse_image->Release( mouse_image );
-     if (keys_image)     keys_image->Release( keys_image );
+     int n;
+
+     for (n = 0; n < NUM_IMAGES; n++) {
+          if (images[n]) images[n]->Release( images[n] );
+     }
+
      if (font_large)     font_large->Release( font_large );
      if (font_normal)    font_normal->Release( font_normal );
      if (font_small)     font_small->Release( font_small );
@@ -613,11 +628,22 @@ static void print_usage()
 
 int main( int argc, char *argv[] )
 {
-     DFBFontDescription     fdsc;
-     DFBSurfaceDescription  sdsc;
-     int                    n;
-     DFBSurfacePixelFormat  fontformat = DSPF_A8;
-     DeviceInfo            *devices    = NULL;
+     int                       n;
+     DFBFontDescription        fdsc;
+     DFBSurfaceDescription     sdsc;
+#if defined(USE_FONT_HEADERS) || defined(USE_IMAGE_HEADERS)
+     DFBDataBufferDescription  ddsc;
+     IDirectFBDataBuffer      *buffer;
+#endif
+#ifndef USE_FONT_HEADERS
+     const char               *fontfile;
+#endif
+#ifndef USE_IMAGE_HEADERS
+     char                      imagefile[PATH_MAX];
+#endif
+     IDirectFBImageProvider   *provider;
+     DFBSurfacePixelFormat     fontformat = DSPF_A8;
+     DeviceInfo               *devices    = NULL;
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));
@@ -628,11 +654,6 @@ int main( int argc, char *argv[] )
                if (strcmp( argv[n] + 2, "help" ) == 0) {
                     print_usage();
                     return 0;
-               }
-               else if (strcmp( argv[n] + 2, "font" ) == 0 && n + 1 < argc) {
-                    fontfile = argv[n+1];
-                    n++;
-                    continue;
                }
                else if (strcmp( argv[n] + 2, "slots" ) == 0 && ++n < argc) {
                     max_slots = atoi( argv[n] );
@@ -680,24 +701,55 @@ int main( int argc, char *argv[] )
 #ifdef HAVE_GETFONTSURFACEFORMAT
      DFBCHECK(dfb->GetFontSurfaceFormat( dfb, &fontformat ));
 #endif
-     if (!fontfile)
-          fontfile = fontformat == DSPF_A8 ? DATADIR"/decker.dgiff" : DATADIR"/decker_argb.dgiff";
-
      fdsc.flags = DFDESC_HEIGHT;
 
+#ifdef USE_FONT_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = fontformat == DSPF_A8 ? decker_data : decker_argb_data;
+     ddsc.memory.length = fontformat == DSPF_A8 ? sizeof(decker_data) : sizeof(decker_argb_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+#else
+     fontfile = fontformat == DSPF_A8 ? DATADIR"/decker.dgiff" : DATADIR"/decker_argb.dgiff";
+#endif
+
      fdsc.height = CLAMP( (int) (screen_width / 30.0 / 8) * 8, 8, 96 );
+#ifdef USE_FONT_HEADERS
+     DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font_small ));
+#else
      DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &font_small ));
+#endif
 
      fdsc.height = CLAMP( (int) (screen_width / 20.0 / 8) * 8, 8, 96 );
+#ifdef USE_FONT_HEADERS
+     DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font_normal ));
+#else
      DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &font_normal ));
+#endif
 
      fdsc.height = CLAMP( (int) (screen_width / 10.0 / 8) * 8, 8, 96 );
+#ifdef USE_FONT_HEADERS
+     DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font_large ));
+#else
      DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &font_large ));
+#endif
 
      /* load images */
-     keys_image     = load_image( DATADIR"/keys.dfiff" );
-     mouse_image    = load_image( DATADIR"/mouse.dfiff" );
-     joystick_image = load_image( DATADIR"/joystick.dfiff" );
+     for (n = 0; n < NUM_IMAGES; n++) {
+#ifdef USE_IMAGE_HEADERS
+          ddsc.flags         = DBDESC_MEMORY;
+          ddsc.memory.data   = image_data[n];
+          ddsc.memory.length = image_length[n];
+          DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+          DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+          snprintf( imagefile, PATH_MAX, DATADIR"/%s", image_names[n] );
+          DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
+          provider->GetSurfaceDescription( provider, &sdsc );
+          DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &images[n] ));
+          provider->RenderTo( provider, images[n], NULL );
+          provider->Release( provider );
+     }
 
      /* clear with black */
      primary->Clear( primary, 0, 0, 0, 0 );

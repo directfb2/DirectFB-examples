@@ -25,6 +25,17 @@
 
 #include "util.h"
 
+#ifdef USE_FONT_HEADERS
+#include "decker.h"
+#endif
+
+#ifdef USE_IMAGE_HEADERS
+#include "destination_mask.h"
+#include "tux.h"
+#include "tux_alpha.h"
+#include "wood_andi.h"
+#endif
+
 /* macro for a safe call to DirectFB functions */
 #define DFBCHECK(x)                                                   \
      do {                                                             \
@@ -457,13 +468,22 @@ static void deinit_resources()
  */
 static void init_resources( int argc, char *argv[] )
 {
+     int                         n;
      DFBDisplayLayerConfig       config;
      DFBDisplayLayerConfigFlags  ret_failed;
      DFBFontDescription          fdsc;
      DFBSurfaceDescription       sdsc;
-     int                         n;
-     IDirectFBImageProvider     *provider;
+#if defined(USE_FONT_HEADERS) || defined(USE_IMAGE_HEADERS)
+     DFBDataBufferDescription    ddsc;
+     IDirectFBDataBuffer        *buffer;
+#endif
+#ifndef USE_FONT_HEADERS
      const char                 *fontfile;
+#endif
+#ifndef USE_IMAGE_HEADERS
+     const char                 *imagefile;
+#endif
+     IDirectFBImageProvider     *provider;
      DFBSurfacePixelFormat       fontformat = DSPF_A8;
 
      /* initialize DirectFB including command line parsing */
@@ -526,18 +546,34 @@ static void init_resources( int argc, char *argv[] )
 #ifdef HAVE_GETFONTSURFACEFORMAT
      DFBCHECK(dfb->GetFontSurfaceFormat( dfb, &fontformat ));
 #endif
-     fontfile = fontformat == DSPF_A8 ? DATADIR"/decker.dgiff" : DATADIR"/decker_argb.dgiff";
-
      fdsc.flags  = DFDESC_HEIGHT;
      fdsc.height = 24;
 
+#ifdef USE_FONT_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = fontformat == DSPF_A8 ? decker_data : decker_argb_data;
+     ddsc.memory.length = fontformat == DSPF_A8 ? sizeof(decker_data) : sizeof(decker_argb_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font ));
+#else
+     fontfile = fontformat == DSPF_A8 ? DATADIR"/decker.dgiff" : DATADIR"/decker_argb.dgiff";
      DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &font ));
+#endif
      DFBCHECK(font->GetHeight( font, &fontheight ));
 
      primary->SetFont( primary, font );
 
      /* load penguin animation */
-     DFBCHECK(dfb->CreateImageProvider( dfb, alpha ? DATADIR"/tux_alpha.dfiff" : DATADIR"/tux.dfiff", &provider ));
+#ifdef USE_IMAGE_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = alpha ? tux_alpha_data : tux_data;
+     ddsc.memory.length = alpha ? sizeof(tux_alpha_data) : sizeof(tux_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+     imagefile = alpha ? DATADIR"/tux_alpha.dfiff" : DATADIR"/tux.dfiff";
+     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      DFBCHECK(primary->GetPixelFormat( primary, &sdsc.pixelformat ));
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &tuximage ));
@@ -545,10 +581,21 @@ static void init_resources( int argc, char *argv[] )
      provider->Release( provider );
 
      /* set the colorkey to green */
-     DFBCHECK(tuximage->SetSrcColorKey( tuximage, 0x00, 0xFF, 0x00 ));
+     if (!alpha) {
+          DFBCHECK(tuximage->SetSrcColorKey( tuximage, 0x00, 0xFF, 0x00 ));
+     }
 
      /* load the background image */
-     DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/wood_andi.dfiff", &provider ));
+#ifdef USE_IMAGE_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = wood_andi_data;
+     ddsc.memory.length = sizeof(wood_andi_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+     imagefile = DATADIR"/wood_andi.dfiff";
+     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width  = xres;
      sdsc.height = yres;
@@ -558,7 +605,16 @@ static void init_resources( int argc, char *argv[] )
      provider->Release( provider );
 
      /* load the penguin destination mask */
-     DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/destination_mask.dfiff", &provider ));
+#ifdef USE_IMAGE_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = destination_mask_data;
+     ddsc.memory.length = sizeof(destination_mask_data);
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+#else
+     imagefile = DATADIR"/destination_mask.dfiff";
+     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &destination_mask ));
      provider->RenderTo( provider, destination_mask, NULL );
