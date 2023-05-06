@@ -620,10 +620,9 @@ static void print_usage()
      printf( "DirectFB Input Demo\n\n" );
      printf( "Usage: df_input [options]\n\n" );
      printf( "Options:\n\n" );
-     printf( "  --font <filename>  Use the specified font file.\n" );
-     printf( "  --slots <num>      Number of possible touch contacts (default = 1, max = 10).\n" );
-     printf( "  --help             Print usage information.\n" );
-     printf( "  --dfb-help         Output DirectFB usage information.\n\n" );
+     printf( "  --slots <num>  Number of possible touch contacts (default = 1, max = 10).\n" );
+     printf( "  --help         Print usage information.\n" );
+     printf( "  --dfb-help     Output DirectFB usage information.\n\n" );
 }
 
 int main( int argc, char *argv[] )
