@@ -1,3 +1,39 @@
+commit a01422fd59f88885f4716e8e327b319668248211
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Sat May 6 11:25:00 2023 +0200
+
+    df_porter: Add <background> option
+
+commit 0cd4c63be797d1ab494c9e1b685a4829e75da836
+Merge: 0b97c2c c16fcd8
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Mon May 1 13:32:36 2023 +0200
+
+    Merge pull request #22 from caramelli/master
+    
+    Add build options to use generated headers containing font/image/video data
+
+commit c16fcd83d311dc1041c1d8b06945a871df12e9a3
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Mon May 1 13:16:54 2023 +0200
+
+    Add build options to use generated headers containing font/image/video data
+
+commit 0b97c2c83b17337b215eaccff85fdbfba3fa763d
+Merge: 4dad7a7 6a8c04c
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Sat Apr 15 14:28:20 2023 +0200
+
+    Merge pull request #21 from caramelli/master
+    
+    df_layers: Add --iterations option
+
+commit 6a8c04cdc44e0adae8bb314d8623c71d17c083b7
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Sat Apr 15 14:22:05 2023 +0200
+
+    Update ChangeLog
+
 commit e0903231f8daf24669a3c43b4f1686cb7ddf013a
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Sat Apr 15 14:21:36 2023 +0200
