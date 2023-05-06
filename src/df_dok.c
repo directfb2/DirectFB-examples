@@ -331,7 +331,6 @@ static void print_usage()
      printf( "  --system                     Do benchmarks in system memory.\n" );
      printf( "  --dump                       Dump output of each benchmark to a file.\n" );
      printf( "  --wait <seconds>             Wait a few seconds after each benchmark.\n" );
-     printf( "  --font <filename>            Use the specified font file.\n" );
      printf( "  --noaccel                    Don't use hardware acceleration.\n" );
      printf( "  --accelonly                  Only show accelerated benchmarks.\n" );
      printf( "  --smooth                     Enable smooth up/down scaling option.\n" );

@@ -74,6 +74,12 @@ static void dfb_shutdown()
      if (dfb)          dfb->Release( dfb );
 }
 
+static void print_usage()
+{
+     printf( "DirectFB Porter/Duff Demo\n\n" );
+     printf( "Usage: df_porter <background>\n\n" );
+}
+
 int main( int argc, char *argv[] )
 {
      int                       i, step;
@@ -94,6 +100,12 @@ int main( int argc, char *argv[] )
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));
+
+     /* parse command line */
+     if (argv[1] && !strcmp( argv[1], "--help" )) {
+          print_usage();
+          return 0;
+     }
 
      /* create the main interface */
      DFBCHECK(DirectFBCreate( &dfb ));
@@ -125,16 +137,21 @@ int main( int argc, char *argv[] )
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &surface ));
 
      /* create an image provider for loading the background image. */
+     if (argc > 1) {
+          DFBCHECK(dfb->CreateImageProvider( dfb, argv[1], &provider ));
+     }
+     else {
 #ifdef USE_IMAGE_HEADERS
-     ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = wood_andi_data;
-     ddsc.memory.length = sizeof(wood_andi_data);
-     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
-     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+          ddsc.flags         = DBDESC_MEMORY;
+          ddsc.memory.data   = wood_andi_data;
+          ddsc.memory.length = sizeof(wood_andi_data);
+          DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+          DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
 #else
-     imagefile = DATADIR"/wood_andi.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
+          imagefile = DATADIR"/wood_andi.dfiff";
+          DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
 #endif
+     }
 
      /* render the image to the temporary surface. */
      provider->RenderTo( provider, surface, NULL );
