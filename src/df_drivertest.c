@@ -50,8 +50,8 @@ static IDirectFBSurface *testimage2 = NULL;
 
 /* background */
 typedef enum {
-  GRID_BG,
-  MASK_BG
+     GRID_BG,
+     MASK_BG
 } Background;
 
 #ifdef USE_IMAGE_HEADERS

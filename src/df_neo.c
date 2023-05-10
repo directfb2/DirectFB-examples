@@ -58,15 +58,15 @@ static int               back_height;
 
 /* test images */
 typedef enum {
-  APPLE_RED,
-  GNOME_APPLETS,
-  GNOME_CALENDAR,
-  GNOME_FOOT,
-  GNOME_GMUSH,
-  GNOME_GIMP,
-  GNOME_GSAME,
-  GNU_KEYS,
-  NUM_IMAGES
+     APPLE_RED,
+     GNOME_APPLETS,
+     GNOME_CALENDAR,
+     GNOME_FOOT,
+     GNOME_GMUSH,
+     GNOME_GIMP,
+     GNOME_GSAME,
+     GNU_KEYS,
+     NUM_IMAGES
 } Image;
 
 #ifdef USE_IMAGE_HEADERS
