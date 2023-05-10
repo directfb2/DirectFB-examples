@@ -60,10 +60,10 @@ static IDirectFBFont *font_large  = NULL;
 
 /* images */
 typedef enum {
-  JOYSTICK,
-  KEYS,
-  MOUSE,
-  NUM_IMAGES
+     JOYSTICK,
+     KEYS,
+     MOUSE,
+     NUM_IMAGES
 } Image;
 
 #ifdef USE_IMAGE_HEADERS

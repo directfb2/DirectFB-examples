@@ -37,22 +37,30 @@
 IFusionSound              *sound    = NULL;
 IFusionSoundMusicProvider *provider = NULL;
 IFusionSoundBuffer        *buffer   = NULL;
+IFusionSoundStream        *stream   = NULL;
 IFusionSoundPlayback      *playback = NULL;
 
-#define BEGIN_TEST(name)                                   \
-     FSCHECK(buffer->CreatePlayback( buffer, &playback )); \
-     sleep( 2 );                                           \
+typedef enum {
+     SOUND_BUFFER,
+     SOUND_STREAM
+} SoundType;
+
+#define BEGIN_TEST(type,name)                                   \
+     if (type == SOUND_BUFFER)                                  \
+          FSCHECK(buffer->CreatePlayback( buffer, &playback )); \
+     else if (type == SOUND_STREAM)                             \
+          FSCHECK(stream->GetPlayback( stream, &playback ));    \
+     sleep( 2 );                                                \
      fprintf( stderr, "Testing %-30s", name );
 
-#define END_TEST()                                         \
-     fprintf( stderr, "OK\n" );                            \
-     playback->Release( playback );                        \
+#define END_TEST()                                              \
+     fprintf( stderr, "OK\n" );                                 \
+     playback->Release( playback );                             \
      playback = NULL
 
-static void
-test_simple_playback( IFusionSoundBuffer *buffer )
+static void test_start_simple_playback()
 {
-     BEGIN_TEST( "Simple Playback" );
+     BEGIN_TEST( SOUND_BUFFER, "Simple Playback" );
 
      FSCHECK(playback->Start( playback, 0, 0 ));
 
@@ -61,12 +69,11 @@ test_simple_playback( IFusionSoundBuffer *buffer )
      END_TEST();
 }
 
-static void
-test_positioned_playback( IFusionSoundBuffer *buffer )
+static void test_start_positioned_playback()
 {
      FSBufferDescription desc;
 
-     BEGIN_TEST( "Positioned Playback" );
+     BEGIN_TEST( SOUND_BUFFER, "Positioned Playback" );
 
      FSCHECK(buffer->GetDescription( buffer, &desc ));
 
@@ -83,10 +90,9 @@ test_positioned_playback( IFusionSoundBuffer *buffer )
      END_TEST();
 }
 
-static void
-test_looping_playback( IFusionSoundBuffer *buffer )
+static void test_start_looping_playback()
 {
-     BEGIN_TEST( "Looping Playback" );
+     BEGIN_TEST( SOUND_BUFFER, "Looping Playback" );
 
      FSCHECK(playback->Start( playback, 0, -1 ));
 
@@ -97,14 +103,14 @@ test_looping_playback( IFusionSoundBuffer *buffer )
      END_TEST();
 }
 
-static void
-test_stop_continue_playback( IFusionSoundBuffer *buffer )
+static void test_stop_continue_playback( SoundType type )
 {
      int i;
 
-     BEGIN_TEST( "Stop/Continue Playback" );
+     BEGIN_TEST( type, "Stop/Continue Playback" );
 
-     FSCHECK(playback->Start( playback, 0, -1 ));
+     if (type == SOUND_BUFFER)
+          FSCHECK(playback->Start( playback, 0, -1 ));
 
      for (i = 0; i < 8; i++) {
           usleep( 500000 );
@@ -119,14 +125,14 @@ test_stop_continue_playback( IFusionSoundBuffer *buffer )
      END_TEST();
 }
 
-static void
-test_volume_level( IFusionSoundBuffer *buffer )
+static void test_volume_level( SoundType type )
 {
      int i;
 
-     BEGIN_TEST( "Volume Level" );
+     BEGIN_TEST( type, "Volume Level" );
 
-     FSCHECK(playback->Start( playback, 0, -1 ));
+     if (type == SOUND_BUFFER)
+          FSCHECK(playback->Start( playback, 0, -1 ));
 
      for (i = 0; i < 60; i++) {
           FSCHECK(playback->SetVolume( playback, sin( i / 3.0) / 3.0 + 0.6 ));
@@ -137,14 +143,14 @@ test_volume_level( IFusionSoundBuffer *buffer )
      END_TEST();
 }
 
-static void
-test_pan_value( IFusionSoundBuffer *buffer )
+static void test_pan_value( SoundType type )
 {
      int i;
 
-     BEGIN_TEST( "Pan Value" );
+     BEGIN_TEST( type, "Pan Value" );
 
-     FSCHECK(playback->Start( playback, 0, -1 ));
+     if (type == SOUND_BUFFER)
+          FSCHECK(playback->Start( playback, 0, -1 ));
 
      for (i = 0; i < 30; i++) {
           FSCHECK(playback->SetPan( playback, sin( i / 3.0 ) ));
@@ -155,14 +161,14 @@ test_pan_value( IFusionSoundBuffer *buffer )
      END_TEST();
 }
 
-static void
-test_pitch_value( IFusionSoundBuffer *buffer )
+static void test_pitch_value( SoundType type )
 {
      int i;
 
-     BEGIN_TEST( "Pitch Value" );
+     BEGIN_TEST( type, "Pitch Value" );
 
-     FSCHECK(playback->Start( playback, 0, -1 ));
+     if (type == SOUND_BUFFER)
+          FSCHECK(playback->Start( playback, 0, -1 ));
 
      for (i = 500; i < 1500; i++) {
           FSCHECK(playback->SetPitch( playback, i / 1000.0f ));
@@ -183,6 +189,10 @@ static void cleanup()
      if (buffer)
           buffer->Release( buffer );
 
+     /* Release the sound stream. */
+     if (stream)
+          stream->Release( stream );
+
      /* Release the music provider. */
      if (provider)
           provider->Release( provider );
@@ -194,7 +204,8 @@ static void cleanup()
 
 int main( int argc, char *argv[] )
 {
-     FSBufferDescription dsc;
+     FSBufferDescription bdsc;
+     FSStreamDescription sdsc;
 
      /* Initialize FusionSound including command line parsing. */
      FSCHECK(FusionSoundInit( &argc, &argv ));
@@ -205,20 +216,34 @@ int main( int argc, char *argv[] )
      /* Register termination function. */
      atexit( cleanup );
 
-     /* Load the sound buffer. */
+     /* Create a music provider for loading the file. */
      FSCHECK(sound->CreateMusicProvider( sound, DATADIR"/test.wav", &provider ));
-     provider->GetBufferDescription( provider, &dsc );
-     FSCHECK(sound->CreateBuffer( sound, &dsc, &buffer ));
+     provider->GetBufferDescription( provider, &bdsc );
+     provider->GetStreamDescription( provider, &sdsc );
+
+     /* Running sound buffer tests. */
+     fprintf( stderr, "\nRunning sound buffer tests:\n" );
+     FSCHECK(sound->CreateBuffer( sound, &bdsc, &buffer ));
      provider->PlayToBuffer( provider, buffer, NULL, NULL );
 
-     /* Running tests. */
-     test_simple_playback( buffer );
-     test_positioned_playback( buffer );
-     test_looping_playback( buffer );
-     test_stop_continue_playback( buffer );
-     test_volume_level( buffer );
-     test_pan_value( buffer );
-     test_pitch_value( buffer );
+     test_start_simple_playback();
+     test_start_positioned_playback();
+     test_start_looping_playback();
+     test_stop_continue_playback( SOUND_BUFFER );
+     test_volume_level( SOUND_BUFFER );
+     test_pan_value( SOUND_BUFFER );
+     test_pitch_value( SOUND_BUFFER );
+
+     /* Running sound stream tests. */
+     fprintf( stderr, "\nRunning sound stream tests:\n" );
+     FSCHECK(sound->CreateStream( sound, &sdsc, &stream ));
+     provider->PlayToStream( provider, stream );
+     provider->SetPlaybackFlags( provider, FMPLAY_LOOPING );
+
+     test_stop_continue_playback( SOUND_STREAM );
+     test_volume_level( SOUND_STREAM );
+     test_pan_value( SOUND_STREAM );
+     test_pitch_value( SOUND_STREAM );
 
      return 0;
 }
