@@ -1,3 +1,24 @@
+commit 4b7de0d8554c0c2cc411f0a712936fc5cf7f56ac
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Wed May 10 16:56:59 2023 +0200
+
+    fs advanced: Test advanced playback control for both sound buffer and sound stream
+
+commit 262fb78e5bd485a531cc594d0455d2e8834765a5
+Merge: 0cd4c63 3eaaad4
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Sat May 6 11:32:51 2023 +0200
+
+    Merge pull request #23 from caramelli/master
+    
+    df_porter: Add <background> option
+
+commit 3eaaad45697a3584588e28dfbe0982641ea7b600
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Sat May 6 11:26:02 2023 +0200
+
+    Update ChangeLog
+
 commit a01422fd59f88885f4716e8e327b319668248211
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Sat May 6 11:25:00 2023 +0200
