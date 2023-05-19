@@ -62,16 +62,23 @@ else
   message('multi-touch support not found')
 endif
 
-if get_option('font-headers') or get_option('image-headers') or get_option('video-headers')
+font_headers  = get_option('font-headers')
+image_headers = get_option('image-headers')
+video_headers = get_option('video-headers')
+
+if font_headers != 'disabled' or image_headers != 'disabled' or video_headers != 'disabled'
   directfb_csource = find_program('directfb-csource')
-  if get_option('font-headers')
-    cat = find_program('cat')
+  if font_headers != 'disabled'
     add_global_arguments('-DUSE_FONT_HEADERS', language: 'c')
+    if font_headers == 'dgiff'
+      cat = find_program('cat')
+      add_global_arguments('-DDGIFF_EXTENSION', language: 'c')
+    endif
   endif
-  if get_option('image-headers')
+  if image_headers != 'disabled'
     add_global_arguments('-DUSE_IMAGE_HEADERS', language: 'c')
   endif
-  if get_option('video-headers')
+  if video_headers != 'disabled'
     add_global_arguments('-DUSE_VIDEO_HEADERS', language: 'c')
   endif
 endif

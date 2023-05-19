@@ -25,6 +25,8 @@
 #include <directfb_strings.h>
 #include <directfb_util.h>
 
+#include "util.h"
+
 #ifdef USE_FONT_HEADERS
 #include "decker.h"
 #endif
@@ -202,13 +204,8 @@ int main( int argc, char *argv[] )
      DFBResult                 ret;
      int                       n;
      DFBFontDescription        fdsc;
-#ifdef USE_FONT_HEADERS
      DFBDataBufferDescription  ddsc;
      IDirectFBDataBuffer      *buffer;
-#else
-     const char               *fontfile;
-#endif
-     DFBSurfacePixelFormat     fontformat = DSPF_A8;
 
      /* initialize planes */
      memset( planes, 0, sizeof(planes) );
@@ -270,22 +267,19 @@ int main( int argc, char *argv[] )
      DFBCHECK(screen->GetSize( screen, &screen_width, &screen_height ));
 
      /* load font */
-#ifdef HAVE_GETFONTSURFACEFORMAT
-     DFBCHECK(dfb->GetFontSurfaceFormat( dfb, &fontformat ));
-#endif
      fdsc.flags  = DFDESC_HEIGHT;
      fdsc.height = 16;
 
 #ifdef USE_FONT_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = fontformat == DSPF_A8 ? decker_data : decker_argb_data;
-     ddsc.memory.length = fontformat == DSPF_A8 ? sizeof(decker_data) : sizeof(decker_argb_data);
+     ddsc.memory.data   = GET_FONTDATA( decker );
+     ddsc.memory.length = GET_FONTSIZE( decker );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_FONTFILE( decker );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font ));
-#else
-     fontfile = fontformat == DSPF_A8 ? DATADIR"/decker.dgiff" : DATADIR"/decker_argb.dgiff";
-     DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &font ));
-#endif
 
      screen->EnumDisplayLayers( screen, display_layer_callback, NULL );
 

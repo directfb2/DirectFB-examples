@@ -19,16 +19,19 @@
 #  THE SOFTWARE.
 
 option('font-headers',
-       type: 'boolean',
-       value: false,
+       type: 'combo',
+       value: 'disabled',
+       choices: ['disabled', 'dgiff', 'ttf'],
        description: 'Use generated font headers')
 
 option('image-headers',
-       type: 'boolean',
-       value: false,
+       type: 'combo',
+       value: 'disabled',
+       choices: ['disabled', 'dfiff', 'png'],
        description: 'Use generated image headers')
 
 option('video-headers',
-       type: 'boolean',
-       value: false,
+       type: 'combo',
+       value: 'disabled',
+       choices: ['disabled', 'dfvff', 'm2v', '264'],
        description: 'Use generated video headers')

@@ -24,6 +24,8 @@
 #include <directfb.h>
 #include <math.h>
 
+#include "util.h"
+
 #ifdef USE_IMAGE_HEADERS
 #include "panel.h"
 #endif
@@ -125,16 +127,8 @@ int main( int argc, char *argv[] )
      DFBDisplayLayerConfig     config;
      DFBSurfaceDescription     sdsc;
      DFBWindowDescription      wdsc;
-#if defined(USE_IMAGE_HEADERS) || defined(USE_VIDEO_HEADERS)
      DFBDataBufferDescription  ddsc;
      IDirectFBDataBuffer      *buffer;
-#endif
-#ifndef USE_IMAGE_HEADERS
-     const char               *imagefile;
-#endif
-#ifndef USE_VIDEO_HEADERS
-     const char               *videofile;
-#endif
      IDirectFBImageProvider   *provider;
 
      /* initialize DirectFB including command line parsing */
@@ -167,14 +161,14 @@ int main( int argc, char *argv[] )
      /* video window */
 #ifdef USE_VIDEO_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = bbb_data;
-     ddsc.memory.length = sizeof(bbb_data);
+     ddsc.memory.data   = GET_VIDEODATA( bbb );
+     ddsc.memory.length = GET_VIDEOSIZE( bbb );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = argc > 1 ? argv[1] : GET_VIDEOFILE( bbb );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateVideoProvider( buffer, &videoprovider ));
-#else
-     videofile = DATADIR"/bbb.dfvff";
-     DFBCHECK(dfb->CreateVideoProvider( dfb, argc > 1 ? argv[1] : videofile, &videoprovider ));
-#endif
      videoprovider->GetSurfaceDescription( videoprovider, &sdsc );
      wdsc.flags  = DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT;
      wdsc.posx   = 0;
@@ -190,14 +184,14 @@ int main( int argc, char *argv[] )
      /* panel window */
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = panel_data;
-     ddsc.memory.length = sizeof(panel_data);
+     ddsc.memory.data   = GET_IMAGEDATA( panel );
+     ddsc.memory.length = GET_IMAGESIZE( panel );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_IMAGEFILE( panel );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = DATADIR"/panel.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      wdsc.flags  = DWDESC_CAPS | DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT;
      wdsc.caps   = DWCAPS_ALPHACHANNEL;

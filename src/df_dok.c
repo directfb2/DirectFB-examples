@@ -20,7 +20,6 @@
    THE SOFTWARE.
 */
 
-#include <direct/system.h>
 #include <direct/util.h>
 #include <directfb.h>
 #include <directfb_strings.h>
@@ -419,12 +418,8 @@ static void showResult()
 {
      DFBRectangle              rect;
      DFBSurfaceDescription     sdsc;
-#ifdef USE_IMAGE_HEADERS
      DFBDataBufferDescription  ddsc;
      IDirectFBDataBuffer      *buffer;
-#else
-     const char               *imagefile;
-#endif
      IDirectFBImageProvider   *provider;
      IDirectFBSurface         *meter;
      int                       i, y, w, h, max_string_width = 0;
@@ -444,14 +439,14 @@ static void showResult()
 
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = meter_data;
-     ddsc.memory.length = sizeof(meter_data);
+     ddsc.memory.data   = GET_IMAGEDATA( meter );
+     ddsc.memory.length = GET_IMAGESIZE( meter );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_IMAGEFILE( meter );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = DATADIR"/meter.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.height = 8;
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &meter ));
@@ -595,7 +590,7 @@ static unsigned long long draw_string( long long t )
                             myrand() % (SH - bench_fontheight), DSTF_TOPLEFT );
      }
 
-     return 1000 * 36 * (unsigned long long)i;
+     return 1000 * 36 * (unsigned long long) i;
 }
 
 static unsigned long long draw_string_blend( long long t )
@@ -616,7 +611,7 @@ static unsigned long long draw_string_blend( long long t )
                             myrand() % (SH - bench_fontheight), DSTF_TOPLEFT );
      }
 
-     return 1000 * 36 * (unsigned long long)i;
+     return 1000 * 36 * (unsigned long long) i;
 }
 
 static unsigned long long fill_rect( long long t )
@@ -633,7 +628,7 @@ static unsigned long long fill_rect( long long t )
           dest->FillRectangle( dest, SW != SX ? myrand() % (SW - SX) : 0, SH != SY ? myrand() % (SH - SY) : 0, SX, SY );
      }
 
-     return SX * SY * (unsigned long long)i;
+     return SX * SY * (unsigned long long) i;
 }
 
 static unsigned long long fill_rect_blend( long long t )
@@ -650,7 +645,7 @@ static unsigned long long fill_rect_blend( long long t )
           dest->FillRectangle( dest, SW != SX ? myrand() % (SW - SX) : 0, SH != SY ? myrand() % (SH - SY) : 0, SX, SY );
      }
 
-     return SX * SY * (unsigned long long)i;
+     return SX * SY * (unsigned long long) i;
 }
 
 static unsigned long long fill_rects( long long t )
@@ -675,7 +670,7 @@ static unsigned long long fill_rects( long long t )
           dest->FillRectangles( dest, rects, 10 );
      }
 
-     return SX * SY * 10 * (unsigned long long)i;
+     return SX * SY * 10 * (unsigned long long) i;
 }
 
 static unsigned long long fill_rects_blend( long long t )
@@ -700,7 +695,7 @@ static unsigned long long fill_rects_blend( long long t )
           dest->FillRectangles( dest, rects, 10 );
      }
 
-     return SX * SY * 10 * (unsigned long long)i;
+     return SX * SY * 10 * (unsigned long long) i;
 }
 
 static unsigned long long fill_triangle( long long t )
@@ -720,7 +715,7 @@ static unsigned long long fill_triangle( long long t )
           dest->FillTriangle( dest, x, y, x + SX - 1, y + SY / 2, x, y + SY - 1 );
      }
 
-     return SX * SY * (unsigned long long)i / 2;
+     return SX * SY * (unsigned long long) i / 2;
 }
 
 static unsigned long long fill_triangle_blend( long long t )
@@ -740,7 +735,7 @@ static unsigned long long fill_triangle_blend( long long t )
           dest->FillTriangle( dest, x, y, x + SX - 1, y + SY / 2, x, y + SY - 1 );
      }
 
-     return SX * SY * (unsigned long long)i / 2;
+     return SX * SY * (unsigned long long) i / 2;
 }
 
 static unsigned long long draw_rect( long long t )
@@ -757,7 +752,7 @@ static unsigned long long draw_rect( long long t )
           dest->DrawRectangle( dest, SW != SX ? myrand() % (SW - SX) : 0, SH != SY ? myrand() % (SH - SY) : 0, SX, SY );
      }
 
-     return 1000 * (unsigned long long)i;
+     return 1000 * (unsigned long long) i;
 }
 
 static unsigned long long draw_rect_blend( long long t )
@@ -774,7 +769,7 @@ static unsigned long long draw_rect_blend( long long t )
           dest->DrawRectangle( dest, SW != SX ? myrand() % (SW - SX) : 0, SH != SY ? myrand() % (SH - SY) : 0, SX, SY );
      }
 
-     return 1000 * (unsigned long long)i;
+     return 1000 * (unsigned long long) i;
 }
 
 static unsigned long long draw_lines( long long t )
@@ -804,7 +799,7 @@ static unsigned long long draw_lines( long long t )
           dest->DrawLines( dest, lines, 10 );
      }
 
-     return 1000 * 10 * (unsigned long long)i;
+     return 1000 * 10 * (unsigned long long) i;
 }
 
 static unsigned long long draw_lines_blend( long long t )
@@ -834,7 +829,7 @@ static unsigned long long draw_lines_blend( long long t )
           dest->DrawLines( dest, lines, 10 );
      }
 
-     return 1000 * 10 * (unsigned long long)i;
+     return 1000 * 10 * (unsigned long long) i;
 }
 
 static unsigned long long fill_spans_with_flags( long long t, DFBSurfaceDrawingFlags flags )
@@ -912,7 +907,7 @@ static unsigned long long fill_traps( long long t )
           dest->FillTrapezoids( dest, traps, 10 );
      }
 
-     return SX * SY * 10 * (unsigned long long)i;
+     return SX * SY * 10 * (unsigned long long) i;
 }
 
 static unsigned long long blit( long long t )
@@ -928,7 +923,7 @@ static unsigned long long blit( long long t )
           dest->Blit( dest, simple, NULL, SW != SX ? myrand() % (SW - SX) : 0, SH != SY ? myrand() % (SH - SY) : 0 );
      }
 
-     return SX * SY * (unsigned long long)i;
+     return SX * SY * (unsigned long long) i;
 }
 
 static unsigned long long blit180( long long t )
@@ -944,7 +939,7 @@ static unsigned long long blit180( long long t )
           dest->Blit( dest, simple, NULL, SW != SX ? myrand() % (SW - SX) : 0, SH != SY ? myrand() % (SH - SY) : 0 );
      }
 
-     return SX * SY * (unsigned long long)i;
+     return SX * SY * (unsigned long long) i;
 }
 
 static unsigned long long blit_colorkeyed( long long t )
@@ -960,7 +955,7 @@ static unsigned long long blit_colorkeyed( long long t )
           dest->Blit( dest, colorkeyed, NULL, SW != SX ? myrand() % (SW - SX) : 0, SH != SY ? myrand() % (SH - SY) : 0 );
      }
 
-     return SX * SY * (unsigned long long)i;
+     return SX * SY * (unsigned long long) i;
 }
 
 static unsigned long long blit_dst_colorkeyed( long long t )
@@ -988,7 +983,7 @@ static unsigned long long blit_dst_colorkeyed( long long t )
           dest->Blit( dest, simple, NULL, SW != SX ? myrand() % (SW - SX) : 0, SH != SY ? myrand() % (SH - SY) : 0 );
      }
 
-     return SX * SY * (unsigned long long)i;
+     return SX * SY * (unsigned long long) i;
 }
 
 static unsigned long long blit_convert( long long t )
@@ -1004,7 +999,7 @@ static unsigned long long blit_convert( long long t )
           dest->Blit( dest, image32, NULL, SW != SX ? myrand() % (SW - SX) : 0, SH != SY ? myrand() % (SH - SY) : 0 );
      }
 
-     return SX * SY * (unsigned long long)i;
+     return SX * SY * (unsigned long long) i;
 }
 
 static unsigned long long blit_colorize( long long t )
@@ -1020,7 +1015,7 @@ static unsigned long long blit_colorize( long long t )
           dest->SetColor( dest, myrand() & 0xFF, myrand() & 0xFF, myrand() & 0xFF, 0xFF );
           dest->Blit( dest, simple, NULL, SW != SX ? myrand() % (SW - SX) : 0, SH != SY ? myrand() % (SH - SY) : 0 );
      }
-     return SX * SY * (unsigned long long)i;
+     return SX * SY * (unsigned long long) i;
 }
 
 static unsigned long long blit_mask( long long t )
@@ -1040,7 +1035,7 @@ static unsigned long long blit_mask( long long t )
           dest->Blit( dest, swirl, &src, SW != SX ? myrand() % (SW - SX) : 0, SH != SY ? myrand() % (SH - SY) : 0 );
      }
 
-     return SX * SY * (unsigned long long)i;
+     return SX * SY * (unsigned long long) i;
 }
 
 static unsigned long long blit_blend( long long t )
@@ -1056,7 +1051,7 @@ static unsigned long long blit_blend( long long t )
           dest->Blit( dest, image32a, NULL, SW != SX ? myrand() % (SW - SX) : 0, SH != SY ? myrand() % (SH - SY) : 0 );
      }
 
-     return SX * SY * (unsigned long long)i;
+     return SX * SY * (unsigned long long) i;
 }
 
 static unsigned long long blit_blend_colorize( long long t )
@@ -1073,7 +1068,7 @@ static unsigned long long blit_blend_colorize( long long t )
           dest->Blit( dest, image32a, NULL, SW != SX ? myrand() % (SW - SX) : 0, SH != SY ? myrand() % (SH - SY) : 0 );
      }
 
-     return SX * SY * (unsigned long long)i;
+     return SX * SY * (unsigned long long) i;
 }
 
 static unsigned long long blit_srcover( long long t )
@@ -1093,7 +1088,7 @@ static unsigned long long blit_srcover( long long t )
 
      dest->SetPorterDuff( dest, DSPD_NONE );
 
-     return SX * SY * (unsigned long long)i;
+     return SX * SY * (unsigned long long) i;
 }
 
 static unsigned long long blit_srcover_pre( long long t )
@@ -1113,7 +1108,7 @@ static unsigned long long blit_srcover_pre( long long t )
 
      dest->SetPorterDuff( dest, DSPD_NONE );
 
-     return SX * SY * (unsigned long long)i;
+     return SX * SY * (unsigned long long) i;
 }
 
 static unsigned long long stretch_blit( long long t )
@@ -1209,7 +1204,7 @@ static unsigned long long load_image( long long t )
      snprintf( buf, sizeof(buf), " (%dx%d %s)", dsc.width, dsc.height, dfb_pixelformat_name( dsc.pixelformat ) );
      strcat( current_demo->desc, buf );
 
-     return dsc.width * dsc.height * (unsigned long long)i;
+     return dsc.width * dsc.height * (unsigned long long) i;
 }
 
 /**************************************************************************************************/
@@ -1220,18 +1215,9 @@ int main( int argc, char *argv[] )
      DFBInputEvent             evt;
      DFBFontDescription        fdsc;
      DFBSurfaceDescription     sdsc;
-#if defined(USE_FONT_HEADERS) || defined(USE_IMAGE_HEADERS)
      DFBDataBufferDescription  ddsc;
      IDirectFBDataBuffer      *buffer;
-#endif
-#ifndef USE_FONT_HEADERS
-     const char               *fontfile;
-#endif
-#ifndef USE_IMAGE_HEADERS
-     const char               *imagefile;
-#endif
      IDirectFBImageProvider   *provider;
-     DFBSurfacePixelFormat     fontformat     = DSPF_A8;
      DFBSurfaceRenderOptions   render_options = DSRO_NONE;
      int                       demo_requested = 0;
 
@@ -1375,35 +1361,25 @@ int main( int argc, char *argv[] )
      DFBCHECK(primary->GetSize( primary, &SW, &SH ));
 
      /* load bench and ui fonts */
-#ifdef HAVE_GETFONTSURFACEFORMAT
-     DFBCHECK(dfb->GetFontSurfaceFormat( dfb, &fontformat ));
-#endif
      fdsc.flags = DFDESC_HEIGHT;
 
 #ifdef USE_FONT_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = fontformat == DSPF_A8 ? decker_data : decker_argb_data;
-     ddsc.memory.length = fontformat == DSPF_A8 ? sizeof(decker_data) : sizeof(decker_argb_data);
-     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     ddsc.memory.data   = GET_FONTDATA( decker );
+     ddsc.memory.length = GET_FONTSIZE( decker );
 #else
-     fontfile = fontformat == DSPF_A8 ? DATADIR"/decker.dgiff" : DATADIR"/decker_argb.dgiff";
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_FONTFILE( decker );
 #endif
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
 
      fdsc.height = 24;
-#ifdef USE_FONT_HEADERS
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &bench_font ));
-#else
-     DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &bench_font ));
-#endif
      DFBCHECK(bench_font->GetHeight( bench_font, &bench_fontheight ));
      DFBCHECK(bench_font->GetStringWidth( bench_font, "This is the DirectFB Benchmarking!!!", -1, &bench_stringwidth ));
 
      fdsc.height = 16;
-#ifdef USE_FONT_HEADERS
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &ui_font ));
-#else
-     DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &ui_font ));
-#endif
      DFBCHECK(ui_font->GetHeight( ui_font, &ui_fontheight ));
 
      /* clear with black */
@@ -1412,14 +1388,14 @@ int main( int argc, char *argv[] )
      /* start screen */
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = biglogo_data;
-     ddsc.memory.length = sizeof(biglogo_data);
+     ddsc.memory.data   = GET_IMAGEDATA( biglogo );
+     ddsc.memory.length = GET_IMAGESIZE( biglogo );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_IMAGEFILE( biglogo );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = DATADIR"/biglogo.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width  = (SH / 8) * sdsc.width / sdsc.height;
      sdsc.height = SH / 8;
@@ -1453,14 +1429,14 @@ int main( int argc, char *argv[] )
      /* card icon */
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = card_data;
-     ddsc.memory.length = sizeof(card_data);
+     ddsc.memory.data   = GET_IMAGEDATA( card );
+     ddsc.memory.length = GET_IMAGESIZE( card );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_IMAGEFILE( card );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = DATADIR"/card.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width  = sdsc.width * (ui_fontheight - ui_fontheight / 5) / sdsc.height;
      sdsc.height = (ui_fontheight - ui_fontheight / 5);
@@ -1472,14 +1448,14 @@ int main( int argc, char *argv[] )
      /* create a surface and render an image to it */
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = swirl_data;
-     ddsc.memory.length = sizeof(swirl_data);
+     ddsc.memory.data   = GET_IMAGEDATA( swirl );
+     ddsc.memory.length = GET_IMAGESIZE( swirl );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_IMAGEFILE( swirl );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = DATADIR"/swirl.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX * 2;
      sdsc.height      = SY * 2;
@@ -1491,14 +1467,14 @@ int main( int argc, char *argv[] )
      /* create a surface and render an image to it */
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = rose_data;
-     ddsc.memory.length = sizeof(rose_data);
+     ddsc.memory.data   = GET_IMAGEDATA( rose );
+     ddsc.memory.length = GET_IMAGESIZE( rose );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_IMAGEFILE( rose );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = DATADIR"/rose.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX;
      sdsc.height      = SY;
@@ -1514,14 +1490,14 @@ int main( int argc, char *argv[] )
      /* create a surface and render an image to it */
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = melted_data;
-     ddsc.memory.length = sizeof(melted_data);
+     ddsc.memory.data   = GET_IMAGEDATA( melted );
+     ddsc.memory.length = GET_IMAGESIZE( melted );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_IMAGEFILE( melted );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = DATADIR"/melted.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX;
      sdsc.height      = SY;
@@ -1533,14 +1509,14 @@ int main( int argc, char *argv[] )
      /* create a surface and render an image to it */
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = colorkeyed_data;
-     ddsc.memory.length = sizeof(colorkeyed_data);
+     ddsc.memory.data   = GET_IMAGEDATA( colorkeyed );
+     ddsc.memory.length = GET_IMAGESIZE( colorkeyed );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_IMAGEFILE( colorkeyed );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = DATADIR"/colorkeyed.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX;
      sdsc.height      = SY;
@@ -1553,14 +1529,14 @@ int main( int argc, char *argv[] )
      /* create a surface and render an image to it */
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = laden_bike_data;
-     ddsc.memory.length = sizeof(laden_bike_data);
+     ddsc.memory.data   = GET_IMAGEDATA( laden_bike );
+     ddsc.memory.length = GET_IMAGESIZE( laden_bike );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_IMAGEFILE( laden_bike );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = DATADIR"/laden_bike.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX;
      sdsc.height      = SY;
@@ -1572,14 +1548,14 @@ int main( int argc, char *argv[] )
      /* create a surface and render an image to it */
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = sacred_heart_data;
-     ddsc.memory.length = sizeof(sacred_heart_data);
+     ddsc.memory.data   = GET_IMAGEDATA( sacred_heart );
+     ddsc.memory.length = GET_IMAGESIZE( sacred_heart );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_IMAGEFILE( sacred_heart );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = DATADIR"/sacred_heart.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX;
      sdsc.height      = SY;
@@ -1591,14 +1567,14 @@ int main( int argc, char *argv[] )
      /* create a surface and render an image to it */
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = fish_data;
-     ddsc.memory.length = sizeof(fish_data);
+     ddsc.memory.data   = GET_IMAGEDATA( fish );
+     ddsc.memory.length = GET_IMAGESIZE( fish );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_IMAGEFILE( fish );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = DATADIR"/fish.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX;
      sdsc.height      = SY;
@@ -1611,14 +1587,14 @@ int main( int argc, char *argv[] )
      if (with_intro) {
 #ifdef USE_IMAGE_HEADERS
           ddsc.flags         = DBDESC_MEMORY;
-          ddsc.memory.data   = intro_data;
-          ddsc.memory.length = sizeof(intro_data);
+          ddsc.memory.data   = GET_IMAGEDATA( intro );
+          ddsc.memory.length = GET_IMAGESIZE( intro );
+#else
+          ddsc.flags         = DBDESC_FILE;
+          ddsc.file          = GET_IMAGEFILE( intro );
+#endif
           DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
           DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-          imagefile = DATADIR"/intro.dfiff";
-          DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
           provider->GetSurfaceDescription( provider, &sdsc );
           sdsc.width  = SW;
           sdsc.height = run_fullscreen ? SH : SH + ui_fontheight;

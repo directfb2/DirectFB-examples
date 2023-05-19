@@ -24,6 +24,8 @@
 #include <directfb.h>
 #include <directfb_keynames.h>
 
+#include "util.h"
+
 #ifdef USE_FONT_HEADERS
 #include "decker.h"
 #endif
@@ -68,14 +70,18 @@ typedef enum {
 
 #ifdef USE_IMAGE_HEADERS
 static const void *image_data[] = {
-     joystick_data, keys_data, mouse_data
+     GET_IMAGEDATA( joystick ), GET_IMAGEDATA( keys ), GET_IMAGEDATA( mouse )
 };
-static unsigned int image_length[] = {
-     sizeof(joystick_data), sizeof(keys_data), sizeof(mouse_data)
+static unsigned int image_size[] = {
+     GET_IMAGESIZE( joystick ), GET_IMAGESIZE( keys ), GET_IMAGESIZE( mouse )
 };
 #else
-static const char *image_names[] = {
-     "joystick.dfiff", "keys.dfiff", "mouse.dfiff"
+static const char *joystick() { return GET_IMAGEFILE( joystick ); }
+static const char *keys()     { return GET_IMAGEFILE( keys );     }
+static const char *mouse()    { return GET_IMAGEFILE( mouse );    }
+
+static const char *(*image_file[])() = {
+     joystick, keys, mouse
 };
 #endif
 
@@ -603,9 +609,8 @@ static void dfb_shutdown()
 {
      int n;
 
-     for (n = 0; n < NUM_IMAGES; n++) {
+     for (n = 0; n < NUM_IMAGES; n++)
           if (images[n]) images[n]->Release( images[n] );
-     }
 
      if (font_large)     font_large->Release( font_large );
      if (font_normal)    font_normal->Release( font_normal );
@@ -630,18 +635,9 @@ int main( int argc, char *argv[] )
      int                       n;
      DFBFontDescription        fdsc;
      DFBSurfaceDescription     sdsc;
-#if defined(USE_FONT_HEADERS) || defined(USE_IMAGE_HEADERS)
      DFBDataBufferDescription  ddsc;
      IDirectFBDataBuffer      *buffer;
-#endif
-#ifndef USE_FONT_HEADERS
-     const char               *fontfile;
-#endif
-#ifndef USE_IMAGE_HEADERS
-     char                      imagefile[PATH_MAX];
-#endif
      IDirectFBImageProvider   *provider;
-     DFBSurfacePixelFormat     fontformat = DSPF_A8;
      DeviceInfo               *devices    = NULL;
 
      /* initialize DirectFB including command line parsing */
@@ -697,53 +693,39 @@ int main( int argc, char *argv[] )
      mouse_pressure[0] = false;
 
      /* load fonts */
-#ifdef HAVE_GETFONTSURFACEFORMAT
-     DFBCHECK(dfb->GetFontSurfaceFormat( dfb, &fontformat ));
-#endif
      fdsc.flags = DFDESC_HEIGHT;
 
 #ifdef USE_FONT_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = fontformat == DSPF_A8 ? decker_data : decker_argb_data;
-     ddsc.memory.length = fontformat == DSPF_A8 ? sizeof(decker_data) : sizeof(decker_argb_data);
-     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     ddsc.memory.data   = GET_FONTDATA( decker );
+     ddsc.memory.length = GET_FONTSIZE( decker );
 #else
-     fontfile = fontformat == DSPF_A8 ? DATADIR"/decker.dgiff" : DATADIR"/decker_argb.dgiff";
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_FONTFILE( decker );
 #endif
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
 
      fdsc.height = CLAMP( (int) (screen_width / 30.0 / 8) * 8, 8, 96 );
-#ifdef USE_FONT_HEADERS
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font_small ));
-#else
-     DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &font_small ));
-#endif
 
      fdsc.height = CLAMP( (int) (screen_width / 20.0 / 8) * 8, 8, 96 );
-#ifdef USE_FONT_HEADERS
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font_normal ));
-#else
-     DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &font_normal ));
-#endif
 
      fdsc.height = CLAMP( (int) (screen_width / 10.0 / 8) * 8, 8, 96 );
-#ifdef USE_FONT_HEADERS
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font_large ));
-#else
-     DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &font_large ));
-#endif
 
      /* load images */
      for (n = 0; n < NUM_IMAGES; n++) {
 #ifdef USE_IMAGE_HEADERS
           ddsc.flags         = DBDESC_MEMORY;
           ddsc.memory.data   = image_data[n];
-          ddsc.memory.length = image_length[n];
+          ddsc.memory.length = image_size[n];
+#else
+          ddsc.flags         = DBDESC_FILE;
+          ddsc.file          = image_file[n]();
+#endif
           DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
           DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-          snprintf( imagefile, PATH_MAX, DATADIR"/%s", image_names[n] );
-          DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
           provider->GetSurfaceDescription( provider, &sdsc );
           DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &images[n] ));
           provider->RenderTo( provider, images[n], NULL );
