@@ -23,6 +23,8 @@
 #include <direct/util.h>
 #include <directfb.h>
 
+#include "util.h"
+
 #ifdef USE_FONT_HEADERS
 #include "decker.h"
 #endif
@@ -85,18 +87,9 @@ int main( int argc, char *argv[] )
      int                       i, step;
      DFBFontDescription        fdsc;
      DFBSurfaceDescription     sdsc;
-#if defined(USE_FONT_HEADERS) || defined(USE_IMAGE_HEADERS)
      DFBDataBufferDescription  ddsc;
      IDirectFBDataBuffer      *buffer;
-#endif
-#ifndef USE_FONT_HEADERS
-     const char               *fontfile;
-#endif
-#ifndef USE_IMAGE_HEADERS
-     const char               *imagefile;
-#endif
      IDirectFBImageProvider   *provider;
-     DFBSurfacePixelFormat     fontformat = DSPF_A8;
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));
@@ -143,14 +136,14 @@ int main( int argc, char *argv[] )
      else {
 #ifdef USE_IMAGE_HEADERS
           ddsc.flags         = DBDESC_MEMORY;
-          ddsc.memory.data   = wood_andi_data;
-          ddsc.memory.length = sizeof(wood_andi_data);
+          ddsc.memory.data   = GET_IMAGEDATA( wood_andi );
+          ddsc.memory.length = GET_IMAGESIZE( wood_andi );
+#else
+          ddsc.flags         = DBDESC_FILE;
+          ddsc.file          = GET_IMAGEFILE( wood_andi );
+#endif
           DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
           DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-          imagefile = DATADIR"/wood_andi.dfiff";
-          DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      }
 
      /* render the image to the temporary surface. */
@@ -168,22 +161,19 @@ int main( int argc, char *argv[] )
      surface->Clear( surface, 0, 0, 0, 0 );
 
      /* load font */
-#ifdef HAVE_GETFONTSURFACEFORMAT
-     DFBCHECK(dfb->GetFontSurfaceFormat( dfb, &fontformat ));
-#endif
      fdsc.flags  = DFDESC_HEIGHT;
      fdsc.height = CLAMP( (int) (screen_width / 32.0 / 8) * 8, 8, 96 );
 
 #ifdef USE_FONT_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = fontformat == DSPF_A8 ? decker_data : decker_argb_data;
-     ddsc.memory.length = fontformat == DSPF_A8 ? sizeof(decker_data) : sizeof(decker_argb_data);
+     ddsc.memory.data   = GET_FONTDATA( decker );
+     ddsc.memory.length = GET_FONTSIZE( decker );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_FONTFILE( decker );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font ));
-#else
-     fontfile = fontformat == DSPF_A8 ? DATADIR"/decker.dgiff" : DATADIR"/decker_argb.dgiff";
-     DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &font ));
-#endif
 
      surface->SetFont( surface, font );
 
@@ -201,7 +191,7 @@ int main( int argc, char *argv[] )
           int                  x = (1 + i % 4) * step;
           int                  y = (0 + i / 4) * 180;
 
-          str = strdup( rules[i] );
+          str = D_STRDUP( rules[i] );
 
           surface->SetPorterDuff( surface, DSPD_SRC );
           surface->SetColor( surface, 255, 0, 0, 140 );
@@ -219,7 +209,7 @@ int main( int argc, char *argv[] )
           surface->SetColor( surface, 6 * 0x1F, 6 * 0x10 + 0x7f, 0xFF, 0xFF );
           surface->DrawString( surface, str, -1, x, y + 210, DSTF_TOPCENTER );
 
-          free( str );
+          D_FREE( str );
      }
 
      primary->SetBlittingFlags( primary, DSBLIT_BLEND_ALPHACHANNEL );

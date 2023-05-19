@@ -24,6 +24,8 @@
 #include <directfb.h>
 #include <math.h>
 
+#include "util.h"
+
 #ifdef USE_IMAGE_HEADERS
 #include "apple-red.h"
 #include "background.h"
@@ -71,39 +73,41 @@ typedef enum {
 
 #ifdef USE_IMAGE_HEADERS
 static const void *image_data[] = {
-     apple_red_data,
-     gnome_applets_data,
-     gnome_calendar_data,
-     gnome_foot_data,
-     gnome_gmush_data,
-     gnome_gimp_data,
-     gnome_gsame_data,
-     gnu_keys_data
+     GET_IMAGEDATA( apple_red ),
+     GET_IMAGEDATA( gnome_applets ),
+     GET_IMAGEDATA( gnome_calendar ),
+     GET_IMAGEDATA( gnome_foot ),
+     GET_IMAGEDATA( gnome_gmush ),
+     GET_IMAGEDATA( gnome_gimp ),
+     GET_IMAGEDATA( gnome_gsame ),
+     GET_IMAGEDATA( gnu_keys )
 };
-static unsigned int image_length[] = {
-     sizeof(apple_red_data),
-     sizeof(gnome_applets_data),
-     sizeof(gnome_calendar_data),
-     sizeof(gnome_foot_data),
-     sizeof(gnome_gmush_data),
-     sizeof(gnome_gimp_data),
-     sizeof(gnome_gsame_data),
-     sizeof(gnu_keys_data)
+static unsigned int image_size[] = {
+     GET_IMAGESIZE( apple_red ),
+     GET_IMAGESIZE( gnome_applets ),
+     GET_IMAGESIZE( gnome_calendar ),
+     GET_IMAGESIZE( gnome_foot ),
+     GET_IMAGESIZE( gnome_gmush ),
+     GET_IMAGESIZE( gnome_gimp ),
+     GET_IMAGESIZE( gnome_gsame ),
+     GET_IMAGESIZE( gnu_keys )
 };
 #else
-static const char *image_names[] = {
-     "apple-red.dfiff",
-     "gnome-applets.dfiff",
-     "gnome-calendar.dfiff",
-     "gnome-foot.dfiff",
-     "gnome-gmush.dfiff",
-     "gnome-gimp.dfiff",
-     "gnome-gsame.dfiff",
-     "gnu-keys.dfiff"
+static const char *apple_red()      { return GET_IMAGEFILE( apple-red );      }
+static const char *gnome_applets()  { return GET_IMAGEFILE( gnome-applets );  }
+static const char *gnome_calendar() { return GET_IMAGEFILE( gnome-calendar ); }
+static const char *gnome_foot()     { return GET_IMAGEFILE( gnome-foot );     }
+static const char *gnome_gmush()    { return GET_IMAGEFILE( gnome-gmush );    }
+static const char *gnome_gimp()     { return GET_IMAGEFILE( gnome-gimp );     }
+static const char *gnome_gsame()    { return GET_IMAGEFILE( gnome-gsame );    }
+static const char *gnu_keys()       { return GET_IMAGEFILE( gnu-keys );       }
+
+static const char *(*image_file[])() = {
+     apple_red, gnome_applets, gnome_calendar, gnome_foot, gnome_gmush, gnome_gimp, gnome_gsame, gnu_keys
 };
 #endif
 
-static IDirectFBSurface *images[NUM_IMAGES];
+static IDirectFBSurface *images[NUM_IMAGES] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
 static int               image_widths[NUM_IMAGES];
 static int               image_heights[NUM_IMAGES];
 
@@ -221,19 +225,11 @@ int main( int argc, char *argv[] )
      int                       n;
      DFBRectangle              rect;
      DFBSurfaceDescription     sdsc;
-#ifdef USE_IMAGE_HEADERS
      DFBDataBufferDescription  ddsc;
      IDirectFBDataBuffer      *buffer;
-#else
-     int                       path_length;
-     char                     *imagefile;
-#endif
      IDirectFBImageProvider   *provider;
      unsigned int              cycle_len   = CYCLE_LEN;
      unsigned int              frame_delay = FRAME_DELAY;
-
-     /* initialize test images */
-     memset( images, 0, sizeof(images) );
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));
@@ -261,14 +257,14 @@ int main( int argc, char *argv[] )
      /* load the background image */
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = background_data;
-     ddsc.memory.length = sizeof(background_data);
+     ddsc.memory.data   = GET_IMAGEDATA( background );
+     ddsc.memory.length = GET_IMAGESIZE( background );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_IMAGEFILE( background );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = DATADIR"/background.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      back_width  = sdsc.width;
      back_height = sdsc.height;
@@ -288,15 +284,13 @@ int main( int argc, char *argv[] )
 #ifdef USE_IMAGE_HEADERS
           ddsc.flags         = DBDESC_MEMORY;
           ddsc.memory.data   = image_data[n];
-          ddsc.memory.length = image_length[n];
+          ddsc.memory.length = image_size[n];
+#else
+          ddsc.flags         = DBDESC_FILE;
+          ddsc.file          = image_file[n]();
+#endif
           DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
           DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-          path_length = strlen( DATADIR ) + 1 + strlen( image_names[n] ) + 1;
-          imagefile   = alloca( path_length );
-          snprintf( imagefile, path_length, DATADIR"/%s", image_names[n] );
-          DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
           provider->GetSurfaceDescription( provider, &sdsc );
           image_widths[n]  = sdsc.width;
           image_heights[n] = sdsc.height;

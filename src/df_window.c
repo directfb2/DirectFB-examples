@@ -25,6 +25,8 @@
 #include <directfb_util.h>
 #include <math.h>
 
+#include "util.h"
+
 #ifdef USE_FONT_HEADERS
 #include "decker.h"
 #endif
@@ -97,16 +99,8 @@ int main( int argc, char *argv[] )
      DFBFontDescription        fdsc;
      DFBSurfaceDescription     sdsc;
      DFBWindowDescription      wdsc;
-#if defined(USE_FONT_HEADERS) || defined(USE_IMAGE_HEADERS)
      DFBDataBufferDescription  ddsc;
      IDirectFBDataBuffer      *buffer;
-#endif
-#ifndef USE_FONT_HEADERS
-     const char               *fontfile;
-#endif
-#ifndef USE_IMAGE_HEADERS
-     const char               *imagefile;
-#endif
      IDirectFBImageProvider   *provider;
      IDirectFBWindow          *upper;
      IDirectFBWindow          *active            = NULL;
@@ -120,7 +114,6 @@ int main( int argc, char *argv[] )
      int                       endx              = 0;
      int                       endy              = 0;
      int                       winupdate         = 0;
-     DFBSurfacePixelFormat     fontformat        = DSPF_A8;
      int                       quit              = 0;
 
      /* initialize DirectFB including command line parsing */
@@ -184,14 +177,14 @@ int main( int argc, char *argv[] )
 
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = dfblogo_data;
-     ddsc.memory.length = sizeof(dfblogo_data);
+     ddsc.memory.data   = GET_IMAGEDATA( dfblogo );
+     ddsc.memory.length = GET_IMAGESIZE( dfblogo );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_IMAGEFILE( dfblogo );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = DATADIR"/dfblogo.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      DFBCHECK(window1->GetSurface( window1, &window_surface1 ));
      provider->RenderTo( provider, window_surface1, NULL );
      window_surface1->SetDrawingFlags( window_surface1, DSDRAW_SRC_PREMULTIPLY );
@@ -201,14 +194,14 @@ int main( int argc, char *argv[] )
 
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = cursor_red_data;
-     ddsc.memory.length = sizeof(cursor_red_data);
+     ddsc.memory.data   = GET_IMAGEDATA( cursor_red );
+     ddsc.memory.length = GET_IMAGESIZE( cursor_red );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_IMAGEFILE( cursor_red );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = DATADIR"/cursor_red.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &cursor_surface1 ));
      provider->RenderTo( provider, cursor_surface1, NULL );
@@ -233,14 +226,14 @@ int main( int argc, char *argv[] )
 
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = cursor_yellow_data;
-     ddsc.memory.length = sizeof(cursor_yellow_data);
+     ddsc.memory.data   = GET_IMAGEDATA( cursor_yellow );
+     ddsc.memory.length = GET_IMAGESIZE( cursor_yellow );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_IMAGEFILE( cursor_yellow );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = DATADIR"/cursor_yellow.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, DATADIR"/cursor_yellow.dfiff", &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &cursor_surface2 ));
      provider->RenderTo( provider, cursor_surface2, NULL );
@@ -253,22 +246,19 @@ int main( int argc, char *argv[] )
      DFBCHECK(window2->AttachEventBuffer( window2, event_buffer ));
 
      /* load font */
-#ifdef HAVE_GETFONTSURFACEFORMAT
-     DFBCHECK(dfb->GetFontSurfaceFormat( dfb, &fontformat ));
-#endif
      fdsc.flags  = DFDESC_HEIGHT;
      fdsc.height = 16;
 
 #ifdef USE_FONT_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = fontformat == DSPF_A8 ? decker_data : decker_argb_data;
-     ddsc.memory.length = fontformat == DSPF_A8 ? sizeof(decker_data) : sizeof(decker_argb_data);
+     ddsc.memory.data   = GET_FONTDATA( decker );
+     ddsc.memory.length = GET_FONTSIZE( decker );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_FONTFILE( decker );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font ));
-#else
-     fontfile = fontformat == DSPF_A8 ? DATADIR"/decker.dgiff" : DATADIR"/decker_argb.dgiff";
-     DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &font ));
-#endif
      DFBCHECK(font->GetHeight( font, &fontheight ));
 
      window_surface1->SetFont( window_surface1, font );

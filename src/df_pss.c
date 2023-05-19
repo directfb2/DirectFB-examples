@@ -24,6 +24,8 @@
 #include <directfb.h>
 #include <math.h>
 
+#include "util.h"
+
 #ifdef USE_FONT_HEADERS
 #include "decker.h"
 #endif
@@ -200,19 +202,10 @@ int main( int argc, char *argv[] )
      DFBResult                 ret;
      DFBFontDescription        fdsc;
      DFBSurfaceDescription     sdsc;
-#if defined(USE_FONT_HEADERS) || defined(USE_IMAGE_HEADERS)
      DFBDataBufferDescription  ddsc;
      IDirectFBDataBuffer      *buffer;
-#endif
-#ifndef USE_FONT_HEADERS
-     const char               *fontfile;
-#endif
-#ifndef USE_IMAGE_HEADERS
-     const char               *imagefile;
-#endif
      IDirectFBImageProvider   *provider;
      DirectThread             *demos_loop_thread;
-     DFBSurfacePixelFormat     fontformat = DSPF_A8;
 
      srand( time( NULL ) );
 
@@ -242,36 +235,33 @@ int main( int argc, char *argv[] )
      DFBCHECK(primary->GetSize( primary, &xres, &yres ));
 
      /* load font */
-#ifdef HAVE_GETFONTSURFACEFORMAT
-     DFBCHECK(dfb->GetFontSurfaceFormat( dfb, &fontformat ));
-#endif
      fdsc.flags  = DFDESC_HEIGHT;
      fdsc.height = CLAMP( (int) (yres / 10.0 / 8) * 8, 8, 96 );
 
 #ifdef USE_FONT_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = fontformat == DSPF_A8 ? decker_data : decker_argb_data;
-     ddsc.memory.length = fontformat == DSPF_A8 ? sizeof(decker_data) : sizeof(decker_argb_data);
+     ddsc.memory.data   = GET_FONTDATA( decker );
+     ddsc.memory.length = GET_FONTSIZE( decker );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_FONTFILE( decker );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font ));
-#else
-     fontfile = fontformat == DSPF_A8 ? DATADIR"/decker.dgiff" : DATADIR"/decker_argb.dgiff";
-     DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &font ));
-#endif
 
      primary->SetFont( primary, font );
 
      /* create a surface and render an image to it */
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = smokey_light_data;
-     ddsc.memory.length = sizeof(smokey_light_data);
+     ddsc.memory.data   = GET_IMAGEDATA( smokey_light );
+     ddsc.memory.length = GET_IMAGESIZE( smokey_light );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_IMAGEFILE( smokey_light );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = DATADIR"/smokey_light.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      DFBCHECK(primary->GetPixelFormat( primary, &sdsc.pixelformat ));
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &smokey_light ));

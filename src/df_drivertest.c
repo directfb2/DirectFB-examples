@@ -22,6 +22,8 @@
 
 #include <directfb.h>
 
+#include "util.h"
+
 #ifdef USE_IMAGE_HEADERS
 #include "grid.h"
 #include "laden_bike.h"
@@ -56,14 +58,17 @@ typedef enum {
 
 #ifdef USE_IMAGE_HEADERS
 static const void *bg_data[] = {
-     grid_data, mask_data
+     GET_IMAGEDATA( grid ), GET_IMAGEDATA( mask )
 };
-static unsigned int bg_length[] = {
-     sizeof(grid_data), sizeof(mask_data)
+static unsigned int bg_size[] = {
+     GET_IMAGESIZE( grid ), GET_IMAGESIZE( mask )
 };
 #else
-static const char *bg_names[] = {
-     "grid.dfiff", "mask.dfiff"
+static const char *grid() { return GET_IMAGEFILE( grid ); }
+static const char *mask() { return GET_IMAGEFILE( mask ); }
+
+static const char *(*bg_file[])() = {
+     grid, mask
 };
 #endif
 
@@ -94,28 +99,21 @@ static void deinit_resources()
 static void init_resources( Background bg, int w, int h, int w2, int h2 )
 {
      DFBSurfaceDescription     sdsc;
-#ifdef USE_IMAGE_HEADERS
      DFBDataBufferDescription  ddsc;
      IDirectFBDataBuffer      *buffer;
-#else
-     int                       path_length;
-     char                     *imagefile;
-#endif
      IDirectFBImageProvider   *provider;
 
      /* load the background image */
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
      ddsc.memory.data   = bg_data[bg];
-     ddsc.memory.length = bg_length[bg];
+     ddsc.memory.length = bg_size[bg];
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = bg_file[bg]();
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     path_length = strlen( DATADIR ) + 1 + strlen( bg_names[bg] ) + 1;
-     imagefile   = alloca( path_length );
-     snprintf( imagefile, path_length, DATADIR"/%s", bg_names[bg] );
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &background ));
      provider->RenderTo( provider, background, NULL );
@@ -124,14 +122,14 @@ static void init_resources( Background bg, int w, int h, int w2, int h2 )
      /* create a surface and render an image to it */
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = laden_bike_data;
-     ddsc.memory.length = sizeof(laden_bike_data);
+     ddsc.memory.data   = GET_IMAGEDATA( laden_bike );
+     ddsc.memory.length = GET_IMAGESIZE( laden_bike );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_IMAGEFILE( laden_bike );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = DATADIR"/laden_bike.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width  = w;
      sdsc.height = h;

@@ -24,6 +24,8 @@
 #include <directfb.h>
 #include <math.h>
 
+#include "util.h"
+
 #ifdef USE_IMAGE_HEADERS
 #include "star1.h"
 #include "star2.h"
@@ -50,15 +52,30 @@ static IDirectFBEventBuffer *event_buffer = NULL;
 /* primary surface */
 static IDirectFBSurface *primary = NULL;
 
-/* DirectFB surfaces */
+/* stars */
 #define NUM_STARS 4
 
-static IDirectFBSurface *stars[NUM_STARS];
+#ifdef USE_IMAGE_HEADERS
+static const DFBSurfaceDescription *star_desc[] = {
+     GET_IMAGEDESC( star1 ), GET_IMAGEDESC( star2 ), GET_IMAGEDESC( star3 ), GET_IMAGEDESC( star4 )
+};
+#else
+static const char *star1() { return GET_IMAGEFILE( star1 ); }
+static const char *star2() { return GET_IMAGEFILE( star2 ); }
+static const char *star3() { return GET_IMAGEFILE( star3 ); }
+static const char *star4() { return GET_IMAGEFILE( star4 ); }
+
+static const char *(*star_file[])() = {
+     star1, star2, star3, star4
+};
+#endif
+
+static IDirectFBSurface *stars[NUM_STARS] = { NULL, NULL, NULL, NULL };
 
 /* screen width and height */
 static int xres, yres;
 
-/******************************************************************************/
+/**************************************************************************************************/
 
 typedef struct {
      float v[4];
@@ -276,7 +293,7 @@ static void matrix_rotate( Matrix *matrix, Vector_Elements axis, float angle )
      matrix_multiply( matrix, &tmp );
 }
 
-/******************************************************************************/
+/**************************************************************************************************/
 
 static Matrix *camera     = NULL;
 static Matrix *projection = NULL;
@@ -331,19 +348,15 @@ static void load_stars()
      int i;
 
 #ifdef USE_IMAGE_HEADERS
-     const DFBSurfaceDescription *star_desc[] = { &star1_desc, &star2_desc, &star3_desc, &star4_desc };
-
      for (i = 0; i < NUM_STARS; i++) {
           DFBCHECK(dfb->CreateSurface( dfb, star_desc[i], &stars[i] ));
      }
 #else
      for (i = 0; i < NUM_STARS; i++) {
           DFBSurfaceDescription   desc;
-          char                    filename[PATH_MAX];
           IDirectFBImageProvider *provider;
 
-          snprintf( filename, PATH_MAX, DATADIR"/star%d.dfiff", i + 1 );
-          DFBCHECK(dfb->CreateImageProvider( dfb, filename, &provider ));
+          DFBCHECK(dfb->CreateImageProvider( dfb, star_file[i](), &provider ));
           provider->GetSurfaceDescription( provider, &desc );
           DFBCHECK(dfb->CreateSurface( dfb, &desc, &stars[i] ));
           provider->RenderTo( provider, stars[i], NULL );
@@ -391,9 +404,6 @@ static void deinit_resources()
 static void init_resources( int argc, char *argv[] )
 {
      DFBSurfaceDescription dsc;
-
-     /* initialize stars */
-     memset( stars, 0, sizeof(stars) );
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));

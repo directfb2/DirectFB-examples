@@ -21,8 +21,97 @@
 */
 
 #include <direct/clock.h>
+#include <direct/system.h>
 #include <directfb.h>
 #include <sys/times.h> /* for times() */
+
+/**************************************************************************************************/
+
+#ifdef USE_FONT_HEADERS
+#ifdef DGIFF_EXTENSION
+static inline bool
+check_fontformat()
+{
+     DFBSurfacePixelFormat fontformat = DSPF_A8;
+
+#ifdef HAVE_GETFONTSURFACEFORMAT
+     idirectfb_singleton->GetFontSurfaceFormat( idirectfb_singleton, &fontformat );
+#endif
+
+     return fontformat == DSPF_A8 ? true : false;
+}
+
+#define GET_FONTDATA(name) check_fontformat() ? name##_data : name##_argb_data
+#else
+#define GET_FONTDATA(name) name##_data
+#endif
+#define GET_FONTSIZE(name) sizeof(name##_data)
+#else
+static char fontfile[PATH_MAX];
+
+static inline char *
+get_fontfile( const char *name )
+{
+     const char *formatname;
+     const char *extension = direct_getenv( "FONT_EXTENSION" ) ?: "dgiff";
+
+     if (!strcmp( extension, "dgiff" )) {
+          DFBSurfacePixelFormat fontformat = DSPF_A8;
+#ifdef HAVE_GETFONTSURFACEFORMAT
+          idirectfb_singleton->GetFontSurfaceFormat( idirectfb_singleton, &fontformat );
+#endif
+          formatname = fontformat == DSPF_A8 ? "" : "_argb";
+     }
+     else
+          formatname = "";
+
+     snprintf( fontfile, PATH_MAX, DATADIR"/%s%s.%s", name, formatname, extension );
+
+     return fontfile;
+}
+
+#define GET_FONTFILE(name) get_fontfile( #name )
+#endif
+
+#ifdef USE_IMAGE_HEADERS
+#define GET_IMAGEDATA(name) name##_data
+#define GET_IMAGESIZE(name) sizeof(name##_data)
+
+#define GET_IMAGEDESC(name) &name##_desc
+#else
+static char imagefile[PATH_MAX];
+
+static inline char *
+get_imagefile( const char *name )
+{
+     const char *extension = direct_getenv( "IMAGE_EXTENSION" ) ?: "dfiff";
+
+     snprintf( imagefile, PATH_MAX, DATADIR"/%s.%s", name, extension );
+
+     return imagefile;
+}
+
+#define GET_IMAGEFILE(name) get_imagefile( #name )
+#endif
+
+#ifdef USE_VIDEO_HEADERS
+#define GET_VIDEODATA(name) name##_data
+#define GET_VIDEOSIZE(name) sizeof(name##_data)
+#else
+static char videofile[PATH_MAX];
+
+static inline char *
+get_videofile( const char *name )
+{
+     const char *extension = direct_getenv( "VIDEO_EXTENSION" ) ?: "dfvff";
+
+     snprintf( videofile, PATH_MAX, DATADIR"/%s.%s", name, extension );
+
+     return videofile;
+}
+
+#define GET_VIDEOFILE(name) get_videofile( #name )
+#endif
 
 /**************************************************************************************************/
 
@@ -151,7 +240,7 @@ process_time()
 {
      struct tms tms;
 
-     times(&tms);
+     times( &tms );
 
      return tms.tms_utime + tms.tms_stime;
 }
@@ -159,5 +248,5 @@ process_time()
 static inline long
 ticks_per_second()
 {
-     return sysconf(_SC_CLK_TCK);
+     return sysconf( _SC_CLK_TCK );
 }

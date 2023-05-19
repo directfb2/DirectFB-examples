@@ -473,18 +473,9 @@ static void init_resources( int argc, char *argv[] )
      DFBDisplayLayerConfigFlags  ret_failed;
      DFBFontDescription          fdsc;
      DFBSurfaceDescription       sdsc;
-#if defined(USE_FONT_HEADERS) || defined(USE_IMAGE_HEADERS)
      DFBDataBufferDescription    ddsc;
      IDirectFBDataBuffer        *buffer;
-#endif
-#ifndef USE_FONT_HEADERS
-     const char                 *fontfile;
-#endif
-#ifndef USE_IMAGE_HEADERS
-     const char                 *imagefile;
-#endif
      IDirectFBImageProvider     *provider;
-     DFBSurfacePixelFormat       fontformat = DSPF_A8;
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));
@@ -543,22 +534,19 @@ static void init_resources( int argc, char *argv[] )
      DFBCHECK(primary->GetSize( primary, &xres, &yres ));
 
      /* load font */
-#ifdef HAVE_GETFONTSURFACEFORMAT
-     DFBCHECK(dfb->GetFontSurfaceFormat( dfb, &fontformat ));
-#endif
      fdsc.flags  = DFDESC_HEIGHT;
      fdsc.height = 24;
 
 #ifdef USE_FONT_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = fontformat == DSPF_A8 ? decker_data : decker_argb_data;
-     ddsc.memory.length = fontformat == DSPF_A8 ? sizeof(decker_data) : sizeof(decker_argb_data);
+     ddsc.memory.data   = GET_FONTDATA( decker );
+     ddsc.memory.length = GET_FONTSIZE( decker );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_FONTFILE( decker );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font ));
-#else
-     fontfile = fontformat == DSPF_A8 ? DATADIR"/decker.dgiff" : DATADIR"/decker_argb.dgiff";
-     DFBCHECK(dfb->CreateFont( dfb, fontfile, &fdsc, &font ));
-#endif
      DFBCHECK(font->GetHeight( font, &fontheight ));
 
      primary->SetFont( primary, font );
@@ -566,14 +554,14 @@ static void init_resources( int argc, char *argv[] )
      /* load penguin animation */
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = alpha ? tux_alpha_data : tux_data;
-     ddsc.memory.length = alpha ? sizeof(tux_alpha_data) : sizeof(tux_data);
+     ddsc.memory.data   = alpha ? GET_IMAGEDATA( tux_alpha ) : GET_IMAGEDATA( tux );
+     ddsc.memory.length = alpha ? GET_IMAGESIZE( tux_alpha ) : GET_IMAGESIZE( tux );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = alpha ? GET_IMAGEFILE( tux_alpha ) : GET_IMAGEFILE( tux );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = alpha ? DATADIR"/tux_alpha.dfiff" : DATADIR"/tux.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      DFBCHECK(primary->GetPixelFormat( primary, &sdsc.pixelformat ));
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &tuximage ));
@@ -588,14 +576,14 @@ static void init_resources( int argc, char *argv[] )
      /* load the background image */
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = wood_andi_data;
-     ddsc.memory.length = sizeof(wood_andi_data);
+     ddsc.memory.data   = GET_IMAGEDATA( wood_andi );
+     ddsc.memory.length = GET_IMAGESIZE( wood_andi );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_IMAGEFILE( wood_andi );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = DATADIR"/wood_andi.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width  = xres;
      sdsc.height = yres;
@@ -607,14 +595,14 @@ static void init_resources( int argc, char *argv[] )
      /* load the penguin destination mask */
 #ifdef USE_IMAGE_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = destination_mask_data;
-     ddsc.memory.length = sizeof(destination_mask_data);
+     ddsc.memory.data   = GET_IMAGEDATA( destination_mask );
+     ddsc.memory.length = GET_IMAGESIZE( destination_mask );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_IMAGEFILE( destination_mask );
+#endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-#else
-     imagefile = DATADIR"/destination_mask.dfiff";
-     DFBCHECK(dfb->CreateImageProvider( dfb, imagefile, &provider ));
-#endif
      provider->GetSurfaceDescription( provider, &sdsc );
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &destination_mask ));
      provider->RenderTo( provider, destination_mask, NULL );
