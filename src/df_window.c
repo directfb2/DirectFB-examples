@@ -63,7 +63,7 @@ static IDirectFBFont         *font            = NULL;
 /* default stacking class */
 static int stacking_id = DWSC_MIDDLE;
 
-static void dfb_shutdown()
+static void dfb_shutdown( void )
 {
      if (font)            font->Release( font );
      if (event_buffer)    event_buffer->Release( event_buffer );
@@ -86,7 +86,7 @@ static void dfb_shutdown()
      if (dfb)             dfb->Release( dfb );
 }
 
-static void print_usage()
+static void print_usage( void )
 {
      printf( "DirectFB Window Demo\n\n" );
      printf( "Usage: df_window <stacking class>\n\n" );

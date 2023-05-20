@@ -93,16 +93,16 @@ static unsigned int image_size[] = {
      GET_IMAGESIZE( gnu_keys )
 };
 #else
-static const char *apple_red()      { return GET_IMAGEFILE( apple-red );      }
-static const char *gnome_applets()  { return GET_IMAGEFILE( gnome-applets );  }
-static const char *gnome_calendar() { return GET_IMAGEFILE( gnome-calendar ); }
-static const char *gnome_foot()     { return GET_IMAGEFILE( gnome-foot );     }
-static const char *gnome_gmush()    { return GET_IMAGEFILE( gnome-gmush );    }
-static const char *gnome_gimp()     { return GET_IMAGEFILE( gnome-gimp );     }
-static const char *gnome_gsame()    { return GET_IMAGEFILE( gnome-gsame );    }
-static const char *gnu_keys()       { return GET_IMAGEFILE( gnu-keys );       }
+static const char *apple_red( void )      { return GET_IMAGEFILE( apple-red );      }
+static const char *gnome_applets( void )  { return GET_IMAGEFILE( gnome-applets );  }
+static const char *gnome_calendar( void ) { return GET_IMAGEFILE( gnome-calendar ); }
+static const char *gnome_foot( void )     { return GET_IMAGEFILE( gnome-foot );     }
+static const char *gnome_gmush( void )    { return GET_IMAGEFILE( gnome-gmush );    }
+static const char *gnome_gimp( void )     { return GET_IMAGEFILE( gnome-gimp );     }
+static const char *gnome_gsame( void )    { return GET_IMAGEFILE( gnome-gsame );    }
+static const char *gnu_keys( void )       { return GET_IMAGEFILE( gnu-keys );       }
 
-static const char *(*image_file[])() = {
+static const char *(*image_file[])( void ) = {
      apple_red, gnome_applets, gnome_calendar, gnome_foot, gnome_gmush, gnome_gimp, gnome_gsame, gnu_keys
 };
 #endif
@@ -190,7 +190,7 @@ static void render( unsigned int cycle_len )
      frame_num++;
 }
 
-static void cleanup()
+static void cleanup( void )
 {
      int n;
 

@@ -151,7 +151,8 @@ fps_count( FPSData *data,
      if (diff >= interval) {
           data->fps = 1000.0f * data->frames / diff;
 
-          snprintf( data->fps_string, sizeof(data->fps_string), "%.1f", data->fps );
+          snprintf( data->fps_string, sizeof(data->fps_string),
+                    "%d.%d", (int) data->fps, (int) (data->fps * 10) % 10 );
 
           data->fps_time = now;
           data->frames   = 0;
@@ -198,7 +199,7 @@ idle_init( IdleData *data )
 
      memset( data, 0, sizeof(IdleData) );
 
-     idle_read(&data->stat_total, &data->stat_idle);
+     idle_read( &data->stat_total, &data->stat_idle );
 
      data->idle_time = direct_clock_get_millis();
 
@@ -218,14 +219,15 @@ idle_count( IdleData *data,
      if (diff >= interval) {
          unsigned int total = 0, idle = 0;
 
-         idle_read(&total, &idle);
+         idle_read( &total, &idle );
 
          if (idle != data->stat_idle)
              data->idle = 100.0f * (idle - data->stat_idle) / (total - data->stat_total);
          else
              data->idle = 0;
 
-          snprintf( data->idle_string, sizeof(data->idle_string), "%.1f", data->idle );
+          snprintf( data->idle_string, sizeof(data->idle_string),
+                    "%d.%d", (int) data->idle, (int) (data->idle * 10) % 10 );
 
           data->idle_time  = now;
           data->stat_total = total;
@@ -236,7 +238,7 @@ idle_count( IdleData *data,
 /**************************************************************************************************/
 
 static inline long long
-process_time()
+process_time( void )
 {
      struct tms tms;
 
@@ -246,7 +248,7 @@ process_time()
 }
 
 static inline long
-ticks_per_second()
+ticks_per_second( void )
 {
      return sysconf( _SC_CLK_TCK );
 }

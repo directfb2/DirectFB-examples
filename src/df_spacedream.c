@@ -60,12 +60,12 @@ static const DFBSurfaceDescription *star_desc[] = {
      GET_IMAGEDESC( star1 ), GET_IMAGEDESC( star2 ), GET_IMAGEDESC( star3 ), GET_IMAGEDESC( star4 )
 };
 #else
-static const char *star1() { return GET_IMAGEFILE( star1 ); }
-static const char *star2() { return GET_IMAGEFILE( star2 ); }
-static const char *star3() { return GET_IMAGEFILE( star3 ); }
-static const char *star4() { return GET_IMAGEFILE( star4 ); }
+static const char *star1( void ) { return GET_IMAGEFILE( star1 ); }
+static const char *star2( void ) { return GET_IMAGEFILE( star2 ); }
+static const char *star3( void ) { return GET_IMAGEFILE( star3 ); }
+static const char *star4( void ) { return GET_IMAGEFILE( star4 ); }
 
-static const char *(*star_file[])() = {
+static const char *(*star_file[])( void ) = {
      star1, star2, star3, star4
 };
 #endif
@@ -75,7 +75,7 @@ static IDirectFBSurface *stars[NUM_STARS] = { NULL, NULL, NULL, NULL };
 /* screen width and height */
 static int xres, yres;
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
 typedef struct {
      float v[4];
@@ -116,7 +116,7 @@ static const Matrix identity = { { 1, 0, 0, 0,
                                    0, 0, 1, 0,
                                    0, 0, 0, 1 } };
 
-static Matrix *matrix_new_identity()
+static Matrix *matrix_new_identity( void )
 {
      Matrix *matrix = malloc( sizeof(Matrix) );
 
@@ -293,7 +293,7 @@ static void matrix_rotate( Matrix *matrix, Vector_Elements axis, float angle )
      matrix_multiply( matrix, &tmp );
 }
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
 static Matrix *camera     = NULL;
 static Matrix *projection = NULL;
@@ -343,7 +343,7 @@ static void *render_loop( DirectThread *thread, void *arg )
      return NULL;
 }
 
-static void load_stars()
+static void load_stars( void )
 {
      int i;
 
@@ -369,7 +369,7 @@ static void load_stars()
      }
 }
 
-static void generate_starfield()
+static void generate_starfield( void )
 {
      int i;
 
@@ -381,7 +381,27 @@ static void generate_starfield()
      }
 }
 
-static void unload_stars()
+static void transform_starfield( void )
+{
+     int    i;
+     Matrix m = *camera;
+
+     matrix_multiply( &m, projection );
+
+     for (i = 0; i < STARFIELD_SIZE; i++) {
+          matrix_transform( &m, &starfield[i].pos, &t_starfield[i].pos );
+
+          if (t_starfield[i].pos.v[W]) {
+               t_starfield[i].pos.v[X] /= t_starfield[i].pos.v[W];
+               t_starfield[i].pos.v[Y] /= t_starfield[i].pos.v[W];
+          }
+
+          t_starfield[i].pos.v[X] += xres / 2;
+          t_starfield[i].pos.v[Y] += yres / 2;
+     }
+}
+
+static void unload_stars( void )
 {
      int i;
 
@@ -389,7 +409,9 @@ static void unload_stars()
           if (stars[i]) stars[i]->Release( stars[i] );
 }
 
-static void deinit_resources()
+/**********************************************************************************************************************/
+
+static void deinit_resources( void )
 {
      if (projection) free( projection );
      if (camera)     free( camera );
@@ -434,26 +456,6 @@ static void init_resources( int argc, char *argv[] )
 
      camera     = matrix_new_identity();
      projection = matrix_new_perspective( 400 );
-}
-
-static void transform_starfield()
-{
-     int    i;
-     Matrix m = *camera;
-
-     matrix_multiply( &m, projection );
-
-     for (i = 0; i < STARFIELD_SIZE; i++) {
-          matrix_transform( &m, &starfield[i].pos, &t_starfield[i].pos );
-
-          if (t_starfield[i].pos.v[W]) {
-               t_starfield[i].pos.v[X] /= t_starfield[i].pos.v[W];
-               t_starfield[i].pos.v[Y] /= t_starfield[i].pos.v[W];
-          }
-
-          t_starfield[i].pos.v[X] += xres / 2;
-          t_starfield[i].pos.v[Y] += yres / 2;
-     }
 }
 
 int main( int argc, char *argv[] )

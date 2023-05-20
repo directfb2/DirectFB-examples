@@ -291,7 +291,7 @@ static Demo *current_demo;
 static unsigned int rand_pool = 0x12345678;
 static unsigned int rand_add  = 0x87654321;
 
-static inline unsigned int myrand()
+static inline unsigned int myrand( void )
 {
      rand_pool ^= ((rand_pool << 7) | (rand_pool >> 25));
      rand_pool += rand_add;
@@ -300,7 +300,7 @@ static inline unsigned int myrand()
      return rand_pool;
 }
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
 static const DirectFBPixelFormatNames(format_names)
 
@@ -316,7 +316,7 @@ static DFBSurfacePixelFormat parse_pixelformat( const char *format )
      return DSPF_UNKNOWN;
 }
 
-static void print_usage()
+static void print_usage( void )
 {
      int i;
 
@@ -351,7 +351,7 @@ static void print_usage()
      printf( "\n" );
 }
 
-static void dfb_shutdown()
+static void dfb_shutdown( void )
 {
      if (dest)                dest->Release( dest );
      if (with_intro && intro) intro->Release( intro );
@@ -414,7 +414,7 @@ static void showMessage( const char *msg )
      primary->Clear( primary, 0, 0, 0, 0x80 );
 }
 
-static void showResult()
+static void showResult( void )
 {
      DFBRectangle              rect;
      DFBSurfaceDescription     sdsc;
@@ -566,7 +566,7 @@ static bool showAccelerated( DFBAccelerationMask func, IDirectFBSurface *source 
      return (mask & func) ? true : !accel_only;
 }
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
 #define SET_BLITTING_FLAGS(flags) \
      dest->SetBlittingFlags( dest, (flags) | (do_xor ? DSBLIT_XOR : 0) )
@@ -1207,7 +1207,7 @@ static unsigned long long load_image( long long t )
      return dsc.width * dsc.height * (unsigned long long) i;
 }
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
 int main( int argc, char *argv[] )
 {

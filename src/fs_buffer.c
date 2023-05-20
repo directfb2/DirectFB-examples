@@ -37,7 +37,7 @@ IFusionSound              *sound    = NULL;
 IFusionSoundMusicProvider *provider = NULL;
 IFusionSoundBuffer        *buffer   = NULL;
 
-static void cleanup()
+static void cleanup( void )
 {
      /* Release the sound buffer. */
      if (buffer)

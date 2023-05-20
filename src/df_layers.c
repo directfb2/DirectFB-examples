@@ -86,7 +86,7 @@ static Plane planes[D_ARRAY_SIZE(colors)];
 /* number of planes currently on screen */
 static int plane_count = 0;
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
 static const DirectFBPixelFormatNames(format_names)
 
@@ -168,7 +168,9 @@ display_layer_callback( DFBDisplayLayerID layer_id, DFBDisplayLayerDescription d
      return DFENUM_OK;
 }
 
-static void dfb_shutdown()
+/**********************************************************************************************************************/
+
+static void dfb_shutdown( void )
 {
      int n;
 
@@ -186,7 +188,7 @@ static void dfb_shutdown()
      if (dfb)          dfb->Release( dfb );
 }
 
-static void print_usage()
+static void print_usage( void )
 {
      printf( "DirectFB Layers Demo\n\n" );
      printf( "Usage: df_layers [options]\n\n" );

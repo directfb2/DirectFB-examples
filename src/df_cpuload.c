@@ -23,7 +23,7 @@
 #include <direct/clock.h>
 #include <directfb.h>
 
-/******************************************************************************/
+/**************************************************************************************************/
 
 /* DirectFB interfaces */
 static IDirectFB             *dfb          = NULL;
@@ -32,55 +32,33 @@ static IDirectFBWindow       *window       = NULL;
 static IDirectFBSurface      *surface      = NULL;
 static IDirectFBEventBuffer  *event_buffer = NULL;
 
-/******************************************************************************/
+/**************************************************************************************************/
 
-static void init_application( int argc, char *argv[] );
-static void exit_application( int status );
-
-/******************************************************************************/
-
-static void update();
-
-/******************************************************************************/
-
-int main( int argc, char *argv[] )
+static void exit_application( int status )
 {
-     long long next_update = 0;
+     /* Release the event buffer. */
+     if (event_buffer)
+          event_buffer->Release( event_buffer );
 
-     /* Initialize application. */
-     init_application( argc, argv );
+     /* Release the window's surface. */
+     if (surface)
+          surface->Release( surface );
 
-     surface->Clear( surface, 0xff, 0xff, 0xff, 0x30 );
+     /* Release the window. */
+     if (window)
+          window->Release( window );
 
-     window->SetOpacity( window, 0xff );
+     /* Release the layer. */
+     if (layer)
+          layer->Release( layer );
 
-     /* Main loop. */
-     while (1) {
-          DFBWindowEvent event;
-          long long      now = direct_clock_get_time( DIRECT_CLOCK_MONOTONIC ) / 1000;
+     /* Release the main interface. */
+     if (dfb)
+          dfb->Release( dfb );
 
-          if (next_update <= now) {
-               update();
-
-               next_update = now + 100;
-          }
-
-          event_buffer->WaitForEventWithTimeout( event_buffer, 0, next_update - now );
-
-          /* Check for new events. */
-          while (event_buffer->GetEvent( event_buffer, DFB_EVENT(&event) ) == DFB_OK) {
-               switch (event.type) {
-                    default:
-                         break;
-               }
-          }
-     }
-
-     /* Shouldn't reach this. */
-     return 0;
+     /* Terminate application. */
+     exit( status );
 }
-
-/******************************************************************************/
 
 static void init_application( int argc, char *argv[] )
 {
@@ -151,35 +129,9 @@ static void init_application( int argc, char *argv[] )
      window->RaiseToTop( window );
 }
 
-static void exit_application( int status )
-{
-     /* Release the event buffer. */
-     if (event_buffer)
-          event_buffer->Release( event_buffer );
+/**************************************************************************************************/
 
-     /* Release the window's surface. */
-     if (surface)
-          surface->Release( surface );
-
-     /* Release the window. */
-     if (window)
-          window->Release( window );
-
-     /* Release the layer. */
-     if (layer)
-          layer->Release( layer );
-
-     /* Release the main interface. */
-     if (dfb)
-          dfb->Release( dfb );
-
-     /* Terminate application. */
-     exit( status );
-}
-
-/******************************************************************************/
-
-static int get_load()
+static int get_load( void )
 {
      static int            old_load = 0;
      static unsigned long  old_u, old_n, old_s, old_i, old_wa, old_hi, old_si;
@@ -230,7 +182,7 @@ static int get_load()
      return old_load >> 10;
 }
 
-static void update()
+static void update( void )
 {
      int load = get_load();
 
@@ -246,4 +198,43 @@ static void update()
      surface->DrawRectangle( surface, 0, 0, 64, 64 );
 
      surface->Flip( surface, NULL, DSFLIP_NONE );
+}
+
+/**************************************************************************************************/
+
+int main( int argc, char *argv[] )
+{
+     long long next_update = 0;
+
+     /* Initialize application. */
+     init_application( argc, argv );
+
+     surface->Clear( surface, 0xff, 0xff, 0xff, 0x30 );
+
+     window->SetOpacity( window, 0xff );
+
+     /* Main loop. */
+     while (1) {
+          DFBWindowEvent event;
+          long long      now = direct_clock_get_time( DIRECT_CLOCK_MONOTONIC ) / 1000;
+
+          if (next_update <= now) {
+               update();
+
+               next_update = now + 100;
+          }
+
+          event_buffer->WaitForEventWithTimeout( event_buffer, 0, next_update - now );
+
+          /* Check for new events. */
+          while (event_buffer->GetEvent( event_buffer, DFB_EVENT(&event) ) == DFB_OK) {
+               switch (event.type) {
+                    default:
+                         break;
+               }
+          }
+     }
+
+     /* Shouldn't reach this. */
+     return 0;
 }

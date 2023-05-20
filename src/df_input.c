@@ -76,11 +76,11 @@ static unsigned int image_size[] = {
      GET_IMAGESIZE( joystick ), GET_IMAGESIZE( keys ), GET_IMAGESIZE( mouse )
 };
 #else
-static const char *joystick() { return GET_IMAGEFILE( joystick ); }
-static const char *keys()     { return GET_IMAGEFILE( keys );     }
-static const char *mouse()    { return GET_IMAGEFILE( mouse );    }
+static const char *joystick( void ) { return GET_IMAGEFILE( joystick ); }
+static const char *keys( void )     { return GET_IMAGEFILE( keys );     }
+static const char *mouse( void )    { return GET_IMAGEFILE( mouse );    }
 
-static const char *(*image_file[])() = {
+static const char *(*image_file[])( void ) = {
      joystick, keys, mouse
 };
 #endif
@@ -106,7 +106,7 @@ static int max_slots = 1;
 #define DFB_EVENT_SLOT_ID(e) 0
 #endif
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
 static const DirectFBKeySymbolNames(symbolnames);
 static const DirectFBKeyIdentifierNames(idnames);
@@ -293,7 +293,7 @@ static void show_key_event( DFBInputEvent *evt )
      }
 }
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
 static void show_mouse_buttons( DFBInputEvent *evt )
 {
@@ -410,7 +410,7 @@ static void show_mouse_event( DFBInputEvent *evt )
      }
 }
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
 static void show_any_button_event( DFBInputEvent *evt )
 {
@@ -439,7 +439,7 @@ static void show_any_axis_event( DFBInputEvent *evt )
      primary->DrawString( primary, buf, -1, 40, screen_height - 40, DSTF_LEFT );
 }
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
 static inline int joystick_calc_screenlocation( int screenres, int axisvalue )
 {
@@ -498,7 +498,7 @@ static void show_joystick_event( DFBInputEvent *evt )
      joystick_show_axisgroup( &rect, joy_axis[4], joy_axis[5] );
 }
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
 static void show_event( const char *device_name, DFBInputDeviceTypeFlags device_type, DFBInputEvent *evt )
 {
@@ -605,7 +605,7 @@ static DFBInputDeviceTypeFlags get_device_type( DeviceInfo *devices, DFBInputDev
      return DIDTF_NONE;
 }
 
-static void dfb_shutdown()
+static void dfb_shutdown( void )
 {
      int n;
 
@@ -620,7 +620,7 @@ static void dfb_shutdown()
      if (dfb)            dfb->Release( dfb );
 }
 
-static void print_usage()
+static void print_usage( void )
 {
      printf( "DirectFB Input Demo\n\n" );
      printf( "Usage: df_input [options]\n\n" );

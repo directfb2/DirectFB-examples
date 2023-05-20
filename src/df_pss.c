@@ -172,7 +172,7 @@ static int demo2( DirectThread *thread )
      return 0;
 }
 
-static int (*demos[])() = { intro, demo1, demo2, NULL };
+static int (*demos[])( DirectThread *thread ) = { intro, demo1, demo2, NULL };
 static int current_demo = 0;
 
 static void *demos_loop( DirectThread *thread, void *arg )
@@ -187,7 +187,7 @@ static void *demos_loop( DirectThread *thread, void *arg )
      return NULL;
 }
 
-static void dfb_shutdown()
+static void dfb_shutdown( void )
 {
      if (smokey_light) smokey_light->Release( smokey_light );
      if (font)         font->Release( font );

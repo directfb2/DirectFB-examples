@@ -38,7 +38,7 @@
 IFusionSound       *sound  = NULL;
 IFusionSoundStream *stream = NULL;
 
-static void cleanup()
+static void cleanup( void )
 {
      /* Release the sound stream. */
      if (stream)

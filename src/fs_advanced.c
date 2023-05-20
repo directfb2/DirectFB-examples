@@ -58,7 +58,7 @@ typedef enum {
      playback->Release( playback );                             \
      playback = NULL
 
-static void test_start_simple_playback()
+static void test_start_simple_playback( void )
 {
      BEGIN_TEST( SOUND_BUFFER, "Simple Playback" );
 
@@ -69,7 +69,7 @@ static void test_start_simple_playback()
      END_TEST();
 }
 
-static void test_start_positioned_playback()
+static void test_start_positioned_playback( void )
 {
      FSBufferDescription desc;
 
@@ -90,7 +90,7 @@ static void test_start_positioned_playback()
      END_TEST();
 }
 
-static void test_start_looping_playback()
+static void test_start_looping_playback( void )
 {
      BEGIN_TEST( SOUND_BUFFER, "Looping Playback" );
 
@@ -179,7 +179,7 @@ static void test_pitch_value( SoundType type )
      END_TEST();
 }
 
-static void cleanup()
+static void cleanup( void )
 {
      /* Release the advanced playback. */
      if (playback)
