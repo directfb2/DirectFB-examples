@@ -67,7 +67,7 @@ static char *rules[] = {
      " SRC ATOP", " DST ATOP", " ADD",      " XOR"
 };
 
-static void dfb_shutdown()
+static void dfb_shutdown( void )
 {
      if (font)         font->Release( font );
      if (surface)      surface->Release( surface );
@@ -76,7 +76,7 @@ static void dfb_shutdown()
      if (dfb)          dfb->Release( dfb );
 }
 
-static void print_usage()
+static void print_usage( void )
 {
      printf( "DirectFB Porter/Duff Demo\n\n" );
      printf( "Usage: df_porter <background>\n\n" );

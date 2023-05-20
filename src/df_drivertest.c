@@ -64,10 +64,10 @@ static unsigned int bg_size[] = {
      GET_IMAGESIZE( grid ), GET_IMAGESIZE( mask )
 };
 #else
-static const char *grid() { return GET_IMAGEFILE( grid ); }
-static const char *mask() { return GET_IMAGEFILE( mask ); }
+static const char *grid( void ) { return GET_IMAGEFILE( grid ); }
+static const char *mask( void ) { return GET_IMAGEFILE( mask ); }
 
-static const char *(*bg_file[])() = {
+static const char *(*bg_file[])( void ) = {
      grid, mask
 };
 #endif
@@ -75,7 +75,7 @@ static const char *(*bg_file[])() = {
 /*
  * deinitializes test resources
  */
-static void deinit_resources()
+static void deinit_resources( void )
 {
      if (testimage2) {
           testimage2->Release( testimage2 );
@@ -142,7 +142,7 @@ static void init_resources( Background bg, int w, int h, int w2, int h2 )
      provider->Release( provider );
 }
 
-static void cleanup()
+static void cleanup( void )
 {
      deinit_resources();
 

@@ -41,12 +41,12 @@ static IDirectFBSurface     *primary      = NULL;
 /* screen width and height */
 static int sx, sy;
 
-/******************************************************************************/
+/**********************************************************************************************************************/
 
 static unsigned int rand_pool = 0x12345678;
 static unsigned int rand_add  = 0x87654321;
 
-static inline unsigned int myrand()
+static inline unsigned int myrand( void )
 {
      rand_pool ^= ((rand_pool << 7) | (rand_pool >> 25));
      rand_pool += rand_add;
@@ -55,7 +55,7 @@ static inline unsigned int myrand()
      return rand_pool;
 }
 
-/******************************************************************************/
+/**********************************************************************************************************************/
 
 typedef struct _Particle {
      float             w;
@@ -70,7 +70,7 @@ static Particle *last_particle;
 
 static float f = 0;
 
-static void spawn_particle()
+static void spawn_particle( void )
 {
      Particle *new_particle = malloc( sizeof(Particle) );
 
@@ -91,7 +91,7 @@ static void spawn_particle()
      }
 }
 
-static void draw_particles()
+static void draw_particles( void )
 {
      Particle *p = particles;
 
@@ -115,7 +115,7 @@ static void draw_particles()
      }
 }
 
-static void destroy_particles()
+static void destroy_particles( void )
 {
      Particle *p = particles;
 
@@ -126,9 +126,9 @@ static void destroy_particles()
      }
 }
 
-/******************************************************************************/
+/**********************************************************************************************************************/
 
-static void deinit_resources()
+static void deinit_resources( void )
 {
      destroy_particles();
 

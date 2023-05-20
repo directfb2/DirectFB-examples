@@ -24,7 +24,7 @@
 #include <directfb.h>
 #include <math.h>
 
-/******************************************************************************/
+/**************************************************************************************************/
 
 /* DirectFB interfaces */
 static IDirectFB            *dfb          = NULL;
@@ -34,7 +34,7 @@ static IDirectFBSurface     *primary      = NULL;
 /* screen width and height */
 static int Width, Height;
 
-/******************************************************************************/
+/**************************************************************************************************/
 
 #define FLAT_SHADED 0
 #define WIRE_FRAME  1
@@ -43,7 +43,7 @@ int  PrimitiveType = FLAT_SHADED;
 bool BackfaceCull  = false;
 bool Lighting      = true;
 
-/******************************************************************************/
+/**************************************************************************************************/
 
 typedef struct {
      int a, b, c;
@@ -2004,7 +2004,7 @@ static Vertex SkullVerticies[SKULL_VERTICIES] = {
      {  -69.006248, -170.686996,  -79.508034 }
 };
 
-/******************************************************************************/
+/**************************************************************************************************/
 
 static float Cosine[3600];
 static float Sine[3600];
@@ -2019,7 +2019,7 @@ static float IdentityMatrix[9] = {
 #define M_CLEAR(m)    bzero(m, sizeof(float) * 9)
 #define M_IDENTITY(m) memcpy(m, IdentityMatrix, sizeof(float) * 9)
 
-static void InitMatrix()
+static void InitMatrix( void )
 {
      int i;
 
@@ -2119,7 +2119,12 @@ static void MultiplyVector( Vertex *V, Vertex *R )
      R->y *= divisor;
 }
 
-/******************************************************************************/
+static float DotProduct( Vertex *A, Vertex *B )
+{
+     return A->x * B->x + A->y * B->y + A->z * B->z;
+}
+
+/**************************************************************************************************/
 
 typedef struct _Tri3D {
      Vertex        *a, *b, *c;
@@ -2133,7 +2138,7 @@ static Vertex TransformedVerticies[SKULL_VERTICIES];
 static Vertex Light1 = { 0.0,  0.0, 1.0 };
 static Vertex Light2 = { 0.2, -0.2, 0.4 };
 
-/******************************************************************************/
+/**************************************************************************************************/
 
 static void DrawTriangle( float light1, float light2, Tri3D *tri )
 {
@@ -2174,17 +2179,17 @@ static void DrawTriangle( float light1, float light2, Tri3D *tri )
      }
 }
 
-static void DrawIt()
+static void DrawIt( void )
 {
+     float     l, light1, light2;
+     Vertex    A, B;
+     Tri3D    *pntr, *prev;
      Tri3D    *first          = Triangles;
      Tri3D    *current        = Triangles;
      Triangle *points         = SkullTriangles;
      Vertex   *transPoints    = TransformedVerticies;
      Vertex   *untransPoints  = SkullVerticies;
      int       count, NumUsed = 0;
-     Tri3D    *pntr, *prev;
-     Vertex    A, B;
-     float     l, light1, light2;
 
      primary->Clear( primary, 0x00, 0x00, 0x00, 0xff );
 
@@ -2257,13 +2262,13 @@ static void DrawIt()
 
      while (first) {
           if (Lighting) {
-               l = first->normal.x * first->normal.x + first->normal.y * first->normal.y + first->normal.z * first->normal.z;
+               l = DotProduct( &first->normal, &first->normal );
                l = sqrt( l );
 
-               light1 = -(first->normal.x * Light1.x + first->normal.y * Light1.y + first->normal.z * Light1.z) / l;
+               light1 = -DotProduct( &first->normal, &Light1 ) / l;
                light1 = CLAMP( light1, 0.0, 1.0 );
 
-               light2 = ABS( first->normal.x * Light2.x + first->normal.y * Light2.y + first->normal.z * Light2.z ) / l;
+               light2 = ABS( DotProduct( &first->normal, &Light2 ) ) / l;
                light2 = CLAMP( light2, 0.0, 1.0 );
           }
           else {
@@ -2332,7 +2337,7 @@ static void RotateLight( Vertex *light, int dx, int dy )
      light->z = X * matrix[6] + Y * matrix[7] + Z * matrix[8];
 }
 
-/******************************************************************************/
+/**************************************************************************************************/
 
 static void exit_application( int status )
 {

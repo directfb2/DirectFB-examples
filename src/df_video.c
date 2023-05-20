@@ -69,7 +69,7 @@ unsigned int frame_delay = 50;
 /* number of frames displayed */
 static long frame_num = 0;
 
-static void render()
+static void render( void )
 {
      if (frame_num % frame_delay) {
           static int wx   = 0;
@@ -104,7 +104,7 @@ static void render()
      frame_num++;
 }
 
-static void dfb_shutdown()
+static void dfb_shutdown( void )
 {
      if (surface)       surface->Release( surface );
      if (window)        window->Release( window );
@@ -116,7 +116,7 @@ static void dfb_shutdown()
      if (dfb)           dfb->Release( dfb );
 }
 
-static void print_usage()
+static void print_usage( void )
 {
      printf( "DirectFB Video Demo\n\n" );
      printf( "Usage: df_video <videofile>\n\n" );

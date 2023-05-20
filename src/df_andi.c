@@ -87,7 +87,7 @@ static bool do_print_fps = false;
 static unsigned int rand_pool = 0x12345678;
 static unsigned int rand_add  = 0x87654321;
 
-static inline unsigned int myrand()
+static inline unsigned int myrand( void )
 {
      rand_pool ^= ((rand_pool << 7) | (rand_pool >> 25));
      rand_pool += rand_add;
@@ -140,7 +140,7 @@ static int *coords = NULL;
 /*
  * adds one penguin to the list, and sets initial state
  */
-static void spawn_penguin()
+static void spawn_penguin( void )
 {
      Penguin *new_penguin = calloc( 1, sizeof(Penguin) );
 
@@ -178,7 +178,7 @@ static void spawn_penguins( int number )
 /*
  * removes one penguin (the first) from the list
  */
-static void destroy_penguin()
+static void destroy_penguin( void )
 {
      Penguin *first_penguin = penguins;
 
@@ -201,7 +201,7 @@ static void destroy_penguins( int number )
 /*
  * blits all penguins to the screen
  */
-static void draw_penguins()
+static void draw_penguins( void )
 {
      int           j = population;
      Penguin      *p = penguins;
@@ -312,7 +312,7 @@ static void move_penguins( int step )
 /*
  * searches a destination point in the coords array for each penguin
  */
-static void penguins_search_destination()
+static void penguins_search_destination( void )
 {
      Penguin *p = penguins;
 
@@ -332,7 +332,7 @@ static void penguins_search_destination()
 /*
  * removes all penguins
  */
-static void destroy_all_penguins()
+static void destroy_all_penguins( void )
 {
      Penguin *p = penguins;
 
@@ -346,7 +346,7 @@ static void destroy_all_penguins()
 /*
  * revives all penguins, penguins that are in formation move again
  */
-static void revive_penguins()
+static void revive_penguins( void )
 {
      Penguin *p = penguins;
 
@@ -360,7 +360,7 @@ static void revive_penguins()
  * interprets the destination mask from the destination_mask surface
  * all back pixels become formation points, and are stored in the coords array
  */
-static void read_destination_mask()
+static void read_destination_mask( void )
 {
      int   x, y;
      int   pitch;
@@ -421,7 +421,7 @@ static void initialize_direction_frames( PenguinFrame **direction_frames, int yo
 /*
  * initializes all animation frames
  */
-static void initialize_animation()
+static void initialize_animation( void )
 {
      initialize_direction_frames( &down_frames,  0 );
      initialize_direction_frames( &left_frames,  1 );
@@ -432,7 +432,7 @@ static void initialize_animation()
 /*
  * print usage
  */
-static void print_usage()
+static void print_usage( void )
 {
      printf( "DirectFB Penguin Demo\n\n" );
      printf( "Usage: df_andi [options]\n\n" );
@@ -446,7 +446,7 @@ static void print_usage()
 /*
  * deinitializes resources and DirectFB
  */
-static void deinit_resources()
+static void deinit_resources( void )
 {
      destroy_all_penguins();
 

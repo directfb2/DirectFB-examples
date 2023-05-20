@@ -295,7 +295,7 @@ static void vbAdd( float x, float y, float z, float s, float t )
      vtx->index = -1;
 }
 
-static void vbClear()
+static void vbClear( void )
 {
      buffer->count = 0;
 }
@@ -459,7 +459,7 @@ static void build_polygon( const int *input, int count )
      Q[2] = M[2] * P[0] + M[6] * P[1] + M[10] * P[2] + M[14] * P[3]; \
      Q[3] = M[3] * P[0] + M[7] * P[1] + M[11] * P[2] + M[15] * P[3];
 
-static void vbExec()
+static void vbExec( void )
 {
      int i;
 
@@ -514,7 +514,7 @@ static void vbExec()
                                      buffer->vertices, buffer->indices, buffer->num_indices, DTTF_LIST );
 }
 
-static void vbDestroy()
+static void vbDestroy( void )
 {
      free( buffer->indices );
      free( buffer->vertices );
@@ -546,7 +546,7 @@ static void generate_flag( int num, float cycles, float amplitude, float phase )
      }
 }
 
-static void cleanup()
+static void cleanup( void )
 {
      /* Free vertex buffer. */
      if (buffer)
@@ -577,7 +577,7 @@ static void cleanup()
           dfb->Release( dfb );
 }
 
-static void print_usage()
+static void print_usage( void )
 {
      printf( "DirectFB Texture Demo\n\n" );
      printf( "Usage: df_texture <file>\n\n" );

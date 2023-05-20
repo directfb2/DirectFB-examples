@@ -41,7 +41,7 @@ static IDirectFBPalette     *palette      = NULL;
 /* screen width and height */
 static int screen_width, screen_height;
 
-static void generate_palette()
+static void generate_palette( void )
 {
      DFBColor  colors[256];
      int       i;
@@ -56,7 +56,7 @@ static void generate_palette()
      DFBCHECK(palette->SetEntries( palette, colors, 256, 0 ));
 }
 
-static void rotate_palette()
+static void rotate_palette( void )
 {
      DFBColor colors[256];
 
@@ -71,7 +71,7 @@ static void rotate_palette()
      DFBCHECK(palette->SetEntries( palette, colors, 1, 255 ));
 }
 
-static void fill_surface()
+static void fill_surface( void )
 {
      int   x;
      int   y;
@@ -91,7 +91,7 @@ static void fill_surface()
      DFBCHECK(primary->Unlock( primary ));
 }
 
-static void dfb_shutdown()
+static void dfb_shutdown( void )
 {
      if (palette)      palette->Release( palette );
      if (primary)      primary->Release( primary );
