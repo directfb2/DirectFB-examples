@@ -33,16 +33,6 @@
 #include "star4.h"
 #endif
 
-/* macro for a safe call to DirectFB functions */
-#define DFBCHECK(x)                                                   \
-     do {                                                             \
-          DFBResult ret = x;                                          \
-          if (ret != DFB_OK) {                                        \
-               fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ ); \
-               DirectFBErrorFatal( #x, ret );                         \
-          }                                                           \
-     } while (0)
-
 /* main interface */
 static IDirectFB *dfb = NULL;
 
@@ -458,7 +448,7 @@ static void init_resources( int argc, char *argv[] )
      projection = matrix_new_perspective( 400 );
 }
 
-int main( int argc, char *argv[] )
+int directfb_main( int argc, char *argv[] )
 {
      DirectThread *render_loop_thread;
      int           quit = 0;
@@ -569,3 +559,5 @@ int main( int argc, char *argv[] )
 
      return 42;
 }
+
+DIRECTFB_MAIN()

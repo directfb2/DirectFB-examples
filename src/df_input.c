@@ -36,16 +36,6 @@
 #include "mouse.h"
 #endif
 
-/* macro for a safe call to DirectFB functions */
-#define DFBCHECK(x)                                                   \
-     do {                                                             \
-          DFBResult ret = x;                                          \
-          if (ret != DFB_OK) {                                        \
-               fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ ); \
-               DirectFBErrorFatal( #x, ret );                         \
-          }                                                           \
-     } while (0)
-
 /* main interface */
 static IDirectFB *dfb = NULL;
 
@@ -630,7 +620,7 @@ static void print_usage( void )
      printf( "  --dfb-help     Output DirectFB usage information.\n\n" );
 }
 
-int main( int argc, char *argv[] )
+int directfb_main( int argc, char *argv[] )
 {
      int                       n;
      DFBFontDescription        fdsc;
@@ -638,7 +628,7 @@ int main( int argc, char *argv[] )
      DFBDataBufferDescription  ddsc;
      IDirectFBDataBuffer      *buffer;
      IDirectFBImageProvider   *provider;
-     DeviceInfo               *devices    = NULL;
+     DeviceInfo               *devices = NULL;
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));
@@ -819,3 +809,5 @@ int main( int argc, char *argv[] )
 
      return 42;
 }
+
+DIRECTFB_MAIN()

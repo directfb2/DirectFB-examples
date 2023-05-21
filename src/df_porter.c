@@ -33,16 +33,6 @@
 #include "wood_andi.h"
 #endif
 
-/* macro for a safe call to DirectFB functions */
-#define DFBCHECK(x)                                                   \
-     do {                                                             \
-          DFBResult ret = x;                                          \
-          if (ret != DFB_OK) {                                        \
-               fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ ); \
-               DirectFBErrorFatal( #x, ret );                         \
-          }                                                           \
-     } while (0)
-
 /* main interface */
 static IDirectFB *dfb = NULL;
 
@@ -82,7 +72,7 @@ static void print_usage( void )
      printf( "Usage: df_porter <background>\n\n" );
 }
 
-int main( int argc, char *argv[] )
+int directfb_main( int argc, char *argv[] )
 {
      int                       i, step;
      DFBFontDescription        fdsc;
@@ -225,3 +215,5 @@ int main( int argc, char *argv[] )
 
      return 42;
 }
+
+DIRECTFB_MAIN()

@@ -24,7 +24,7 @@
 #include <directfb.h>
 #include <math.h>
 
-/**************************************************************************************************/
+#include "util.h"
 
 /* DirectFB interfaces */
 static IDirectFB            *dfb          = NULL;
@@ -2401,7 +2401,7 @@ static void init_application( int argc, char *argv[] )
      primary->GetSize( primary, &Width, &Height );
 }
 
-int main( int argc, char *argv[] )
+int directfb_main( int argc, char *argv[] )
 {
      int dxL = 11;
      int dyL = 7;
@@ -2471,3 +2471,5 @@ int main( int argc, char *argv[] )
      /* Shouldn't reach this. */
      return 0;
 }
+
+DIRECTFB_MAIN()

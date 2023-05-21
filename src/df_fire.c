@@ -22,7 +22,7 @@
 
 #include <directfb.h>
 
-/**************************************************************************************************/
+#include "util.h"
 
 /* DirectFB interfaces */
 static IDirectFB            *dfb          = NULL;
@@ -51,7 +51,7 @@ static inline unsigned int myrand( void )
      return rand_pool;
 }
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
 static void fade_out_palette( void )
 {
@@ -257,7 +257,7 @@ static void init_application( int argc, char *argv[] )
      surface->Flip( surface, NULL, DSFLIP_NONE );
 }
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
 static void render_fire( void )
 {
@@ -327,9 +327,9 @@ static void render_fire( void )
      surface->Flip( surface, NULL, DSFLIP_NONE );
 }
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
-int main( int argc, char *argv[] )
+int directfb_main( int argc, char *argv[] )
 {
      /* Initialize application. */
      init_application( argc, argv );
@@ -367,3 +367,5 @@ int main( int argc, char *argv[] )
      /* Shouldn't reach this. */
      return 0;
 }
+
+DIRECTFB_MAIN()

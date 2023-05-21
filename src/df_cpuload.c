@@ -23,6 +23,8 @@
 #include <direct/clock.h>
 #include <directfb.h>
 
+#include "util.h"
+
 /**************************************************************************************************/
 
 /* DirectFB interfaces */
@@ -202,7 +204,7 @@ static void update( void )
 
 /**************************************************************************************************/
 
-int main( int argc, char *argv[] )
+int directfb_main( int argc, char *argv[] )
 {
      long long next_update = 0;
 
@@ -238,3 +240,5 @@ int main( int argc, char *argv[] )
      /* Shouldn't reach this. */
      return 0;
 }
+
+DIRECTFB_MAIN()
