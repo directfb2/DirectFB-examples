@@ -23,7 +23,7 @@
 #include <directfb.h>
 #include <math.h>
 
-/******************************************************************************/
+#include "util.h"
 
 /* DirectFB interfaces */
 static IDirectFB            *dfb          = NULL;
@@ -33,7 +33,7 @@ static IDirectFBSurface     *primary      = NULL;
 /* screen width and height */
 static int width, height;
 
-/******************************************************************************/
+/**********************************************************************************************************************/
 
 typedef struct {
      double xx; double yx;
@@ -97,7 +97,7 @@ static void matrix_rotate( matrix_t *matrix, double radians )
      matrix_multiply( matrix, &tmp, matrix );
 }
 
-/******************************************************************************/
+/**********************************************************************************************************************/
 
 static void set_matrix( const matrix_t *matrix )
 {
@@ -116,14 +116,71 @@ static void set_matrix( const matrix_t *matrix )
      primary->SetMatrix( primary, m );
 }
 
-/******************************************************************************/
+/**********************************************************************************************************************/
 
-static void init_application( int argc, char *argv[] );
-static void exit_application( int status );
+static void exit_application( int status )
+{
+     /* Release the primary surface. */
+     if (primary)
+          primary->Release( primary );
 
-/******************************************************************************/
+     /* Release the event buffer. */
+     if (event_buffer)
+          event_buffer->Release( event_buffer );
 
-int main( int argc, char *argv[] )
+     /* Release the main interface. */
+     if (dfb)
+          dfb->Release( dfb );
+
+     /* Terminate application. */
+     exit( status );
+}
+
+static void init_application( int argc, char *argv[] )
+{
+     DFBResult             ret;
+     DFBSurfaceDescription desc;
+
+     /* Initialize DirectFB including command line parsing. */
+     ret = DirectFBInit( &argc, &argv );
+     if (ret) {
+          DirectFBError( "DirectFBInit() failed", ret );
+          exit_application( 1 );
+     }
+
+     /* Create the main interface. */
+     ret = DirectFBCreate( &dfb );
+     if (ret) {
+          DirectFBError( "DirectFBCreate() failed", ret );
+          exit_application( 2 );
+     }
+
+     /* Set the cooperative level to DFSCL_FULLSCREEN for exclusive access to the primary layer. */
+     dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
+
+     /* Create an event buffer for key events. */
+     ret = dfb->CreateInputEventBuffer( dfb, DICAPS_BUTTONS | DICAPS_KEYS, DFB_FALSE, &event_buffer );
+     if (ret) {
+          DirectFBError( "CreateInputEventBuffer() failed", ret );
+          exit_application( 3 );
+     }
+
+     /* Fill the surface description. */
+     desc.flags = DSDESC_CAPS;
+     desc.caps  = DSCAPS_PRIMARY | DSCAPS_DOUBLE;
+
+     /* Get the primary surface, i.e. the surface of the primary layer. */
+     ret = dfb->CreateSurface( dfb, &desc, &primary );
+     if (ret) {
+          DirectFBError( "CreateSurface() failed", ret );
+          exit_application( 4 );
+     }
+
+     /* Query the size of the primary surface. */
+     primary->GetSize( primary, &width, &height );
+}
+
+int directfb_main( int argc, char *argv[] )
 {
      matrix_t matrix;
      int      i = 0;
@@ -219,66 +276,4 @@ int main( int argc, char *argv[] )
      return 0;
 }
 
-/******************************************************************************/
-
-static void init_application( int argc, char *argv[] )
-{
-     DFBResult             ret;
-     DFBSurfaceDescription desc;
-
-     /* Initialize DirectFB including command line parsing. */
-     ret = DirectFBInit( &argc, &argv );
-     if (ret) {
-          DirectFBError( "DirectFBInit() failed", ret );
-          exit_application( 1 );
-     }
-
-     /* Create the main interface. */
-     ret = DirectFBCreate( &dfb );
-     if (ret) {
-          DirectFBError( "DirectFBCreate() failed", ret );
-          exit_application( 2 );
-     }
-
-     /* Set the cooperative level to DFSCL_FULLSCREEN for exclusive access to the primary layer. */
-     dfb->SetCooperativeLevel( dfb, DFSCL_FULLSCREEN );
-
-     /* Create an event buffer for key events. */
-     ret = dfb->CreateInputEventBuffer( dfb, DICAPS_BUTTONS | DICAPS_KEYS, DFB_FALSE, &event_buffer );
-     if (ret) {
-          DirectFBError( "CreateInputEventBuffer() failed", ret );
-          exit_application( 3 );
-     }
-
-     /* Fill the surface description. */
-     desc.flags = DSDESC_CAPS;
-     desc.caps  = DSCAPS_PRIMARY | DSCAPS_DOUBLE;
-
-     /* Get the primary surface, i.e. the surface of the primary layer. */
-     ret = dfb->CreateSurface( dfb, &desc, &primary );
-     if (ret) {
-          DirectFBError( "CreateSurface() failed", ret );
-          exit_application( 4 );
-     }
-
-     /* Query the size of the primary surface. */
-     primary->GetSize( primary, &width, &height );
-}
-
-static void exit_application( int status )
-{
-     /* Release the primary surface. */
-     if (primary)
-          primary->Release( primary );
-
-     /* Release the event buffer. */
-     if (event_buffer)
-          event_buffer->Release( event_buffer );
-
-     /* Release the main interface. */
-     if (dfb)
-          dfb->Release( dfb );
-
-     /* Terminate application. */
-     exit( status );
-}
+DIRECTFB_MAIN()

@@ -34,16 +34,6 @@
 #include "texture.h"
 #endif
 
-/* macro for a safe call to DirectFB functions */
-#define DFBCHECK(x)                                                   \
-     do {                                                             \
-          DFBResult ret = x;                                          \
-          if (ret != DFB_OK) {                                        \
-               fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ ); \
-               DirectFBErrorFatal( #x, ret );                         \
-          }                                                           \
-     } while (0)
-
 /* main interface */
 static IDirectFB *dfb = NULL;
 
@@ -78,7 +68,7 @@ static int axisabs_y[2] = { -1, -1 };
 #define DFB_EVENT_SLOT_ID(e) 0
 #endif
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
 typedef struct {
      float v[4];
@@ -143,7 +133,7 @@ typedef struct {
      int              num_indices;
 } VeVertexBuffer;
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
 static const VeMatrix identity = { { 1, 0, 0, 0,
                                      0, 1, 0, 0,
@@ -158,7 +148,7 @@ static VeVertexBuffer *buffer = NULL;
 /* composite matrix update */
 static bool update = false;
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
 #define A(row,col) a[(col<<2)+row]
 #define B(row,col) b[(col<<2)+row]
@@ -181,7 +171,7 @@ static void matmul4( float *product, const float *a, const float *b )
 #undef B
 #undef P
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
 static void veInit( float fovy, float aspect, float nearval, float farval )
 {
@@ -260,7 +250,7 @@ static void veTranslate( float x, float y, float z )
      update = true;
 }
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
 static void vbNew( int num )
 {
@@ -522,7 +512,7 @@ static void vbDestroy( void )
      free( buffer );
 }
 
-/**************************************************************************************************/
+/**********************************************************************************************************************/
 
 static void generate_flag( int num, float cycles, float amplitude, float phase )
 {
@@ -583,7 +573,7 @@ static void print_usage( void )
      printf( "Usage: df_texture <file>\n\n" );
 }
 
-int main( int argc, char *argv[] )
+int directfb_main( int argc, char *argv[] )
 {
      DFBResult                 ret = DFB_FAILURE;
      FPSData                   fps;
@@ -857,3 +847,5 @@ int main( int argc, char *argv[] )
      /* Shouldn't reach this. */
      return 0;
 }
+
+DIRECTFB_MAIN()

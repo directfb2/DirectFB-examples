@@ -22,15 +22,7 @@
 
 #include <directfb.h>
 
-/* macro for a safe call to DirectFB functions */
-#define DFBCHECK(x)                                                   \
-     do {                                                             \
-          DFBResult ret = x;                                          \
-          if (ret != DFB_OK) {                                        \
-               fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ ); \
-               DirectFBErrorFatal( #x, ret );                         \
-          }                                                           \
-     } while (0)
+#include "util.h"
 
 /* DirectFB interfaces */
 static IDirectFB            *dfb          = NULL;
@@ -40,6 +32,8 @@ static IDirectFBPalette     *palette      = NULL;
 
 /* screen width and height */
 static int screen_width, screen_height;
+
+/**********************************************************************************************************************/
 
 static void generate_palette( void )
 {
@@ -91,6 +85,8 @@ static void fill_surface( void )
      DFBCHECK(primary->Unlock( primary ));
 }
 
+/**********************************************************************************************************************/
+
 static void dfb_shutdown( void )
 {
      if (palette)      palette->Release( palette );
@@ -99,7 +95,7 @@ static void dfb_shutdown( void )
      if (dfb)          dfb->Release( dfb );
 }
 
-int main( int argc, char *argv[] )
+int directfb_main( int argc, char *argv[] )
 {
      DFBSurfaceDescription desc;
 
@@ -164,3 +160,5 @@ int main( int argc, char *argv[] )
      /* shouldn't reach this */
      return 0;
 }
+
+DIRECTFB_MAIN()

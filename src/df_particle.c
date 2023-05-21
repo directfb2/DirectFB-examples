@@ -23,15 +23,7 @@
 #include <directfb.h>
 #include <math.h>
 
-/* macro for a safe call to DirectFB functions */
-#define DFBCHECK(x)                                                   \
-     do {                                                             \
-          DFBResult ret = x;                                          \
-          if (ret != DFB_OK) {                                        \
-               fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ ); \
-               DirectFBErrorFatal( #x, ret );                         \
-          }                                                           \
-     } while (0)
+#include "util.h"
 
 /* DirectFB interfaces */
 static IDirectFB            *dfb          = NULL;
@@ -41,8 +33,7 @@ static IDirectFBSurface     *primary      = NULL;
 /* screen width and height */
 static int sx, sy;
 
-/**********************************************************************************************************************/
-
+/* random function */
 static unsigned int rand_pool = 0x12345678;
 static unsigned int rand_add  = 0x87654321;
 
@@ -168,7 +159,7 @@ static void init_resources( int argc, char *argv[] )
      primary->Clear( primary, 0x00, 0x00, 0x00, 0xFF );
 }
 
-int main( int argc, char *argv[] )
+int directfb_main( int argc, char *argv[] )
 {
      int spawn;
      int left  = 0;
@@ -241,3 +232,5 @@ int main( int argc, char *argv[] )
 
      return 42;
 }
+
+DIRECTFB_MAIN()

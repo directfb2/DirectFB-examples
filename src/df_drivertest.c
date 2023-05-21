@@ -30,16 +30,6 @@
 #include "mask.h"
 #endif
 
-/* macro for a safe call to DirectFB functions */
-#define DFBCHECK(x)                                                   \
-     do {                                                             \
-          DFBResult ret = x;                                          \
-          if (ret != DFB_OK) {                                        \
-               fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ ); \
-               DirectFBErrorFatal( #x, ret );                         \
-          }                                                           \
-     } while (0)
-
 /* DirectFB interfaces */
 static IDirectFB            *dfb          = NULL;
 static IDirectFBEventBuffer *event_buffer = NULL;
@@ -156,7 +146,7 @@ static void cleanup( void )
           dfb->Release( dfb );
 }
 
-int main( int argc, char *argv[] )
+int directfb_main( int argc, char *argv[] )
 {
      int                     quit;
      DFBSurfaceDescription   desc;
@@ -396,3 +386,5 @@ int main( int argc, char *argv[] )
 
      return 42;
 }
+
+DIRECTFB_MAIN()

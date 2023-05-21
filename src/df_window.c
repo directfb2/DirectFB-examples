@@ -37,16 +37,6 @@
 #include "dfblogo.h"
 #endif
 
-/* macro for a safe call to DirectFB functions */
-#define DFBCHECK(x)                                                   \
-     do {                                                             \
-          DFBResult ret = x;                                          \
-          if (ret != DFB_OK) {                                        \
-               fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ ); \
-               DirectFBErrorFatal( #x, ret );                         \
-          }                                                           \
-     } while (0)
-
 /* DirectFB interfaces */
 static IDirectFB             *dfb             = NULL;
 static IDirectFBDisplayLayer *layer           = NULL;
@@ -92,7 +82,7 @@ static void print_usage( void )
      printf( "Usage: df_window <stacking class>\n\n" );
 }
 
-int main( int argc, char *argv[] )
+int directfb_main( int argc, char *argv[] )
 {
      int                       fontheight, winx, winy, winwidth, winheight;
      DFBWindowID               id1;
@@ -146,8 +136,8 @@ int main( int argc, char *argv[] )
      DFBCHECK(dfb->GetDisplayLayer( dfb, DLID_PRIMARY, &layer ));
 
      /* set cursor shape for the primary display layer */
-     if (getenv( "DEFAULT_CURSOR" )) {
-          DFBCHECK(dfb->CreateImageProvider( dfb, getenv( "DEFAULT_CURSOR" ), &provider ));
+     if (direct_getenv( "DEFAULT_CURSOR" )) {
+          DFBCHECK(dfb->CreateImageProvider( dfb, direct_getenv( "DEFAULT_CURSOR" ), &provider ));
           provider->GetSurfaceDescription( provider, &sdsc );
           DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &cursor_surface ));
           provider->RenderTo( provider, cursor_surface, NULL );
@@ -504,3 +494,5 @@ int main( int argc, char *argv[] )
 
      return 42;
 }
+
+DIRECTFB_MAIN()

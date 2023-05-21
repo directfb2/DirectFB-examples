@@ -27,6 +27,25 @@
 
 /**************************************************************************************************/
 
+/* macro to be used after the directfb_main() function */
+#ifdef DIRECTFB_MAIN_ENTRYPOINT
+#define DIRECTFB_MAIN()
+#else
+#define DIRECTFB_MAIN() int main( int argc, char *argv[] ) { return directfb_main( argc, argv ); }
+#endif
+
+/* macro for a safe call to DirectFB functions */
+#define DFBCHECK(x)                                                   \
+     do {                                                             \
+          DFBResult result = x;                                       \
+          if (result != DFB_OK) {                                     \
+               fprintf( stderr, "%s <%d>:\n\t", __FILE__, __LINE__ ); \
+               DirectFBErrorFatal( #x, result );                      \
+          }                                                           \
+     } while (0)
+
+/**************************************************************************************************/
+
 #ifdef USE_FONT_HEADERS
 #ifdef DGIFF_EXTENSION
 static inline bool
