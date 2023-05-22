@@ -1,13 +1,24 @@
+Installation Instructions
+=========================
+
 DirectFB-examples is built using Meson.
 
 First, configure the build:
 
   $ meson setup build/
 
-Start the build with:
+Linux
+=====
+
+On Linux, start the build with:
 
   $ meson compile -C build/
 
 And install DirectFB-examples using:
 
   $ meson install -C build/
+
+NuttX
+=====
+
+On NuttX, copy the DirectFB-examples directory to your NuttX apps/examples/ directory.

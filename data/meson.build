@@ -65,8 +65,8 @@ rawdata_names = [
   'wood_andi'
 ]
 
-dsdesc_hdr = []
-rawdata_hdr = []
+dsdesc_hdrs = []
+rawdata_hdrs = []
 
 if font_headers == 'disabled'
     examplesdata += ['decker.dgiff', 'decker_argb.dgiff']
@@ -84,17 +84,17 @@ elif font_headers == 'dgiff'
                                        capture: true,
                                        command: [directfb_csource, '--raw', '--name=decker_argb', '@INPUT@'])
 
-  rawdata_hdr += custom_target('decker',
-                               input: [decker_a8_data_hdr, decker_argb_data_hdr],
-                               output: 'decker.h',
-                               capture: true,
-                               command: [cat, '@INPUT0@', '@INPUT1@'])
+  rawdata_hdrs += custom_target('decker',
+                                input: [decker_a8_data_hdr, decker_argb_data_hdr],
+                                output: 'decker.h',
+                                capture: true,
+                                command: [cat, '@INPUT0@', '@INPUT1@'])
 else
-  rawdata_hdr += custom_target('decker',
-                               input: 'decker' + '.' + font_headers,
-                               output: 'decker.h',
-                               capture: true,
-                               command: [directfb_csource, '--raw', '--name=decker', '@INPUT@'])
+  rawdata_hdrs += custom_target('decker',
+                                input: 'decker' + '.' + font_headers,
+                                output: 'decker.h',
+                                capture: true,
+                                command: [directfb_csource, '--raw', '--name=decker', '@INPUT@'])
 endif
 
 if image_headers == 'disabled'
@@ -109,19 +109,19 @@ if image_headers == 'disabled'
   endforeach
 else
   foreach dsdesc_name : dsdesc_names
-    dsdesc_hdr += custom_target(dsdesc_name,
-                                input: dsdesc_name + '.' + image_headers,
-                                output: dsdesc_name + '.h',
-                                capture: true,
-                                command: [directfb_csource, '--name=@0@'.format(dsdesc_name), '@INPUT@'])
+    dsdesc_hdrs += custom_target(dsdesc_name,
+                                 input: dsdesc_name + '.' + image_headers,
+                                 output: dsdesc_name + '.h',
+                                 capture: true,
+                                 command: [directfb_csource, '--name=@0@'.format(dsdesc_name), '@INPUT@'])
   endforeach
 
   foreach rawdata_name : rawdata_names
-    rawdata_hdr += custom_target(rawdata_name,
-                                 input: rawdata_name + '.' + image_headers,
-                                 output: rawdata_name + '.h',
-                                 capture: true,
-                                 command: [directfb_csource, '--raw', '--name=@0@'.format(rawdata_name), '@INPUT@'])
+    rawdata_hdrs += custom_target(rawdata_name,
+                                  input: rawdata_name + '.' + image_headers,
+                                  output: rawdata_name + '.h',
+                                  capture: true,
+                                  command: [directfb_csource, '--raw', '--name=@0@'.format(rawdata_name), '@INPUT@'])
   endforeach
 endif
 
@@ -130,11 +130,11 @@ if video_headers == 'disabled'
   examplesdata += 'bbb.m2v'
   examplesdata += 'bbb.264'
 else
-  rawdata_hdr += custom_target('bbb',
-                               input: 'bbb' + '.' + video_headers,
-                               output: 'bbb.h',
-                               capture: true,
-                               command: [directfb_csource, '--raw', '--name=bbb', '@INPUT@'])
+  rawdata_hdrs += custom_target('bbb',
+                                input: 'bbb' + '.' + video_headers,
+                                output: 'bbb.h',
+                                capture: true,
+                                command: [directfb_csource, '--raw', '--name=bbb', '@INPUT@'])
 endif
 
 if fusionsound_dep.found()
