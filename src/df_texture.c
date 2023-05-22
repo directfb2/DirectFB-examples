@@ -143,7 +143,7 @@ static const VeMatrix identity = { { 1, 0, 0, 0,
 static VeMatrix windowmap, projection, modelview, composite;
 
 /* vertex buffer */
-static VeVertexBuffer *buffer = NULL;
+static VeVertexBuffer *vbuffer = NULL;
 
 /* composite matrix update */
 static bool update = false;
@@ -254,25 +254,25 @@ static void veTranslate( float x, float y, float z )
 
 static void vbNew( int num )
 {
-     buffer = calloc( 1, sizeof(VeVertexBuffer) );
+     vbuffer = calloc( 1, sizeof(VeVertexBuffer) );
 
-     buffer->size         = num;
-     buffer->data         = malloc( buffer->size * sizeof(VeVertex) );
-     buffer->max_vertices = buffer->size << 2;
-     buffer->max_indices  = (buffer->size - 2) * 9;
-     buffer->vertices     = malloc( buffer->max_vertices * sizeof(DFBVertex) );
-     buffer->indices      = malloc( buffer->max_indices * sizeof(int) );
+     vbuffer->size         = num;
+     vbuffer->data         = malloc( vbuffer->size * sizeof(VeVertex) );
+     vbuffer->max_vertices = vbuffer->size << 2;
+     vbuffer->max_indices  = (vbuffer->size - 2) * 9;
+     vbuffer->vertices     = malloc( vbuffer->max_vertices * sizeof(DFBVertex) );
+     vbuffer->indices      = malloc( vbuffer->max_indices * sizeof(int) );
 }
 
 static void vbAdd( float x, float y, float z, float s, float t )
 {
      VeVertex *vtx;
 
-     if (buffer->count == buffer->size) {
+     if (vbuffer->count == vbuffer->size) {
           return;
      }
 
-     vtx = &buffer->data[buffer->count++];
+     vtx = &vbuffer->data[vbuffer->count++];
 
      vtx->obj.v[0] = x;
      vtx->obj.v[1] = y;
@@ -287,7 +287,7 @@ static void vbAdd( float x, float y, float z, float s, float t )
 
 static void vbClear( void )
 {
-     buffer->count = 0;
+     vbuffer->count = 0;
 }
 
 static int add_vertex( const VeVertex *vtx )
@@ -297,10 +297,10 @@ static int add_vertex( const VeVertex *vtx )
      DFBVertex *dst;
 
      /* Use the next free index. */
-     index = buffer->num_vertices++;
+     index = vbuffer->num_vertices++;
 
      /* Get the pointer to the element. */
-     dst = &buffer->vertices[index];
+     dst = &vbuffer->vertices[index];
 
      /* Calculate one over w. */
      oow = 1 / vtx->clip.v[3];
@@ -329,7 +329,7 @@ static int clip_polygon( const int *input, int count, VeClipMask clipOr, int *ou
      VeVertex *to   = tmp2;
 
      for (i = 0; i < count; i++)
-          from[i] = buffer->data[input[i]];
+          from[i] = vbuffer->data[input[i]];
 
      for (p = 0; p < 6; p++) {
           int pc = p >> 1;
@@ -412,7 +412,7 @@ static void build_polygon( const int *input, int count )
 
      /* Combine clipping masks. */
      for (i = 0; i < count; i++) {
-          VeClipMask mask = buffer->data[input[i]].clipMask;
+          VeClipMask mask = vbuffer->data[input[i]].clipMask;
 
           clipOr  |= mask;
           clipAnd &= mask;
@@ -428,17 +428,17 @@ static void build_polygon( const int *input, int count )
           int output[count<<2];
 
           for (i = 2; i < clip_polygon( input, count, clipOr, output ); i++) {
-               buffer->indices[buffer->num_indices++] = output[0];
-               buffer->indices[buffer->num_indices++] = output[i-1];
-               buffer->indices[buffer->num_indices++] = output[i];
+               vbuffer->indices[vbuffer->num_indices++] = output[0];
+               vbuffer->indices[vbuffer->num_indices++] = output[i-1];
+               vbuffer->indices[vbuffer->num_indices++] = output[i];
           }
      }
      else {
           /* No vertex is clipped. */
           for (i = 2; i < count; i++) {
-               buffer->indices[buffer->num_indices++] = buffer->data[input[0]].index;
-               buffer->indices[buffer->num_indices++] = buffer->data[input[i-1]].index;
-               buffer->indices[buffer->num_indices++] = buffer->data[input[i]].index;
+               vbuffer->indices[vbuffer->num_indices++] = vbuffer->data[input[0]].index;
+               vbuffer->indices[vbuffer->num_indices++] = vbuffer->data[input[i-1]].index;
+               vbuffer->indices[vbuffer->num_indices++] = vbuffer->data[input[i]].index;
           }
      }
 }
@@ -461,11 +461,11 @@ static void vbExec( void )
      }
 
      /* Reset the output buffer. */
-     buffer->num_vertices = buffer->num_indices = 0;
+     vbuffer->num_vertices = vbuffer->num_indices = 0;
 
      /* Prepare input buffer. */
-     for (i = 0; i < buffer->count; i++) {
-          VeVertex   *vtx  = &buffer->data[i];
+     for (i = 0; i < vbuffer->count; i++) {
+          VeVertex   *vtx  = &vbuffer->data[i];
           float      *clip = vtx->clip.v;
           VeClipMask  mask = VE_CLIP_NONE;
 
@@ -492,24 +492,24 @@ static void vbExec( void )
      }
 
      /* Build list of indices, fill output buffer with original and/or extra vertices as needed. */
-     for (i = 2; i < buffer->count; i += 2) {
+     for (i = 2; i < vbuffer->count; i += 2) {
           int list[4] = { i - 2, i - 1, i + 1, i };
 
           build_polygon( list, 4 );
      }
 
      /* Render the list of built triangles. */
-     if (buffer->num_indices > 0)
+     if (vbuffer->num_indices > 0)
           primary->TextureTriangles( primary, texture,
-                                     buffer->vertices, buffer->indices, buffer->num_indices, DTTF_LIST );
+                                     vbuffer->vertices, vbuffer->indices, vbuffer->num_indices, DTTF_LIST );
 }
 
 static void vbDestroy( void )
 {
-     free( buffer->indices );
-     free( buffer->vertices );
-     free( buffer->data );
-     free( buffer );
+     free( vbuffer->indices );
+     free( vbuffer->vertices );
+     free( vbuffer->data );
+     free( vbuffer );
 }
 
 /**********************************************************************************************************************/
@@ -539,7 +539,7 @@ static void generate_flag( int num, float cycles, float amplitude, float phase )
 static void cleanup( void )
 {
      /* Free vertex buffer. */
-     if (buffer)
+     if (vbuffer)
           vbDestroy();
 
      /* Release the texture. */
