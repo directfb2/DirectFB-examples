@@ -34,6 +34,9 @@ endif
 ifeq ($(CONFIG_DF_FIRE),y)
 MAINSRC = src/df_fire.c
 endif
+ifeq ($(CONFIG_DF_INPUT),y)
+MAINSRC = src/df_input.c
+endif
 ifeq ($(CONFIG_DF_KNUCKLES),y)
 MAINSRC = src/df_knuckles.c
 endif
@@ -59,6 +62,7 @@ endif
 CFLAGS += -Idata
 CFLAGS += -DDIRECTFB_MAIN_ENTRYPOINT
 CFLAGS += -DDFB_CORE_SYSTEM=nuttxfb
+CFLAGS += -DDFB_INPUT_DRIVER=nuttx_input
 CFLAGS += -DDFB_FONT_PROVIDER=DGIFF
 CFLAGS += -DDFB_IMAGE_PROVIDER=DFIFF
 CFLAGS += -DDFB_VIDEO_PROVIDER=DFVFF
@@ -87,9 +91,12 @@ RAWDATA_HDRS += data/gnome-gmush.h
 RAWDATA_HDRS += data/gnome-gsame.h
 RAWDATA_HDRS += data/gnu-keys.h
 RAWDATA_HDRS += data/intro.h
+RAWDATA_HDRS += data/joystick.h
+RAWDATA_HDRS += data/keys.h
 RAWDATA_HDRS += data/laden_bike.h
 RAWDATA_HDRS += data/melted.h
 RAWDATA_HDRS += data/meter.h
+RAWDATA_HDRS += data/mouse.h
 RAWDATA_HDRS += data/panel.h
 RAWDATA_HDRS += data/rose.h
 RAWDATA_HDRS += data/sacred_heart.h

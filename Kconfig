@@ -40,6 +40,9 @@ config DF_DOK
 config DF_FIRE
 	bool "df_fire"
 
+config DF_INPUT
+	bool "df_input"
+
 config DF_KNUCKLES
 	bool "df_knuckles"
 
