@@ -1,3 +1,99 @@
+commit ed2a0cd5b628990e7751c01af18ee658e3c3bd59
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Fri Jun 2 08:09:43 2023 +0200
+
+    NuttX: Allow the use of specific media providers
+
+commit ccfda8fb2a73fae1b9b1bc68ad668f1576af10f9
+Merge: c9a683b e29a3f5
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Tue May 30 02:56:26 2023 +0200
+
+    Merge pull request #30 from caramelli/master
+    
+    Add df_input build for NuttX
+
+commit e29a3f59dece33bfac828abf53d97c60e1eef530
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Tue May 30 02:53:03 2023 +0200
+
+    Add df_input build for NuttX
+
+commit c9a683b7701781e9132a4fe24171f7ad37b8cb2d
+Merge: 5b0a5a7 6230123
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Mon May 22 15:52:06 2023 +0200
+
+    Merge pull request #29 from caramelli/master
+    
+    Add NuttX build support
+
+commit 623012353aa2343239d399ebd0c362cf66eba605
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Mon May 22 15:29:21 2023 +0200
+
+    Add NuttX build support
+
+commit 5b0a5a78b3399bf1fd727b672889a8b3e183c6bd
+Merge: 1bd0867 59ad2f9
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Sun May 21 08:57:40 2023 +0200
+
+    Merge pull request #27 from caramelli/master
+    
+    Add macro to allow use of a "directfb_main" entry point (for NuttX)
+
+commit 59ad2f999f57e7011af19f3c6d998f631d0bb1b2
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Sun May 21 08:51:20 2023 +0200
+
+    Add macro to allow use of a "directfb_main" entry point (for NuttX)
+
+commit 1bd08671b1d443698eeb716dc2f7ace53d8a87d0
+Merge: 7e38c70 01beb97
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Sat May 20 17:47:46 2023 +0200
+
+    Merge pull request #26 from caramelli/master
+    
+    Fix warning: function declaration isn't a prototype [-Wstrict-prototypes]
+
+commit 01beb973cbecc0e9749a2f6b778a0b58cd1d223e
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Sat May 20 17:43:32 2023 +0200
+
+    Fix warning: function declaration isn't a prototype [-Wstrict-prototypes]
+
+commit 7e38c70af67f16cce40e1f80112eb3bce2e86b99
+Merge: 08d1e10 226b951
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Fri May 19 10:28:11 2023 +0200
+
+    Merge pull request #25 from caramelli/master
+    
+    Allow the use of specific media providers by setting the file extension
+
+commit 226b951ea043d072b7f830b72912093556165989
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Fri May 19 10:19:33 2023 +0200
+
+    Allow the use of specific media providers by setting the file extension
+
+commit 08d1e1085e54a761fc3fcaff44b698b5ba9427fb
+Merge: 262fb78 9781b15
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Wed May 10 17:05:33 2023 +0200
+
+    Merge pull request #24 from caramelli/master
+    
+    fs advanced: Test advanced playback control for both sound buffer and sound stream
+
+commit 9781b152f54d3b3c4312cb3a8cabd5c4bd04cef4
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Wed May 10 16:57:41 2023 +0200
+
+    Update ChangeLog
+
 commit 4b7de0d8554c0c2cc411f0a712936fc5cf7f56ac
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Wed May 10 16:56:59 2023 +0200
