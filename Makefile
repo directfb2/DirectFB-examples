@@ -63,9 +63,9 @@ CFLAGS += -Idata
 CFLAGS += -DDIRECTFB_MAIN_ENTRYPOINT
 CFLAGS += -DDFB_CORE_SYSTEM=nuttxfb
 CFLAGS += -DDFB_INPUT_DRIVER=nuttx_input
-CFLAGS += -DDFB_FONT_PROVIDER=DGIFF
-CFLAGS += -DDFB_IMAGE_PROVIDER=DFIFF
-CFLAGS += -DDFB_VIDEO_PROVIDER=DFVFF
+CFLAGS += -DDFB_FONT_PROVIDER=$(CONFIG_DIRECTFB_EXAMPLE_FONT_PROVIDER)
+CFLAGS += -DDFB_IMAGE_PROVIDER=$(CONFIG_DIRECTFB_EXAMPLE_IMAGE_PROVIDER)
+CFLAGS += -DDFB_VIDEO_PROVIDER=$(CONFIG_DIRECTFB_EXAMPLE_VIDEO_PROVIDER)
 CFLAGS += -DDFB_WINDOW_MANAGER=default
 CFLAGS += -DUSE_FONT_HEADERS
 CFLAGS += -DUSE_IMAGE_HEADERS
@@ -108,14 +108,22 @@ RAWDATA_HDRS += data/wood_andi.h
 
 DIRECTFB_CSOURCE ?= directfb-csource
 
-data/%.h: data/%.dfiff
+data/%.h: data/%.$(shell echo $(CONFIG_DIRECTFB_EXAMPLE_IMAGE_EXTENSION))
 	$(DIRECTFB_CSOURCE) --raw $^ --name=$* > $@
 
-data/%.h: data/%.dfvff
+data/%.h: data/%.$(shell echo $(CONFIG_DIRECTFB_EXAMPLE_VIDEO_EXTENSION))
 	$(DIRECTFB_CSOURCE) --raw $^ --name=$* > $@
 
-data/%.h: data/%.dgiff
+data/%.h: data/%.$(shell echo $(CONFIG_DIRECTFB_EXAMPLE_FONT_EXTENSION))
 	$(DIRECTFB_CSOURCE) --raw $^ --name=$* > $@
+
+src/df_andi.c: data/decker.h data/destination_mask.h data/tux.h data/tux_alpha.h data/wood_andi.h
+src/df_dok.c: data/decker.h data/biglogo.h data/card.h data/colorkeyed.h data/fish.h data/intro.h data/laden_bike.h data/melted.h data/meter.h data/rose.h data/sacred_heart.h data/swirl.h
+src/df_input.c: data/decker.h data/joystick.h data/keys.h data/mouse.h
+src/df_neo.c: data/apple-red.h data/background.h data/gnome-applets.h data/gnome-calendar.h data/gnome-foot.h data/gnome-gimp.h data/gnome-gmush.h data/gnome-gsame.h data/gnu-keys.h
+src/df_texture.c: data/decker.h data/texture.h
+src/df_video.c: data/panel.h data/bbb.h
+src/df_window.c: data/decker.h data/cursor_red.h data/cursor_yellow.h data/dfblogo.h
 
 context:: $(RAWDATA_HDRS)
 

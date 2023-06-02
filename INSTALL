@@ -1,16 +1,14 @@
 Installation Instructions
 =========================
 
-DirectFB-examples is built using Meson.
+Linux
+=====
 
 First, configure the build:
 
   $ meson setup build/
 
-Linux
-=====
-
-On Linux, start the build with:
+Start the build with:
 
   $ meson compile -C build/
 
