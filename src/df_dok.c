@@ -1363,12 +1363,12 @@ int directfb_main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
 
-     fdsc.height = 24;
+     fdsc.height = CLAMP( (int) (SW / 40.0 / 8) * 8, 8, 96 );
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &bench_font ));
      DFBCHECK(bench_font->GetHeight( bench_font, &bench_fontheight ));
      DFBCHECK(bench_font->GetStringWidth( bench_font, "This is the DirectFB Benchmarking!!!", -1, &bench_stringwidth ));
 
-     fdsc.height = 16;
+     fdsc.height = 8 * ((fdsc.height / 2 + 4) / 8);
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &ui_font ));
      DFBCHECK(ui_font->GetHeight( ui_font, &ui_fontheight ));
 

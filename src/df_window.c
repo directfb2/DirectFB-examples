@@ -21,6 +21,7 @@
 */
 
 #include <direct/clock.h>
+#include <direct/util.h>
 #include <directfb.h>
 #include <directfb_util.h>
 #include <math.h>
@@ -84,8 +85,10 @@ static void print_usage( void )
 
 int directfb_main( int argc, char *argv[] )
 {
-     int                       fontheight, winx, winy, winwidth, winheight;
+     int                       fontheight, stringwidth;
+     int                       winx, winy, winwidth, winheight;
      DFBWindowID               id1;
+     DFBDisplayLayerConfig     config;
      DFBFontDescription        fdsc;
      DFBSurfaceDescription     sdsc;
      DFBWindowDescription      wdsc;
@@ -135,6 +138,8 @@ int directfb_main( int argc, char *argv[] )
      /* get the primary display layer */
      DFBCHECK(dfb->GetDisplayLayer( dfb, DLID_PRIMARY, &layer ));
 
+     DFBCHECK(layer->GetConfiguration( layer, &config ));
+
      /* set cursor shape for the primary display layer */
      if (direct_getenv( "DEFAULT_CURSOR" )) {
           DFBCHECK(dfb->CreateImageProvider( dfb, direct_getenv( "DEFAULT_CURSOR" ), &provider ));
@@ -147,6 +152,23 @@ int directfb_main( int argc, char *argv[] )
           provider->Release( provider );
      }
 
+     /* load font */
+     fdsc.flags  = DFDESC_HEIGHT;
+     fdsc.height = CLAMP( (int) (config.width / 50.0 / 8) * 8, 8, 96 );
+
+#ifdef USE_FONT_HEADERS
+     ddsc.flags         = DBDESC_MEMORY;
+     ddsc.memory.data   = GET_FONTDATA( decker );
+     ddsc.memory.length = GET_FONTSIZE( decker );
+#else
+     ddsc.flags         = DBDESC_FILE;
+     ddsc.file          = GET_FONTFILE( decker );
+#endif
+     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+     DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font ));
+     DFBCHECK(font->GetHeight( font, &fontheight ));
+     DFBCHECK(font->GetStringWidth( font, " Press left mouse button and drag to move the window. ", -1, &stringwidth ));
+
      /* fill the window description. */
      wdsc.flags        = DWDESC_CAPS | DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_SURFACE_CAPS;
      wdsc.caps         = DWCAPS_ALPHACHANNEL;
@@ -158,10 +180,10 @@ int directfb_main( int argc, char *argv[] )
      }
 
      /* create window1 */
-     wdsc.posx   = 200;
-     wdsc.posy   = 225;
-     wdsc.width  = 512;
-     wdsc.height = 145;
+     wdsc.posx   = config.width / 5;
+     wdsc.posy   = config.height / 6 + fontheight * 6;
+     wdsc.width  = MIN( config.width - wdsc.posx - 20, 512 );
+     wdsc.height = wdsc.width * 145 / 512;
 
      DFBCHECK(layer->CreateWindow( layer, &wdsc, &window1 ));
 
@@ -199,11 +221,13 @@ int directfb_main( int argc, char *argv[] )
      DFBCHECK(window1->SetCursorShape( window1, cursor_surface1, 0, 0 ));
      provider->Release( provider );
 
+     window_surface1->SetFont( window_surface1, font );
+
      /* create window2. */
      wdsc.posx   = 20;
-     wdsc.posy   = 120;
-     wdsc.width  = 400;
-     wdsc.height = 200;
+     wdsc.posy   = config.height / 6;
+     wdsc.width  = stringwidth;
+     wdsc.height = wdsc.width / 2;
 
      DFBCHECK(layer->CreateWindow( layer, &wdsc, &window2 ));
 
@@ -231,29 +255,11 @@ int directfb_main( int argc, char *argv[] )
      DFBCHECK(window2->SetCursorShape( window2, cursor_surface2, 0, 0 ));
      provider->Release( provider );
 
+     window_surface2->SetFont( window_surface2, font );
+
      /* create an event buffer */
      DFBCHECK(window1->CreateEventBuffer( window1, &event_buffer ));
      DFBCHECK(window2->AttachEventBuffer( window2, event_buffer ));
-
-     /* load font */
-     fdsc.flags  = DFDESC_HEIGHT;
-     fdsc.height = 16;
-
-#ifdef USE_FONT_HEADERS
-     ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = GET_FONTDATA( decker );
-     ddsc.memory.length = GET_FONTSIZE( decker );
-#else
-     ddsc.flags         = DBDESC_FILE;
-     ddsc.file          = GET_FONTFILE( decker );
-#endif
-     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
-     DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font ));
-     DFBCHECK(font->GetHeight( font, &fontheight ));
-
-     window_surface1->SetFont( window_surface1, font );
-
-     window_surface2->SetFont( window_surface2, font );
 
      /* move the cursor to the center of the window1 */
      DFBCHECK(window1->GetPosition( window1, &winx, &winy ));
@@ -276,28 +282,28 @@ int directfb_main( int argc, char *argv[] )
      /* window2 settings */
      window_surface2->SetColor( window_surface2, 0xCF, 0xBF, 0xFF, 0xFF );
      window_surface2->DrawString( window_surface2,
-                                  "Move the mouse over a window to activate it.",
-                                  -1, 0, 0, DSTF_TOPLEFT );
+                                  " Move the mouse over a window to activate it.",
+                                  -1, 0, 2, DSTF_TOPLEFT );
 
      window_surface2->SetColor( window_surface2, 0xCF, 0xCF, 0xCF, 0xFF );
      window_surface2->DrawString( window_surface2,
-                                  "Press left mouse button and drag to move the window.",
-                                  -1, 0, fontheight, DSTF_TOPLEFT );
+                                  " Press left mouse button and drag to move the window.",
+                                  -1, 0, 2 + fontheight, DSTF_TOPLEFT );
 
      window_surface2->SetColor( window_surface2, 0xCF, 0xDF, 0x9F, 0xFF );
      window_surface2->DrawString( window_surface2,
-                                  "Press middle mouse button to raise/lower the window.",
-                                  -1, 0, fontheight * 2, DSTF_TOPLEFT );
+                                  " Press middle mouse button to raise/lower the window.",
+                                  -1, 0, 2 + fontheight * 2, DSTF_TOPLEFT );
 
      window_surface2->SetColor( window_surface2, 0xCF, 0xEF, 0x6F, 0xFF );
      window_surface2->DrawString( window_surface2,
-                                  "Hold right mouse button to fade in/out the window.",
-                                  -1, 0, fontheight * 3, DSTF_TOPLEFT );
+                                  " Hold right mouse button to fade in/out the window.",
+                                  -1, 0, 2 + fontheight * 3, DSTF_TOPLEFT );
 
      window_surface2->SetColor( window_surface2, 0xCF, 0xFF, 0x3F, 0xFF );
      window_surface2->DrawString( window_surface2,
-                                  "Press r key to rotate the window.",
-                                  -1, 0, fontheight * 4, DSTF_TOPLEFT );
+                                  " Press r key to rotate the window.",
+                                  -1, 0, 2 + fontheight * 4, DSTF_TOPLEFT );
 
      window2->SetOpacity( window2, 0xFF );
 
