@@ -54,6 +54,9 @@ static int xres, yres;
 
 /* font information */
 static int fontheight;
+static int population_stringwidth;
+static int fps_stringwidth;
+static int idle_stringwidth;
 
 /* resolution of the destination mask */
 static int DESTINATION_MASK_WIDTH;
@@ -525,7 +528,7 @@ static void init_resources( int argc, char *argv[] )
 
      /* load font */
      fdsc.flags  = DFDESC_HEIGHT;
-     fdsc.height = 24;
+     fdsc.height = CLAMP( (int) (xres / 40.0 / 8) * 8, 8, 96 );
 
 #ifdef USE_FONT_HEADERS
      ddsc.flags         = DBDESC_MEMORY;
@@ -538,6 +541,9 @@ static void init_resources( int argc, char *argv[] )
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font ));
      DFBCHECK(font->GetHeight( font, &fontheight ));
+     DFBCHECK(font->GetStringWidth( font, "Penguin Population: 0000  ", -1, &population_stringwidth ));
+     DFBCHECK(font->GetStringWidth( font, "FPS: 0000.0  ", -1, &fps_stringwidth ));
+     DFBCHECK(font->GetStringWidth( font, "CPU Idle: 00.0%  ", -1, &idle_stringwidth ));
 
      primary->SetFont( primary, font );
 
@@ -640,7 +646,7 @@ int directfb_main( int argc, char *argv[] )
 
           /* draw the population string and fps in upper left corner */
           primary->SetColor( primary, 0, 0, 60, 0xA0 );
-          primary->FillRectangle( primary, 20, 20, 440, fontheight + 5 );
+          primary->FillRectangle( primary, 20, 20, population_stringwidth + fps_stringwidth, fontheight + 5 );
 
           snprintf( buf, sizeof(buf), "Penguin Population: %d", population );
 
@@ -650,16 +656,16 @@ int directfb_main( int argc, char *argv[] )
           snprintf( buf, sizeof(buf), "FPS: %s", fps.fps_string );
 
           primary->SetColor( primary, 190, 210, 255, 0xFF );
-          primary->DrawString( primary, buf, -1, 320, 20, DSTF_TOPLEFT );
+          primary->DrawString( primary, buf, -1, 25 + population_stringwidth, 20, DSTF_TOPLEFT );
 
           /* add idle information in upper right corner */
           primary->SetColor( primary, 0, 0, 60, 0xA0 );
-          primary->FillRectangle( primary, xres - 200, 20, 190, fontheight + 5 );
+          primary->FillRectangle( primary, xres - idle_stringwidth - 10, 20, idle_stringwidth, fontheight + 5 );
 
           snprintf( buf, sizeof(buf), "CPU Idle: %s%%", idle.idle_string );
 
           primary->SetColor( primary, 180, 200, 255, 0xFF );
-          primary->DrawString( primary, buf, -1, xres - 195, 20, DSTF_TOPLEFT );
+          primary->DrawString( primary, buf, -1, xres - idle_stringwidth - 5, 20, DSTF_TOPLEFT );
 
           /* flip display */
           primary->Flip( primary, NULL, triple ? DSFLIP_ONSYNC : DSFLIP_WAITFORSYNC );
