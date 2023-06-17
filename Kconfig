@@ -66,27 +66,27 @@ config DF_WINDOW
 
 endchoice
 
-config DIRECTFB_EXAMPLE_FONT_EXTENSION
+config EXAMPLES_DIRECTFB_FONT_EXTENSION
 	string "Font extension"
 	default "dgiff"
 
-config DIRECTFB_EXAMPLE_FONT_PROVIDER
+config EXAMPLES_DIRECTFB_FONT_PROVIDER
 	string "Font provider"
 	default "DGIFF"
 
-config DIRECTFB_EXAMPLE_IMAGE_EXTENSION
+config EXAMPLES_DIRECTFB_IMAGE_EXTENSION
 	string "Image extension"
 	default "dfiff"
 
-config DIRECTFB_EXAMPLE_IMAGE_PROVIDER
+config EXAMPLES_DIRECTFB_IMAGE_PROVIDER
 	string "Image provider"
 	default "DFIFF"
 
-config DIRECTFB_EXAMPLE_VIDEO_EXTENSION
+config EXAMPLES_DIRECTFB_VIDEO_EXTENSION
 	string "Video extension"
 	default "dfvff"
 
-config DIRECTFB_EXAMPLE_VIDEO_PROVIDER
+config EXAMPLES_DIRECTFB_VIDEO_PROVIDER
 	string "Video provider"
 	default "DFVFF"
 

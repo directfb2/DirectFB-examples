@@ -180,7 +180,7 @@ static void init_application( int argc, char *argv[] )
      primary->GetSize( primary, &width, &height );
 }
 
-int directfb_main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
      matrix_t matrix;
      int      i = 0;
@@ -275,5 +275,3 @@ int directfb_main( int argc, char *argv[] )
      /* Shouldn't reach this. */
      return 0;
 }
-
-DIRECTFB_MAIN()

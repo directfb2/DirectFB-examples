@@ -609,7 +609,7 @@ static void init_resources( int argc, char *argv[] )
      read_destination_mask();
 }
 
-int directfb_main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
      FPSData            fps;
      IdleData           idle;
@@ -745,5 +745,3 @@ int directfb_main( int argc, char *argv[] )
 
      return 42;
 }
-
-DIRECTFB_MAIN()

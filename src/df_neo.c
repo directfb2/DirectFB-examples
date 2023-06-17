@@ -210,7 +210,7 @@ static void cleanup( void )
           dfb->Release( dfb );
 }
 
-int directfb_main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
      int                       n;
      DFBRectangle              rect;
@@ -368,5 +368,3 @@ int directfb_main( int argc, char *argv[] )
      /* shouldn't reach this */
      return 0;
 }
-
-DIRECTFB_MAIN()

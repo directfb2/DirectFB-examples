@@ -573,7 +573,7 @@ static void print_usage( void )
      printf( "Usage: df_texture <file>\n\n" );
 }
 
-int directfb_main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
      DFBResult                 ret = DFB_FAILURE;
      FPSData                   fps;
@@ -847,5 +847,3 @@ int directfb_main( int argc, char *argv[] )
      /* Shouldn't reach this. */
      return 0;
 }
-
-DIRECTFB_MAIN()

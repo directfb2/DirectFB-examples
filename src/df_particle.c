@@ -159,7 +159,7 @@ static void init_resources( int argc, char *argv[] )
      primary->Clear( primary, 0x00, 0x00, 0x00, 0xFF );
 }
 
-int directfb_main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
      int spawn;
      int left  = 0;
@@ -232,5 +232,3 @@ int directfb_main( int argc, char *argv[] )
 
      return 42;
 }
-
-DIRECTFB_MAIN()

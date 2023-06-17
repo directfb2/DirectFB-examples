@@ -204,7 +204,7 @@ static void update( void )
 
 /**************************************************************************************************/
 
-int directfb_main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
      long long next_update = 0;
 
@@ -240,5 +240,3 @@ int directfb_main( int argc, char *argv[] )
      /* Shouldn't reach this. */
      return 0;
 }
-
-DIRECTFB_MAIN()

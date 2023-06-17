@@ -20,54 +20,117 @@
 
 include $(APPDIR)/Make.defs
 
-PROGNAME  = $(CONFIG_EXAMPLES_DIRECTFB_PROGNAME)
-PRIORITY  = $(CONFIG_EXAMPLES_DIRECTFB_PRIORITY)
-STACKSIZE = $(CONFIG_EXAMPLES_DIRECTFB_STACKSIZE)
+PRIORITY  = SCHED_PRIORITY_DEFAULT
+STACKSIZE = 16384
 MODULE    = $(CONFIG_EXAMPLES_DIRECTFB)
 
 CFLAGS += -Idata
-CFLAGS += -DDIRECTFB_MAIN_ENTRYPOINT
 CFLAGS += -DDFB_CORE_SYSTEM=nuttxfb
 CFLAGS += -DDFB_INPUT_DRIVER=nuttx_input
-CFLAGS += -DDFB_FONT_PROVIDER=$(CONFIG_DIRECTFB_EXAMPLE_FONT_PROVIDER)
-CFLAGS += -DDFB_IMAGE_PROVIDER=$(CONFIG_DIRECTFB_EXAMPLE_IMAGE_PROVIDER)
-CFLAGS += -DDFB_VIDEO_PROVIDER=$(CONFIG_DIRECTFB_EXAMPLE_VIDEO_PROVIDER)
+CFLAGS += -DDFB_FONT_PROVIDER=$(CONFIG_EXAMPLES_DIRECTFB_FONT_PROVIDER)
+CFLAGS += -DDFB_IMAGE_PROVIDER=$(CONFIG_EXAMPLES_DIRECTFB_IMAGE_PROVIDER)
+CFLAGS += -DDFB_VIDEO_PROVIDER=$(CONFIG_EXAMPLES_DIRECTFB_VIDEO_PROVIDER)
 CFLAGS += -DDFB_WINDOW_MANAGER=default
 CFLAGS += -DUSE_FONT_HEADERS
 CFLAGS += -DUSE_IMAGE_HEADERS
 CFLAGS += -DUSE_VIDEO_HEADERS
 
 ifeq ($(CONFIG_DF_ANDI),y)
+ifeq ($(CONFIG_NSH_BUILTIN_APPS),y)
+PROGNAME = df_andi
+else
+PROGNAME = directfb
+endif
 MAINSRC = src/df_andi.c
 endif
+
 ifeq ($(CONFIG_DF_DOK),y)
+ifeq ($(CONFIG_NSH_BUILTIN_APPS),y)
+PROGNAME = df_dok
+else
+PROGNAME = directfb
+endif
 MAINSRC = src/df_dok.c
 endif
+
 ifeq ($(CONFIG_DF_FIRE),y)
+ifeq ($(CONFIG_NSH_BUILTIN_APPS),y)
+PROGNAME = df_fire
+else
+PROGNAME = directfb
+endif
 MAINSRC = src/df_fire.c
 endif
+
 ifeq ($(CONFIG_DF_INPUT),y)
+ifeq ($(CONFIG_NSH_BUILTIN_APPS),y)
+PROGNAME = df_input
+else
+PROGNAME = directfb
+endif
 MAINSRC = src/df_input.c
 endif
+
 ifeq ($(CONFIG_DF_KNUCKLES),y)
+ifeq ($(CONFIG_NSH_BUILTIN_APPS),y)
+PROGNAME = df_knuckles
+else
+PROGNAME = directfb
+endif
 MAINSRC = src/df_knuckles.c
 endif
+
 ifeq ($(CONFIG_DF_MATRIX),y)
+ifeq ($(CONFIG_NSH_BUILTIN_APPS),y)
+PROGNAME = df_matrix
+else
+PROGNAME = directfb
+endif
 MAINSRC = src/df_matrix.c
 endif
+
 ifeq ($(CONFIG_DF_NEO),y)
+ifeq ($(CONFIG_NSH_BUILTIN_APPS),y)
+PROGNAME = df_neo
+else
+PROGNAME = directfb
+endif
 MAINSRC = src/df_neo.c
 endif
+
 ifeq ($(CONFIG_DF_PARTICLE),y)
+ifeq ($(CONFIG_NSH_BUILTIN_APPS),y)
+PROGNAME = df_particle
+else
+PROGNAME = directfb
+endif
 MAINSRC = src/df_particle.c
 endif
+
 ifeq ($(CONFIG_DF_TEXTURE),y)
+ifeq ($(CONFIG_NSH_BUILTIN_APPS),y)
+PROGNAME = df_texture
+else
+PROGNAME = directfb
+endif
 MAINSRC = src/df_texture.c
 endif
+
 ifeq ($(CONFIG_DF_VIDEO),y)
+ifeq ($(CONFIG_NSH_BUILTIN_APPS),y)
+PROGNAME = df_video
+else
+PROGNAME = directfb
+endif
 MAINSRC = src/df_video.c
 endif
+
 ifeq ($(CONFIG_DF_WINDOW),y)
+ifeq ($(CONFIG_NSH_BUILTIN_APPS),y)
+PROGNAME = df_window
+else
+PROGNAME = directfb
+endif
 MAINSRC = src/df_window.c
 endif
 
@@ -108,13 +171,13 @@ RAWDATA_HDRS += data/wood_andi.h
 
 DIRECTFB_CSOURCE ?= directfb-csource
 
-data/%.h: data/%.$(shell echo $(CONFIG_DIRECTFB_EXAMPLE_IMAGE_EXTENSION))
+data/%.h: data/%.$(shell echo $(CONFIG_EXAMPLES_DIRECTFB_IMAGE_EXTENSION))
 	$(DIRECTFB_CSOURCE) --raw $^ --name=$* > $@
 
-data/%.h: data/%.$(shell echo $(CONFIG_DIRECTFB_EXAMPLE_VIDEO_EXTENSION))
+data/%.h: data/%.$(shell echo $(CONFIG_EXAMPLES_DIRECTFB_VIDEO_EXTENSION))
 	$(DIRECTFB_CSOURCE) --raw $^ --name=$* > $@
 
-data/%.h: data/%.$(shell echo $(CONFIG_DIRECTFB_EXAMPLE_FONT_EXTENSION))
+data/%.h: data/%.$(shell echo $(CONFIG_EXAMPLES_DIRECTFB_FONT_EXTENSION))
 	$(DIRECTFB_CSOURCE) --raw $^ --name=$* > $@
 
 src/df_andi.c: data/decker.h data/destination_mask.h data/tux.h data/tux_alpha.h data/wood_andi.h

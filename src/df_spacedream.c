@@ -448,7 +448,7 @@ static void init_resources( int argc, char *argv[] )
      projection = matrix_new_perspective( 400 );
 }
 
-int directfb_main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
      DirectThread *render_loop_thread;
      int           quit = 0;
@@ -559,5 +559,3 @@ int directfb_main( int argc, char *argv[] )
 
      return 42;
 }
-
-DIRECTFB_MAIN()

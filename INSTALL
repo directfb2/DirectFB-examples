@@ -19,4 +19,4 @@ And install DirectFB-examples using:
 NuttX
 =====
 
-On NuttX, copy the DirectFB-examples directory to your NuttX apps/examples/ directory.
+On NuttX, copy the DirectFB-examples directory to your NuttX apps/examples/ directory, renaming it DirectFB.

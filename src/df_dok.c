@@ -1199,7 +1199,7 @@ static unsigned long long load_image( long long t )
 
 /**********************************************************************************************************************/
 
-int directfb_main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
      int                       i, n;
      DFBInputEvent             evt;
@@ -1758,5 +1758,3 @@ run:
 
      return 42;
 }
-
-DIRECTFB_MAIN()
