@@ -95,7 +95,7 @@ static void dfb_shutdown( void )
      if (dfb)          dfb->Release( dfb );
 }
 
-int directfb_main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
      DFBSurfaceDescription desc;
 
@@ -160,5 +160,3 @@ int directfb_main( int argc, char *argv[] )
      /* shouldn't reach this */
      return 0;
 }
-
-DIRECTFB_MAIN()

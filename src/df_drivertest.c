@@ -146,7 +146,7 @@ static void cleanup( void )
           dfb->Release( dfb );
 }
 
-int directfb_main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
      int                     quit;
      DFBSurfaceDescription   desc;
@@ -386,5 +386,3 @@ int directfb_main( int argc, char *argv[] )
 
      return 42;
 }
-
-DIRECTFB_MAIN()

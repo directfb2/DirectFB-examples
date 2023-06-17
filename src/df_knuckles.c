@@ -2401,7 +2401,7 @@ static void init_application( int argc, char *argv[] )
      primary->GetSize( primary, &Width, &Height );
 }
 
-int directfb_main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
      int dxL = 11;
      int dyL = 7;
@@ -2471,5 +2471,3 @@ int directfb_main( int argc, char *argv[] )
      /* Shouldn't reach this. */
      return 0;
 }
-
-DIRECTFB_MAIN()

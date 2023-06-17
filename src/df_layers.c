@@ -191,7 +191,7 @@ static void print_usage( void )
      printf( "  --dfb-help                   Output DirectFB usage information.\n\n" );
 }
 
-int directfb_main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
      DFBResult                 ret;
      int                       n;
@@ -317,5 +317,3 @@ int directfb_main( int argc, char *argv[] )
 
      return 42;
 }
-
-DIRECTFB_MAIN()

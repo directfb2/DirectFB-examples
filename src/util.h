@@ -27,13 +27,6 @@
 
 /**************************************************************************************************/
 
-/* macro to be used after the directfb_main() function */
-#ifdef DIRECTFB_MAIN_ENTRYPOINT
-#define DIRECTFB_MAIN()
-#else
-#define DIRECTFB_MAIN() int main( int argc, char *argv[] ) { return directfb_main( argc, argv ); }
-#endif
-
 /* macro for a safe call to DirectFB functions */
 #define DFBCHECK(x)                                                   \
      do {                                                             \

@@ -187,7 +187,7 @@ static void dfb_shutdown( void )
      if (dfb)          dfb->Release( dfb );
 }
 
-int directfb_main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
      DFBResult                 ret;
      DFBFontDescription        fdsc;
@@ -295,5 +295,3 @@ int directfb_main( int argc, char *argv[] )
 
      return 42;
 }
-
-DIRECTFB_MAIN()

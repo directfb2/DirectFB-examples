@@ -112,7 +112,7 @@ static void print_usage( void )
      printf( "Usage: df_video <videofile>\n\n" );
 }
 
-int directfb_main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
      DFBDisplayLayerConfig     config;
      DFBSurfaceDescription     sdsc;
@@ -259,5 +259,3 @@ int directfb_main( int argc, char *argv[] )
      /* shouldn't reach this */
      return 0;
 }
-
-DIRECTFB_MAIN()

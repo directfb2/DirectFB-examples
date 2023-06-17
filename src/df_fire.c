@@ -329,7 +329,7 @@ static void render_fire( void )
 
 /**********************************************************************************************************************/
 
-int directfb_main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
      /* Initialize application. */
      init_application( argc, argv );
@@ -367,5 +367,3 @@ int directfb_main( int argc, char *argv[] )
      /* Shouldn't reach this. */
      return 0;
 }
-
-DIRECTFB_MAIN()

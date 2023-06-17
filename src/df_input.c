@@ -206,7 +206,7 @@ static void show_key_event( DFBInputEvent *evt )
 {
      static DFBInputDeviceKeyIdentifier  last_id = DIKI_UNKNOWN;
      static int                          count   = 0;
-     char                                buf[16];
+     char                                buf[18];
      struct DFBKeySymbolName            *symbol_name;
      struct DFBKeyIdentifierName        *id_name;
 
@@ -620,7 +620,7 @@ static void print_usage( void )
      printf( "  --dfb-help     Output DirectFB usage information.\n\n" );
 }
 
-int directfb_main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
      int                       n;
      DFBFontDescription        fdsc;
@@ -809,5 +809,3 @@ int directfb_main( int argc, char *argv[] )
 
      return 42;
 }
-
-DIRECTFB_MAIN()

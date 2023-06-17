@@ -72,7 +72,7 @@ static void print_usage( void )
      printf( "Usage: df_porter <background>\n\n" );
 }
 
-int directfb_main( int argc, char *argv[] )
+int main( int argc, char *argv[] )
 {
      int                       i, step;
      DFBFontDescription        fdsc;
@@ -215,5 +215,3 @@ int directfb_main( int argc, char *argv[] )
 
      return 42;
 }
-
-DIRECTFB_MAIN()
