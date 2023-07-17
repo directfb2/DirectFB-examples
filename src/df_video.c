@@ -240,7 +240,7 @@ int main( int argc, char *argv[] )
                               /* quit main loop */
                               return 42;
                          default:
-                           break;
+                              break;
                     }
                }
           }

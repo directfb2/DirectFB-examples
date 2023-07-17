@@ -40,6 +40,9 @@ config DF_DOK
 config DF_FIRE
 	bool "df_fire"
 
+config DF_GEARS
+	bool "df_gears"
+
 config DF_INPUT
 	bool "df_input"
 
@@ -89,5 +92,9 @@ config EXAMPLES_DIRECTFB_VIDEO_EXTENSION
 config EXAMPLES_DIRECTFB_VIDEO_PROVIDER
 	string "Video provider"
 	default "DFVFF"
+
+config EXAMPLES_DIRECTFB_OPENGL_IMPLEMENTATION
+	string "OpenGL implementation"
+	default "PGL"
 
 endif

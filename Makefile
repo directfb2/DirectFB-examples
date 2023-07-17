@@ -62,6 +62,17 @@ endif
 MAINSRC = src/df_fire.c
 endif
 
+ifeq ($(CONFIG_DF_GEARS),y)
+CFLAGS += -DDFB_OPENGL_IMPLEMENTATION=$(CONFIG_EXAMPLES_DIRECTFB_OPENGL_IMPLEMENTATION)
+CFLAGS += -DOPENGL_H=\"idirectfbgl_portablegl.h\"
+ifeq ($(CONFIG_NSH_BUILTIN_APPS),y)
+PROGNAME = df_gears
+else
+PROGNAME = directfb
+endif
+MAINSRC = src/df_gears.c
+endif
+
 ifeq ($(CONFIG_DF_INPUT),y)
 ifeq ($(CONFIG_NSH_BUILTIN_APPS),y)
 PROGNAME = df_input

@@ -2417,7 +2417,7 @@ int main( int argc, char *argv[] )
      while (1) {
           DFBInputEvent evt;
 
-          /* Draw skull */
+          /* Draw skull. */
           DrawIt();
 
           /* Check for new events. */
