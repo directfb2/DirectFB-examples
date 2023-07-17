@@ -83,6 +83,14 @@ if font_headers != 'disabled' or image_headers != 'disabled' or video_headers !=
   endif
 endif
 
+gl_dep = []
+if get_option('gl') != ''
+  gl_dep = declare_dependency(compile_args: ['-DOPENGL_H="@0@"'.format(get_option('gl')),
+                                            get_option('gl-cflags').strip().split(' ')],
+                              link_args: get_option('gl-ldflags') != '' ?
+                                         get_option('gl-ldflags').strip().split(' ') : [])
+endif
+
 fusionsound_dep = dependency('fusionsound', required: false)
 
 subdir('data')

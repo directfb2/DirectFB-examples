@@ -1,3 +1,54 @@
+commit 76e0a1f465b38dd24400dbc4b442a9f7294cd66e
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Mon Jul 17 12:45:02 2023 +0200
+
+    Add df_gears example
+
+commit 35c1fc24beb904074f4b2e535ed408a590467519
+Merge: af34f21 a553701
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Sat Jun 17 22:53:53 2023 +0200
+
+    Merge pull request #33 from caramelli/master
+    
+    NuttX: Use PROGNAME
+
+commit a5537015c90b14cb6ef23ab079fce695854e0bbc
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Sat Jun 17 22:49:06 2023 +0200
+
+    NuttX: Use PROGNAME
+
+commit af34f210afb73adefece593f5fdb9bfd4ace50c8
+Merge: c779e03 25ded41
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Thu Jun 15 21:40:47 2023 +0200
+
+    Merge pull request #32 from caramelli/master
+    
+    Adjust size for 320x240 resolution screen
+
+commit 25ded41f7c5d54ffd09e260cdd7df243fcf17256
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Thu Jun 15 21:36:41 2023 +0200
+
+    Adjust size for 320x240 resolution screen
+
+commit c779e03b6a3b4b160c894ab143b46c9553a179bc
+Merge: ccfda8f adcee73
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Fri Jun 2 08:18:58 2023 +0200
+
+    Merge pull request #31 from caramelli/master
+    
+    NuttX: Allow the use of specific media providers
+
+commit adcee730e7acebd2861e9be3145233e01fabf3d5
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Fri Jun 2 08:09:55 2023 +0200
+
+    Update ChangeLog
+
 commit ed2a0cd5b628990e7751c01af18ee658e3c3bd59
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Fri Jun 2 08:09:43 2023 +0200

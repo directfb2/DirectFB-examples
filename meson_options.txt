@@ -24,6 +24,18 @@ option('font-headers',
        choices: ['disabled', 'dgiff', 'ttf'],
        description: 'Use generated font headers')
 
+option('gl',
+        type: 'string',
+        description: 'PATH to OpenGL header')
+
+option('gl-cflags',
+        type: 'string',
+        description: 'CFLAGS of the OpenGL implementation')
+
+option('gl-ldflags',
+        type: 'string',
+        description: 'LDFLAGS of the OpenGL implementation')
+
 option('image-headers',
        type: 'combo',
        value: 'disabled',
