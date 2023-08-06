@@ -127,6 +127,7 @@ endif
 
 if video_headers == 'disabled'
   examplesdata += 'bbb.dfvff'
+  examplesdata += 'bbb.mpg'
   examplesdata += 'bbb.m2v'
   examplesdata += 'bbb.264'
 else

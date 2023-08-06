@@ -19,7 +19,7 @@
 #  THE SOFTWARE.
 
 config EXAMPLES_DIRECTFB
-	tristate "DirectFB examples"
+	bool "DirectFB examples"
 	default n
 	depends on GRAPHICS_DIRECTFB2
 	---help---

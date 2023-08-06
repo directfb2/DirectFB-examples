@@ -41,8 +41,8 @@ static IDirectFBDisplayLayer  *layer         = NULL;
 static IDirectFBVideoProvider *videoprovider = NULL;
 static IDirectFBWindow        *videowindow   = NULL;
 static IDirectFBSurface       *videosurface  = NULL;
-static IDirectFBWindow        *window        = NULL;
-static IDirectFBSurface       *surface       = NULL;
+static IDirectFBWindow        *panelwindow   = NULL;
+static IDirectFBSurface       *panelsurface  = NULL;
 
 /* screen width and height */
 static int screen_width, screen_height;
@@ -58,6 +58,11 @@ unsigned int frame_delay = 50;
 
 /* number of frames displayed */
 static long frame_num = 0;
+
+/* command line options */
+static int use_panel = 1;
+
+/**********************************************************************************************************************/
 
 static void render( void )
 {
@@ -88,19 +93,19 @@ static void render( void )
           w += 0.1f * frame_delay;
      }
 
-     if (movx || movy)
-          window->Move( window, movx, movy );
+     if (panelwindow && (movx || movy))
+          panelwindow->Move( panelwindow, movx, movy );
 
      frame_num++;
 }
 
 static void dfb_shutdown( void )
 {
-     if (surface)       surface->Release( surface );
-     if (window)        window->Release( window );
+     if (panelsurface)  panelsurface->Release( panelsurface );
+     if (panelwindow)   panelwindow->Release( panelwindow );
+     if (videoprovider) videoprovider->Release( videoprovider );
      if (videosurface)  videosurface->Release( videosurface );
      if (videowindow)   videowindow->Release( videowindow );
-     if (videoprovider) videoprovider->Release( videoprovider );
      if (layer)         layer->Release( layer );
      if (event_buffer)  event_buffer->Release( event_buffer );
      if (dfb)           dfb->Release( dfb );
@@ -109,25 +114,45 @@ static void dfb_shutdown( void )
 static void print_usage( void )
 {
      printf( "DirectFB Video Demo\n\n" );
-     printf( "Usage: df_video <videofile>\n\n" );
+     printf( "Usage: df_video [options] <videofile>\n\n" );
+     printf( "  --no-panel  Do not display panel window.\n" );
+     printf( "  --help      Print usage information.\n" );
+     printf( "  --dfb-help  Output DirectFB usage information.\n\n" );
 }
 
 int main( int argc, char *argv[] )
 {
+     int                       n;
      DFBDisplayLayerConfig     config;
      DFBSurfaceDescription     sdsc;
      DFBWindowDescription      wdsc;
      DFBDataBufferDescription  ddsc;
      IDirectFBDataBuffer      *buffer;
      IDirectFBImageProvider   *provider;
+     const char               *mrl = NULL;
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));
 
      /* parse command line */
-     if (argv[1] && !strcmp( argv[1], "--help" )) {
+     for (n = 1; n < argc; n++) {
+          if (strncmp( argv[n], "--", 2 ) == 0) {
+               if (strcmp( argv[n] + 2, "help" ) == 0) {
+                    print_usage();
+                    return 0;
+               }
+               else if (strcmp( argv[n] + 2, "no-panel" ) == 0) {
+                    use_panel = 0;
+                    continue;
+               }
+          }
+          else if (n == argc - 1){
+               mrl = argv[n];
+               break;
+          }
+
           print_usage();
-          return 0;
+          return 1;
      }
 
      /* create the main interface */
@@ -155,7 +180,7 @@ int main( int argc, char *argv[] )
      ddsc.memory.length = GET_VIDEOSIZE( bbb );
 #else
      ddsc.flags         = DBDESC_FILE;
-     ddsc.file          = argc > 1 ? argv[1] : GET_VIDEOFILE( bbb );
+     ddsc.file          = mrl ?: GET_VIDEOFILE( bbb );
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateVideoProvider( buffer, &videoprovider ));
@@ -172,28 +197,30 @@ int main( int argc, char *argv[] )
      videoprovider->PlayTo( videoprovider, videosurface, NULL, NULL, NULL );
 
      /* panel window */
+     if (use_panel) {
 #ifdef USE_IMAGE_HEADERS
-     ddsc.flags         = DBDESC_MEMORY;
-     ddsc.memory.data   = GET_IMAGEDATA( panel );
-     ddsc.memory.length = GET_IMAGESIZE( panel );
+          ddsc.flags         = DBDESC_MEMORY;
+          ddsc.memory.data   = GET_IMAGEDATA( panel );
+          ddsc.memory.length = GET_IMAGESIZE( panel );
 #else
-     ddsc.flags         = DBDESC_FILE;
-     ddsc.file          = GET_IMAGEFILE( panel );
+          ddsc.flags         = DBDESC_FILE;
+          ddsc.file          = GET_IMAGEFILE( panel );
 #endif
-     DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
-     DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
-     provider->GetSurfaceDescription( provider, &sdsc );
-     wdsc.flags  = DWDESC_CAPS | DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT;
-     wdsc.caps   = DWCAPS_ALPHACHANNEL;
-     wdsc.posx   = 0;
-     wdsc.posy   = 20;
-     wdsc.width  = sdsc.width;
-     wdsc.height = sdsc.height;
-     DFBCHECK(layer->CreateWindow( layer, &wdsc, &window ));
-     DFBCHECK(window->GetSurface( window, &surface ));
-     provider->RenderTo( provider, surface, NULL );
-     window->SetOpacity( window, 0xFF );
-     provider->Release( provider );
+          DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
+          DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+          provider->GetSurfaceDescription( provider, &sdsc );
+          wdsc.flags  = DWDESC_CAPS | DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT;
+          wdsc.caps   = DWCAPS_ALPHACHANNEL;
+          wdsc.posx   = 0;
+          wdsc.posy   = 20;
+          wdsc.width  = sdsc.width;
+          wdsc.height = sdsc.height;
+          DFBCHECK(layer->CreateWindow( layer, &wdsc, &panelwindow ));
+          DFBCHECK(panelwindow->GetSurface( panelwindow, &panelsurface ));
+          provider->RenderTo( provider, panelsurface, NULL );
+          panelwindow->SetOpacity( panelwindow, 0xFF );
+          provider->Release( provider );
+     }
 
      /* main loop */
      while (1) {
