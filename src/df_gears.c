@@ -144,23 +144,18 @@ typedef struct {
      GLuint  vbo;
 } Gear;
 
-typedef enum {
-     GEAR_RED,
-     GEAR_GREEN,
-     GEAR_BLUE,
-     NUM_GEARS
-} GearIndex;
-
 typedef struct {
      GLuint  program;
-     Gear   *gear[3];
+     Gear   *gear_red;
+     Gear   *gear_green;
+     Gear   *gear_blue;
      float   projection[16];
      float   view[16];
 } Gears;
 
 Gears gears;
 
-static void create_gear( GearIndex id, float inner, float outer, float width, int teeth, float tooth_depth )
+static Gear *create_gear( float inner, float outer, float width, int teeth, float tooth_depth )
 {
      Gear  *gear;
      float  r0, r1, r2, da, a1, ai, s[5], c[5];
@@ -306,7 +301,7 @@ static void create_gear( GearIndex id, float inner, float outer, float width, in
      glBindBuffer( GL_ARRAY_BUFFER, gear->vbo );
      glBufferData( GL_ARRAY_BUFFER, gear->nvertices * sizeof(Vertex), gear->vertices, GL_STATIC_DRAW );
 
-     gears.gear[id] = gear;
+     return gear;
 }
 
 #ifdef __IDIRECTFBGL_PORTABLEGL_H__
@@ -318,12 +313,11 @@ typedef struct Uniforms {
 } Uniforms;
 #endif
 
-static void draw_gear( GearIndex id, float model_tx, float model_ty, float model_rz, const float *color )
+static void draw_gear( Gear *gear, float model_tx, float model_ty, float model_rz, const float *color )
 {
-     Gear        *gear   = gears.gear[id];
-     const float  pos[4] = { 5.0, 5.0, 10.0, 0.0 };
-     int          k;
-     float        MVP[16], N[16];
+     const float pos[4] = { 5.0, 5.0, 10.0, 0.0 };
+     int         k;
+     float       MVP[16], N[16];
 
      memcpy( N, gears.view, sizeof(N) );
      translate( N, model_tx, model_ty, 0 );
@@ -364,10 +358,8 @@ static void draw_gear( GearIndex id, float model_tx, float model_ty, float model
      glDisableVertexAttribArray( 0 );
 }
 
-static void delete_gear( GearIndex id )
+static void delete_gear( Gear *gear )
 {
-     Gear *gear = gears.gear[id];
-
      glDeleteBuffers( 1, &gear->vbo );
 
      D_FREE( gear->strips );
@@ -485,9 +477,9 @@ void gears_init( void )
      gears.projection[11] = -1;
      gears.projection[14] = -2 * zFar * zNear / (zFar - zNear);
 
-     create_gear( GEAR_RED,   1.0, 4.0, 1.0, 20, 0.7 );
-     create_gear( GEAR_GREEN, 0.5, 2.0, 2.0, 10, 0.7 );
-     create_gear( GEAR_BLUE,  1.3, 2.0, 0.5, 10, 0.7 );
+     gears.gear_red   = create_gear( 1.0, 4.0, 1.0, 20, 0.7 );
+     gears.gear_green = create_gear( 0.5, 2.0, 2.0, 10, 0.7 );
+     gears.gear_blue  = create_gear( 1.3, 2.0, 0.5, 10, 0.7 );
 }
 
 static void gears_draw( float view_tz, float view_rx, float view_ry, float model_rz )
@@ -504,17 +496,16 @@ static void gears_draw( float view_tz, float view_rx, float view_ry, float model
      rotate( gears.view, view_rx, 1, 0, 0 );
      rotate( gears.view, view_ry, 0, 1, 0 );
 
-     draw_gear( GEAR_RED,   -3.0, -2.0,      model_rz     , red );
-     draw_gear( GEAR_GREEN,  3.1, -2.0, -2 * model_rz - 9 , green );
-     draw_gear( GEAR_BLUE,  -3.1,  4.2, -2 * model_rz - 25, blue );
+     draw_gear( gears.gear_red,   -3.0, -2.0,      model_rz     , red );
+     draw_gear( gears.gear_green,  3.1, -2.0, -2 * model_rz - 9 , green );
+     draw_gear( gears.gear_blue,  -3.1,  4.2, -2 * model_rz - 25, blue );
 }
 
 static void gears_term( void )
 {
-     int n;
-
-     for (n = 0; n < NUM_GEARS; n++)
-          delete_gear( n );
+     delete_gear( gears.gear_red );
+     delete_gear( gears.gear_green );
+     delete_gear( gears.gear_blue );
 
      glDeleteProgram( gears.program );
 }
