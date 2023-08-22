@@ -414,6 +414,7 @@ static const GLchar *vertShaderSource =
      "}";
 
 static const GLchar *fragShaderSource =
+     "precision mediump float;\n"
      "varying vec4 v_Color;\n"
      "void main()\n"
      "{\n"
