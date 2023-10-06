@@ -1,3 +1,54 @@
+commit 6c5b38bc9e09f887934a0c5524b59add1b71e159
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Fri Oct 6 18:55:41 2023 +0200
+
+    Add support for DirectFBGL interface with version 2
+
+commit dcba184f9a72bc03ea5440fde4b9c817b702d9d7
+Merge: 9ef1362 228e6ea
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Tue Aug 22 04:25:05 2023 +0200
+
+    Merge pull request #36 from caramelli/master
+    
+    df_gears: Add precision mediump float in fragment shader
+
+commit 228e6ea155adfc6e80397266cb273e4be0bbc71f
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Tue Aug 22 04:22:14 2023 +0200
+
+    df_gears: Add precision mediump float in fragment shader
+
+commit 9ef1362be7b0e9c07a50594ebdbc49ec356e4603
+Merge: 0dff6c7 c6ae999
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Sun Aug 6 10:43:11 2023 +0200
+
+    Merge pull request #35 from caramelli/master
+    
+    df_video: Add --no-panel option
+
+commit c6ae999e7b4df3cd049519028f7fe2ad85822c8b
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Sun Aug 6 10:22:37 2023 +0200
+
+    df_video: Add --no-panel option
+
+commit 0dff6c7bd9bf0c5e3f23d2dfdc9b5ab748ca9cd9
+Merge: 35c1fc2 e2769a4
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Mon Jul 17 12:54:21 2023 +0200
+
+    Merge pull request #34 from caramelli/master
+    
+    Add df_gears example
+
+commit e2769a4e0ac87f73a113ade1b3af50fa53ba9d11
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Mon Jul 17 12:45:41 2023 +0200
+
+    Update ChangeLog
+
 commit 76e0a1f465b38dd24400dbc4b442a9f7294cd66e
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Mon Jul 17 12:45:02 2023 +0200

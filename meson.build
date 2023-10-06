@@ -89,6 +89,10 @@ if get_option('gl') != ''
                                             get_option('gl-cflags').strip().split(' ')],
                               link_args: get_option('gl-ldflags') != '' ?
                                          get_option('gl-ldflags').strip().split(' ') : [])
+
+  if get_option('directfbgl') != ''
+     add_global_arguments('-DDIRECTFBGL_INTERFACE_VERSION=@0@'.format(get_option('directfbgl')), language: 'c')
+  endif
 endif
 
 fusionsound_dep = dependency('fusionsound', required: false)
