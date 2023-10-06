@@ -18,6 +18,11 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
+option('directfbgl',
+        type: 'combo',
+        choices : ['', '1', '2'],
+        description: 'DirectFBGL interface version')
+
 option('font-headers',
        type: 'combo',
        value: 'disabled',

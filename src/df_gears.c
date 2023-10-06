@@ -554,6 +554,9 @@ int main( int argc, char *argv[] )
      /* fill the surface description */
      sdsc.flags = DSDESC_CAPS;
      sdsc.caps  = DSCAPS_PRIMARY | DSCAPS_DOUBLE | DSCAPS_DEPTH;
+#if DIRECTFBGL_INTERFACE_VERSION > 1
+     sdsc.caps |= DSCAPS_GL;
+#endif
 
      /* get the primary surface, i.e. the surface of the primary layer */
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &primary ));
@@ -604,6 +607,11 @@ int main( int argc, char *argv[] )
           /* draw gears */
           model_rz = fmod( 15 * dt, 360 );
           gears_draw( view_tz, view_rx, view_ry, model_rz );
+
+#if DIRECTFBGL_INTERFACE_VERSION > 1
+          /* swap buffers */
+          gl->SwapBuffers( gl );
+#endif
 
           /* draw the fps in upper right corner */
           primary->DrawString( primary, fps.fps_string, -1, screen_width - 5, 5, DSTF_TOPRIGHT );
