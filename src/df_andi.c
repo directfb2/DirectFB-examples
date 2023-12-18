@@ -75,6 +75,7 @@ static bool triple = false;
 /* command line options */
 static bool alpha        = false;
 static bool do_print_fps = false;
+static int  num_penguins = 200;
 
 /* random function */
 static unsigned int rand_pool = 0x12345678;
@@ -430,10 +431,11 @@ static void print_usage( void )
      printf( "DirectFB Penguin Demo\n\n" );
      printf( "Usage: df_andi [options]\n\n" );
      printf( "Options:\n\n" );
-     printf( "  --alpha     Use alpha channel for penguins instead of color keying.\n" );
-     printf( "  --fps       Print frame rate every second on console.\n" );
-     printf( "  --help      Print usage information.\n" );
-     printf( "  --dfb-help  Output DirectFB usage information.\n\n" );
+     printf( "  --alpha           Use alpha channel for penguins instead of color keying.\n" );
+     printf( "  --fps             Print frame rate every second on console.\n" );
+     printf( "  --penguins <num>  Number of penguins (default = 200).\n" );
+     printf( "  --help            Print usage information.\n" );
+     printf( "  --dfb-help        Output DirectFB usage information.\n\n" );
 }
 
 /*
@@ -486,6 +488,10 @@ static void init_resources( int argc, char *argv[] )
                }
                else if (strcmp( argv[n] + 2, "fps" ) == 0) {
                     do_print_fps = true;
+                    continue;
+               }
+               else if (strcmp( argv[n] + 2, "penguins" ) == 0 && ++n < argc) {
+                    num_penguins = atoi( argv[n] );
                     continue;
                }
           }
@@ -621,7 +627,7 @@ int main( int argc, char *argv[] )
 
      initialize_animation();
 
-     spawn_penguins( 200 );
+     spawn_penguins( num_penguins );
 
      primary->SetDrawingFlags( primary, DSDRAW_BLEND );
 
