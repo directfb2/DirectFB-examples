@@ -1,3 +1,24 @@
+commit 9349abcde0aaca928402966993c7b8a7de7d05be
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Mon Dec 18 22:07:43 2023 +0100
+
+    df_andi: Add --penguins option
+
+commit 3f50428fbfaa8541fd45ad8499cdef16a828556c
+Merge: dcba184 4d781bf
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Fri Oct 6 19:24:03 2023 +0200
+
+    Merge pull request #37 from caramelli/master
+    
+    Add support for DirectFBGL interface with version 2
+
+commit 4d781bfc4ad73c095d9ef15855d32f7772583c12
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Fri Oct 6 18:56:02 2023 +0200
+
+    Update ChangeLog
+
 commit 6c5b38bc9e09f887934a0c5524b59add1b71e159
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Fri Oct 6 18:55:41 2023 +0200
