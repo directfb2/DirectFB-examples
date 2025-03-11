@@ -21,7 +21,7 @@
 project('DirectFB-examples', 'c',
         version: '2.0.0')
 
-examplesdatadir = join_paths(get_option('prefix'), get_option('datadir'), 'directfb-examples')
+examplesdatadir = get_option('prefix') / get_option('datadir') / 'directfb-examples'
 
 add_global_arguments('-DDATADIR="@0@"'.format(examplesdatadir), language: 'c')
 
@@ -85,14 +85,13 @@ endif
 
 gl_dep = []
 if get_option('gl') != ''
-  gl_dep = declare_dependency(compile_args: ['-DOPENGL_H="@0@"'.format(get_option('gl')),
-                                            get_option('gl-cflags').strip().split(' ')],
-                              link_args: get_option('gl-ldflags') != '' ?
-                                         get_option('gl-ldflags').strip().split(' ') : [])
-
-  if get_option('directfbgl') != ''
-     add_global_arguments('-DDIRECTFBGL_INTERFACE_VERSION=@0@'.format(get_option('directfbgl')), language: 'c')
-  endif
+  gl_dep = declare_dependency(compile_args: ['-DOPENGL_HEADER="@0@"'.format(get_option('gl')),
+                                             get_option('directfbgl') != '' ?
+                                             '-DDIRECTFBGL_INTERFACE_VERSION=@0@'.format(get_option('directfbgl')) : [],
+                                             get_option('gl-cflags') != '' ?
+                                             get_option('gl-cflags').strip().split(' ') : []],
+                              link_args:     get_option('gl-ldflags') != '' ?
+                                             get_option('gl-ldflags').strip().split(' ') : [])
 endif
 
 fusionsound_dep = dependency('fusionsound', required: false)

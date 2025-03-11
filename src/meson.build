@@ -23,7 +23,7 @@ executable('df_cpuload',     'df_cpuload.c',                   dependencies:  di
 executable('df_dok',        ['df_dok.c',        rawdata_hdrs], dependencies:  directfb_dep,                    install: true)
 executable('df_drivertest', ['df_drivertest.c', rawdata_hdrs], dependencies:  directfb_dep,                    install: true)
 executable('df_fire',        'df_fire.c',                      dependencies:  directfb_dep,                    install: true)
-executable('df_gears',       'df_gears.c',                     dependencies: [directfb_dep, gl_dep, libm_dep], install: true)
+executable('df_glgears',     'df_glgears.c',                   dependencies: [directfb_dep, gl_dep, libm_dep], install: true)
 executable('df_input',      ['df_input.c',      rawdata_hdrs], dependencies:  directfb_dep,                    install: true)
 executable('df_knuckles',    'df_knuckles.c',                  dependencies: [directfb_dep, libm_dep],         install: true)
 executable('df_layers',     ['df_layers.c',     rawdata_hdrs], dependencies:  directfb_dep,                    install: true)
