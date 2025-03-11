@@ -36,6 +36,7 @@ executable('df_pss',        ['df_pss.c',        rawdata_hdrs], dependencies: [di
 executable('df_spacedream', ['df_spacedream.c',  dsdesc_hdrs], dependencies: [directfb_dep, libm_dep],         install: true)
 executable('df_texture',    ['df_texture.c',    rawdata_hdrs], dependencies: [directfb_dep, libm_dep],         install: true)
 executable('df_video',      ['df_video.c',      rawdata_hdrs], dependencies: [directfb_dep, libm_dep],         install: true)
+executable('df_vkcolor',     'df_vkcolor.c',                   dependencies: [directfb_dep, vk_dep],           install: true)
 executable('df_window',     ['df_window.c',     rawdata_hdrs], dependencies: [directfb_dep, libm_dep],         install: true)
 
 if fusionsound_dep.found()

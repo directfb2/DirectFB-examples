@@ -94,6 +94,15 @@ if get_option('gl') != ''
                                              get_option('gl-ldflags').strip().split(' ') : [])
 endif
 
+vk_dep = []
+if get_option('vk') != ''
+  vk_dep = declare_dependency(compile_args: ['-DVK_PHYSICAL_DEVICE_TYPE=@0@'.format(get_option('vk')),
+                                             get_option('vk-cflags') != '' ?
+                                             get_option('vk-cflags').strip().split(' ') : []],
+                              link_args:     get_option('vk-ldflags') != '' ?
+                                             get_option('vk-ldflags').strip().split(' ') : [])
+endif
+
 fusionsound_dep = dependency('fusionsound', required: false)
 
 subdir('data')
