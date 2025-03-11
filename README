@@ -23,6 +23,7 @@ The following applications can be run:
   df_spacedream - an interactive starfield simulation
   df_texture    - a texture mapping example
   df_video      - a video playback in a moving window
+  df_vkcolor    - a program showing RGB color transitions along cube edges and diagonals
   df_window     - a window stack example
 
 And if FusionSound is available:

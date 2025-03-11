@@ -52,3 +52,16 @@ option('video-headers',
        value: 'disabled',
        choices: ['disabled', 'dfvff', 'm2v', '264'],
        description: 'Use generated video headers')
+
+option('vk',
+       type: 'combo',
+       choices : ['', '1', '2', '4'],
+       description: 'Preferred physical device type for Vulkan (1 = Integrated GPU, 2 = Discrete GPU, 4 = CPU)')
+
+option('vk-cflags',
+       type: 'string',
+       description: 'CFLAGS of the Vulkan implementation')
+
+option('vk-ldflags',
+       type: 'string',
+       description: 'LDFLAGS of the Vulkan implementation')
