@@ -21,9 +21,9 @@
 */
 
 #include <direct/util.h>
-#ifdef OPENGL_H
+#ifdef OPENGL_HEADER
 #include <directfbgl.h>
-#include OPENGL_H
+#include OPENGL_HEADER
 #include <math.h>
 
 #include "util.h"

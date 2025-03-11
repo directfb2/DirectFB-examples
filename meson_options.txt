@@ -19,9 +19,9 @@
 #  THE SOFTWARE.
 
 option('directfbgl',
-        type: 'combo',
-        choices : ['', '1', '2'],
-        description: 'DirectFBGL interface version')
+       type: 'combo',
+       choices : ['', '1', '2'],
+       description: 'DirectFBGL interface version')
 
 option('font-headers',
        type: 'combo',
@@ -30,16 +30,16 @@ option('font-headers',
        description: 'Use generated font headers')
 
 option('gl',
-        type: 'string',
-        description: 'PATH to OpenGL header')
+       type: 'string',
+       description: 'PATH to OpenGL header')
 
 option('gl-cflags',
-        type: 'string',
-        description: 'CFLAGS of the OpenGL implementation')
+       type: 'string',
+       description: 'CFLAGS of the OpenGL implementation')
 
 option('gl-ldflags',
-        type: 'string',
-        description: 'LDFLAGS of the OpenGL implementation')
+       type: 'string',
+       description: 'LDFLAGS of the OpenGL implementation')
 
 option('image-headers',
        type: 'combo',

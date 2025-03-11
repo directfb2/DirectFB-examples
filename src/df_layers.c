@@ -71,7 +71,7 @@ typedef struct {
 } Plane;
 
 /* planes array */
-static Plane planes[D_ARRAY_SIZE(colors)];
+static Plane planes[D_ARRAY_SIZE(colors)] = { 0 };
 
 /* number of planes currently on screen */
 static int plane_count = 0;
@@ -198,9 +198,6 @@ int main( int argc, char *argv[] )
      DFBFontDescription        fdsc;
      DFBDataBufferDescription  ddsc;
      IDirectFBDataBuffer      *buffer;
-
-     /* initialize planes */
-     memset( planes, 0, sizeof(planes) );
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));
