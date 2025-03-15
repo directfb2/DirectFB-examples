@@ -1,3 +1,54 @@
+commit 70e41547b3b75cfdebcc34c72c07d00dda594651
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Sat Mar 15 12:06:55 2025 +0100
+
+    Add missing Release() call
+
+commit d37093f392d4aa7155c9d922756a41dbb06414bb
+Merge: fe4bf36 ccf44fa
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Tue Mar 11 22:44:33 2025 +0100
+
+    Merge pull request #40 from caramelli/master
+    
+    Add Vulkan example
+
+commit ccf44fad5e70a8e3cb7e542e9da986f30fe0c3a8
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Tue Mar 11 22:14:35 2025 +0100
+
+    Add Vulkan example
+
+commit fe4bf36654746a127f0f4e2960d1ed5b60e1ea2c
+Merge: d627550 c6504f2
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Tue Mar 11 21:38:16 2025 +0100
+
+    Merge pull request #39 from caramelli/master
+    
+    Rename df_gears to df_glgears
+
+commit c6504f2084b1b172d36ff133e0199493ea9bfd9e
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Tue Mar 11 21:35:32 2025 +0100
+
+    Rename df_gears to df_glgears
+
+commit d627550430407ce6f1e42a861985ec42c0f4ac19
+Merge: 3f50428 e451d0c
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Mon Dec 18 22:24:59 2023 +0100
+
+    Merge pull request #38 from caramelli/master
+    
+    df_andi: Add --penguins option
+
+commit e451d0cdaf2c2cea4cf258902e1fb53a79074ef5
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Mon Dec 18 22:07:54 2023 +0100
+
+    Update ChangeLog
+
 commit 9349abcde0aaca928402966993c7b8a7de7d05be
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Mon Dec 18 22:07:43 2023 +0100
