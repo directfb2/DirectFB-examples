@@ -238,6 +238,7 @@ int main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font ));
+     buffer->Release( buffer );
 
      primary->SetFont( primary, font );
 
@@ -252,6 +253,7 @@ int main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      provider->GetSurfaceDescription( provider, &sdsc );
      DFBCHECK(primary->GetPixelFormat( primary, &sdsc.pixelformat ));
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &smokey_light ));

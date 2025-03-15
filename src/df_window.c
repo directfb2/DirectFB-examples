@@ -166,6 +166,7 @@ int main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font ));
+     buffer->Release( buffer );
      DFBCHECK(font->GetHeight( font, &fontheight ));
      DFBCHECK(font->GetStringWidth( font, " Press left mouse button and drag to move the window. ", -1, &stringwidth ));
 
@@ -197,6 +198,7 @@ int main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      DFBCHECK(window1->GetSurface( window1, &window_surface1 ));
      provider->RenderTo( provider, window_surface1, NULL );
      window_surface1->SetDrawingFlags( window_surface1, DSDRAW_SRC_PREMULTIPLY );
@@ -214,6 +216,7 @@ int main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      provider->GetSurfaceDescription( provider, &sdsc );
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &cursor_surface1 ));
      provider->RenderTo( provider, cursor_surface1, NULL );
@@ -248,6 +251,7 @@ int main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      provider->GetSurfaceDescription( provider, &sdsc );
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &cursor_surface2 ));
      provider->RenderTo( provider, cursor_surface2, NULL );

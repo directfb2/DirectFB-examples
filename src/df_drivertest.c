@@ -104,6 +104,7 @@ static void init_resources( Background bg, int w, int h, int w2, int h2 )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      provider->GetSurfaceDescription( provider, &sdsc );
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &background ));
      provider->RenderTo( provider, background, NULL );
@@ -120,6 +121,7 @@ static void init_resources( Background bg, int w, int h, int w2, int h2 )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width  = w;
      sdsc.height = h;
