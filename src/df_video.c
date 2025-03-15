@@ -184,6 +184,7 @@ int main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateVideoProvider( buffer, &videoprovider ));
+     buffer->Release( buffer );
      videoprovider->GetSurfaceDescription( videoprovider, &sdsc );
      wdsc.flags  = DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT;
      wdsc.posx   = 0;
@@ -208,6 +209,7 @@ int main( int argc, char *argv[] )
 #endif
           DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
           DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+          buffer->Release( buffer );
           provider->GetSurfaceDescription( provider, &sdsc );
           wdsc.flags  = DWDESC_CAPS | DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT;
           wdsc.caps   = DWCAPS_ALPHACHANNEL;

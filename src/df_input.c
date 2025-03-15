@@ -704,6 +704,8 @@ int main( int argc, char *argv[] )
      fdsc.height = CLAMP( (int) (screen_width / 10.0 / 8) * 8, 8, 96 );
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font_large ));
 
+     buffer->Release( buffer );
+
      /* load images */
      for (n = 0; n < NUM_IMAGES; n++) {
 #ifdef USE_IMAGE_HEADERS
@@ -716,6 +718,7 @@ int main( int argc, char *argv[] )
 #endif
           DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
           DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+          buffer->Release( buffer );
           provider->GetSurfaceDescription( provider, &sdsc );
           DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &images[n] ));
           provider->RenderTo( provider, images[n], NULL );

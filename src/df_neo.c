@@ -255,6 +255,7 @@ int main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      provider->GetSurfaceDescription( provider, &sdsc );
      back_width  = sdsc.width;
      back_height = sdsc.height;
@@ -281,6 +282,7 @@ int main( int argc, char *argv[] )
 #endif
           DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
           DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+          buffer->Release( buffer );
           provider->GetSurfaceDescription( provider, &sdsc );
           image_widths[n]  = sdsc.width;
           image_heights[n] = sdsc.height;

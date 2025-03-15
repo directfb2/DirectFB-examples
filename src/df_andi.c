@@ -546,6 +546,7 @@ static void init_resources( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font ));
+     buffer->Release( buffer );
      DFBCHECK(font->GetHeight( font, &fontheight ));
      DFBCHECK(font->GetStringWidth( font, "Penguin Population: 0000  ", -1, &population_stringwidth ));
      DFBCHECK(font->GetStringWidth( font, "FPS: 0000.0  ", -1, &fps_stringwidth ));
@@ -564,6 +565,7 @@ static void init_resources( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      provider->GetSurfaceDescription( provider, &sdsc );
      DFBCHECK(primary->GetPixelFormat( primary, &sdsc.pixelformat ));
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &tuximage ));
@@ -586,6 +588,7 @@ static void init_resources( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width  = xres;
      sdsc.height = yres;
@@ -605,6 +608,7 @@ static void init_resources( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      provider->GetSurfaceDescription( provider, &sdsc );
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &destination_mask ));
      provider->RenderTo( provider, destination_mask, NULL );

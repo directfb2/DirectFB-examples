@@ -173,6 +173,7 @@ static void dfb_shutdown( void )
           if (plane->layer)   plane->layer->Release( plane->layer );
      }
 
+     if (screen)       screen->Release( screen );
      if (event_buffer) event_buffer->Release( event_buffer );
      if (mouse)        mouse->Release( mouse );
      if (dfb)          dfb->Release( dfb );
@@ -269,6 +270,7 @@ int main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font ));
+     buffer->Release( buffer );
 
      screen->EnumDisplayLayers( screen, display_layer_callback, NULL );
 

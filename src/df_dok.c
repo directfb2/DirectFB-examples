@@ -437,6 +437,7 @@ static void showResult( void )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.height = 8;
      DFBCHECK(dfb->CreateSurface( dfb, &sdsc, &meter ));
@@ -1372,6 +1373,8 @@ int main( int argc, char *argv[] )
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &ui_font ));
      DFBCHECK(ui_font->GetHeight( ui_font, &ui_fontheight ));
 
+     buffer->Release( buffer );
+
      /* clear with black */
      primary->Clear( primary, 0, 0, 0, 0x80 );
 
@@ -1386,6 +1389,7 @@ int main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width  = (SH / 8) * sdsc.width / sdsc.height;
      sdsc.height = SH / 8;
@@ -1427,6 +1431,7 @@ int main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width  = sdsc.width * (ui_fontheight - ui_fontheight / 5) / sdsc.height;
      sdsc.height = (ui_fontheight - ui_fontheight / 5);
@@ -1446,6 +1451,7 @@ int main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX * 2;
      sdsc.height      = SY * 2;
@@ -1465,6 +1471,7 @@ int main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX;
      sdsc.height      = SY;
@@ -1488,6 +1495,7 @@ int main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX;
      sdsc.height      = SY;
@@ -1507,6 +1515,7 @@ int main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX;
      sdsc.height      = SY;
@@ -1527,6 +1536,7 @@ int main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX;
      sdsc.height      = SY;
@@ -1546,6 +1556,7 @@ int main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX;
      sdsc.height      = SY;
@@ -1565,6 +1576,7 @@ int main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+     buffer->Release( buffer );
      provider->GetSurfaceDescription( provider, &sdsc );
      sdsc.width       = SX;
      sdsc.height      = SY;
@@ -1585,6 +1597,7 @@ int main( int argc, char *argv[] )
 #endif
           DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
           DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+          buffer->Release( buffer );
           provider->GetSurfaceDescription( provider, &sdsc );
           sdsc.width  = SW;
           sdsc.height = run_fullscreen ? SH : SH + ui_fontheight;

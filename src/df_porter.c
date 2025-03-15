@@ -134,6 +134,7 @@ int main( int argc, char *argv[] )
 #endif
           DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
           DFBCHECK(buffer->CreateImageProvider( buffer, &provider ));
+          buffer->Release( buffer );
      }
 
      /* render the image to the temporary surface. */
@@ -164,6 +165,7 @@ int main( int argc, char *argv[] )
 #endif
      DFBCHECK(dfb->CreateDataBuffer( dfb, &ddsc, &buffer ));
      DFBCHECK(buffer->CreateFont( buffer, &fdsc, &font ));
+     buffer->Release( buffer );
 
      surface->SetFont( surface, font );
 
