@@ -183,7 +183,7 @@ int main( int argc, char *argv[] )
      quit = 0;
      primary->Clear( primary, 0x00, 0x00, 0x00, 0xFF );
      primary->Blit( primary, background, NULL, 0, 0 );
-     primary->Flip( primary, NULL, DSFLIP_WAITFORSYNC );
+     primary->Flip( primary, NULL, DSFLIP_NONE );
 
      /* test1 main loop */
      while (!quit) {
@@ -275,7 +275,7 @@ int main( int argc, char *argv[] )
      quit = 0;
      primary->Clear( primary, 0x00, 0x00, 0x00, 0xFF );
      primary->Blit( primary, background, NULL, 128, 128 );
-     primary->Flip( primary, NULL, DSFLIP_WAITFORSYNC );
+     primary->Flip( primary, NULL, DSFLIP_NONE );
 
      /* test2 main loop */
      while (!quit) {

@@ -560,7 +560,7 @@ input_device_callback( DFBInputDeviceID device_id, DFBInputDeviceDescription des
      }
 #endif
 
-     device = malloc( sizeof(DeviceInfo) );
+     device = D_MALLOC( sizeof(DeviceInfo) );
 
      device->device_id = device_id;
      device->desc      = desc;
@@ -769,7 +769,7 @@ int main( int argc, char *argv[] )
                          /* clear the old list */
                          while (devices) {
                               DeviceInfo *next = devices->next;
-                              free( devices );
+                              D_FREE( devices );
                               devices = next;
                          }
 
@@ -806,7 +806,7 @@ int main( int argc, char *argv[] )
 
      while (devices) {
           DeviceInfo *next = devices->next;
-          free( devices );
+          D_FREE( devices );
           devices = next;
      }
 

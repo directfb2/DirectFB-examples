@@ -108,7 +108,7 @@ static const Matrix identity = { { 1, 0, 0, 0,
 
 static Matrix *matrix_new_identity( void )
 {
-     Matrix *matrix = malloc( sizeof(Matrix) );
+     Matrix *matrix = D_MALLOC( sizeof(Matrix) );
 
      *matrix = identity;
 
@@ -403,8 +403,8 @@ static void unload_stars( void )
 
 static void deinit_resources( void )
 {
-     if (projection) free( projection );
-     if (camera)     free( camera );
+     if (projection) D_FREE( projection );
+     if (camera)     D_FREE( camera );
 
      unload_stars();
 

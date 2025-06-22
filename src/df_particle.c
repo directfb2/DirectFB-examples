@@ -63,7 +63,7 @@ static float f = 0;
 
 static void spawn_particle( void )
 {
-     Particle *new_particle = malloc( sizeof(Particle) );
+     Particle *new_particle = D_MALLOC( sizeof(Particle) );
 
      new_particle->w      = 0.05f;
      new_particle->sw     = myrand() % (int) (sx / 3.2f) + sx / 3.2f * sin( f ) + sx / 3.2f;
@@ -95,7 +95,7 @@ static void draw_particles( void )
 
           if (p->w > M_PI) {
                particles = p->next;
-               free( p );
+               D_FREE( p );
                p = particles;
                if (!p)
                     last_particle = NULL;
@@ -112,7 +112,7 @@ static void destroy_particles( void )
 
      while (p) {
           particles = p->next;
-          free( p );
+          D_FREE( p );
           p = particles;
      }
 }

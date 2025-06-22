@@ -1737,7 +1737,7 @@ run:
                 int  index = 0;
                 char buf[200];
 
-                snprintf( buf, sizeof(buf), "DirectFB_%s%s%s",
+                snprintf( buf, sizeof(buf), "DirectFB_%s%s%.127s",
                           do_aa ? "AA " : "", do_matrix ? "MX " : "", demos[i].desc );
 
                 while (buf[index]) {
