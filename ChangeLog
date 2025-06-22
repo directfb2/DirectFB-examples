@@ -1,3 +1,24 @@
+commit 6f753d6bcfab35adfd39e92e14176e67fdcdb705
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Sun Jun 22 20:30:13 2025 +0200
+
+    df_neo and df_video: Update FRAME_DELAY
+
+commit f92a702fc3051bf5a1b9677fd619d412babd6c8f
+Merge: d37093f 8b7391d
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Sat Mar 15 12:13:31 2025 +0100
+
+    Merge pull request #41 from caramelli/master
+    
+    Add missing Release() call
+
+commit 8b7391dd590a68da2b1599ed8d794225fe1e0a69
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Sat Mar 15 12:08:47 2025 +0100
+
+    Update ChangeLog
+
 commit 70e41547b3b75cfdebcc34c72c07d00dda594651
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Sat Mar 15 12:06:55 2025 +0100
