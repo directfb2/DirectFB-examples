@@ -144,16 +144,9 @@ typedef struct {
      GLuint  vbo;
 } Gear;
 
-typedef struct {
-     GLuint  program;
-     Gear   *gear_red;
-     Gear   *gear_green;
-     Gear   *gear_blue;
-     float   projection[16];
-     float   view[16];
-} Gears;
-
-Gears gears;
+static GLuint program;
+static float projection[16], view[16];
+static Gear *gear_red, *gear_green, *gear_blue;
 
 static Gear *create_gear( float inner, float outer, float width, int teeth, float tooth_depth )
 {
@@ -319,10 +312,10 @@ static void draw_gear( Gear *gear, float model_tx, float model_ty, float model_r
      int         k;
      float       MVP[16], N[16];
 
-     memcpy( N, gears.view, sizeof(N) );
+     memcpy( N, view, sizeof(N) );
      translate( N, model_tx, model_ty, 0 );
      rotate( N, model_rz, 0, 0, 1 );
-     memcpy( MVP, gears.projection, sizeof(MVP) );
+     memcpy( MVP, projection, sizeof(MVP) );
      multiply( MVP, N );
      invert( N );
      transpose( N );
@@ -337,10 +330,10 @@ static void draw_gear( Gear *gear, float model_tx, float model_ty, float model_r
 
      pglSetUniform( &uniforms );
 #else
-     glUniform4fv      ( glGetUniformLocation( gears.program, "u_LightPos" ),                  1,           pos );
-     glUniformMatrix4fv( glGetUniformLocation( gears.program, "u_ModelViewProjectionMatrix" ), 1, GL_FALSE, MVP );
-     glUniformMatrix4fv( glGetUniformLocation( gears.program, "u_NormalMatrix" ),              1, GL_FALSE, N );
-     glUniform4fv      ( glGetUniformLocation( gears.program, "u_Color" ),                     1,           color );
+     glUniform4fv      ( glGetUniformLocation( program, "u_LightPos" ),                  1,           pos );
+     glUniformMatrix4fv( glGetUniformLocation( program, "u_ModelViewProjectionMatrix" ), 1, GL_FALSE, MVP );
+     glUniformMatrix4fv( glGetUniformLocation( program, "u_NormalMatrix" ),              1, GL_FALSE, N );
+     glUniform4fv      ( glGetUniformLocation( program, "u_Color" ),                     1,           color );
 #endif
 
      glBindBuffer( GL_ARRAY_BUFFER, gear->vbo );
@@ -430,39 +423,39 @@ void gears_init( void )
 #ifdef __IDIRECTFBGL_PORTABLEGL_H__
      GLenum interpolation[3] = { SMOOTH, SMOOTH, SMOOTH };
 
-     gears.program = pglCreateProgram( vertex_shader, fragment_shader, 3, interpolation, GL_FALSE );
+     program = pglCreateProgram( vertex_shader, fragment_shader, 3, interpolation, GL_FALSE );
 #else
      GLuint vertShader, fragShader;
 
-     gears.program = glCreateProgram();
+     program = glCreateProgram();
 
      /* vertex shader */
      vertShader = glCreateShader( GL_VERTEX_SHADER );
      glShaderSource( vertShader, 1, &vertShaderSource, NULL );
      glCompileShader( vertShader );
-     glAttachShader( gears.program, vertShader );
+     glAttachShader( program, vertShader );
      glDeleteShader( vertShader );
 
      /* fragment shader */
      fragShader = glCreateShader( GL_FRAGMENT_SHADER );
      glShaderSource( fragShader, 1, &fragShaderSource, NULL );
      glCompileShader( fragShader );
-     glAttachShader( gears.program, fragShader );
+     glAttachShader( program, fragShader );
      glDeleteShader( fragShader );
 
      /* vertex attribs */
-     glBindAttribLocation( gears.program, 0, "a_Position" );
-     glBindAttribLocation( gears.program, 1, "a_Normal" );
+     glBindAttribLocation( program, 0, "a_Position" );
+     glBindAttribLocation( program, 1, "a_Normal" );
 
      /* link program */
-     glLinkProgram( gears.program );
+     glLinkProgram( program );
 #endif
 
      /* enable depth testing */
      glEnable( GL_DEPTH_TEST );
 
      /* use program */
-     glUseProgram( gears.program );
+     glUseProgram( program );
 
      /* set clear values */
      glClearColor( 0, 0, 0, 1 );
@@ -471,16 +464,16 @@ void gears_init( void )
      glViewport( 0, 0, screen_width, screen_height );
 
      /* set projection matrix */
-     memset( gears.projection, 0, sizeof(gears.projection) );
-     gears.projection[0]  = zNear;
-     gears.projection[5]  = (float) screen_width / screen_height * zNear;
-     gears.projection[10] = -(zFar + zNear) / (zFar - zNear);
-     gears.projection[11] = -1;
-     gears.projection[14] = -2 * zFar * zNear / (zFar - zNear);
+     memset( projection, 0, sizeof(projection) );
+     projection[0]  = zNear;
+     projection[5]  = (float) screen_width / screen_height * zNear;
+     projection[10] = -(zFar + zNear) / (zFar - zNear);
+     projection[11] = -1;
+     projection[14] = -2 * zFar * zNear / (zFar - zNear);
 
-     gears.gear_red   = create_gear( 1.0, 4.0, 1.0, 20, 0.7 );
-     gears.gear_green = create_gear( 0.5, 2.0, 2.0, 10, 0.7 );
-     gears.gear_blue  = create_gear( 1.3, 2.0, 0.5, 10, 0.7 );
+     gear_red   = create_gear( 1.0, 4.0, 1.0, 20, 0.7 );
+     gear_green = create_gear( 0.5, 2.0, 2.0, 10, 0.7 );
+     gear_blue  = create_gear( 1.3, 2.0, 0.5, 10, 0.7 );
 }
 
 static void gears_draw( float view_tz, float view_rx, float view_ry, float model_rz )
@@ -492,23 +485,23 @@ static void gears_draw( float view_tz, float view_rx, float view_ry, float model
      glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
      /* set view matrix */
-     identity( gears.view );
-     translate( gears.view, 0, 0, view_tz );
-     rotate( gears.view, view_rx, 1, 0, 0 );
-     rotate( gears.view, view_ry, 0, 1, 0 );
+     identity( view );
+     translate( view, 0, 0, view_tz );
+     rotate( view, view_rx, 1, 0, 0 );
+     rotate( view, view_ry, 0, 1, 0 );
 
-     draw_gear( gears.gear_red,   -3.0, -2.0,      model_rz     , red );
-     draw_gear( gears.gear_green,  3.1, -2.0, -2 * model_rz - 9 , green );
-     draw_gear( gears.gear_blue,  -3.1,  4.2, -2 * model_rz - 25, blue );
+     draw_gear( gear_red,   -3.0, -2.0,      model_rz     , red );
+     draw_gear( gear_green,  3.1, -2.0, -2 * model_rz - 9 , green );
+     draw_gear( gear_blue,  -3.1,  4.2, -2 * model_rz - 25, blue );
 }
 
 static void gears_term( void )
 {
-     delete_gear( gears.gear_red );
-     delete_gear( gears.gear_green );
-     delete_gear( gears.gear_blue );
+     delete_gear( gear_red );
+     delete_gear( gear_green );
+     delete_gear( gear_blue );
 
-     glDeleteProgram( gears.program );
+     glDeleteProgram( program );
 }
 
 /**********************************************************************************************************************/

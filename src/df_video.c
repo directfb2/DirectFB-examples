@@ -54,7 +54,8 @@ static int video_width, video_height;
 static int movx, movy;
 
 /* default animation speed settings */
-unsigned int frame_delay = 50;
+#define CYCLE_LEN   60
+#define FRAME_DELAY 16666
 
 /* number of frames displayed */
 static long frame_num = 0;
@@ -64,9 +65,9 @@ static int use_panel = 1;
 
 /**********************************************************************************************************************/
 
-static void render( void )
+static void render( unsigned int cycle_len )
 {
-     if (frame_num % frame_delay) {
+     if (frame_num % cycle_len) {
           static int wx   = 0;
           static int wy   = 0;
           static int dirx = 4;
@@ -90,7 +91,7 @@ static void render( void )
 
           layer->SetBackgroundColor( layer, r, g, b, 0 );
 
-          w += 0.1f * frame_delay;
+          w += 0.1f * cycle_len;
      }
 
      if (panelwindow && (movx || movy))
@@ -129,7 +130,9 @@ int main( int argc, char *argv[] )
      DFBDataBufferDescription  ddsc;
      IDirectFBDataBuffer      *buffer;
      IDirectFBImageProvider   *provider;
-     const char               *mrl = NULL;
+     const char               *mrl         = NULL;
+     unsigned int              cycle_len   = CYCLE_LEN;
+     unsigned int              frame_delay = FRAME_DELAY;
 
      /* initialize DirectFB including command line parsing */
      DFBCHECK(DirectFBInit( &argc, &argv ));
@@ -231,7 +234,7 @@ int main( int argc, char *argv[] )
 
           direct_clock_start( &clock );
 
-          render();
+          render( cycle_len );
 
           movx = 0;
           movy = 0;
@@ -247,7 +250,7 @@ int main( int argc, char *argv[] )
                               movy += evt.axisrel;
                               break;
                          case DIAI_Z:
-                              frame_delay = CLAMP( frame_delay + evt.axisrel, 2, 100 );
+                              frame_delay = CLAMP( frame_delay + 1000 * evt.axisrel, 2000, 100000 );
                               break;
                          default:
                               break;
@@ -279,7 +282,7 @@ int main( int argc, char *argv[] )
 
                direct_clock_stop( &clock );
 
-               delay = 1000 * frame_delay - direct_clock_diff( &clock );
+               delay = frame_delay - direct_clock_diff( &clock );
                if (delay > 0)
                  usleep( delay );
           }

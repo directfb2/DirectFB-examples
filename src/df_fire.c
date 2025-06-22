@@ -121,7 +121,7 @@ static void exit_application( int status )
 
      /* Deallocate fire data. */
      if (data)
-          free( data );
+          D_FREE( data );
 
      /* Release the primary surface. */
      if (surface)
@@ -243,7 +243,7 @@ static void init_application( int argc, char *argv[] )
           height = 256;
 
      /* Allocate fire data including an additional line. */
-     data = calloc( height + 1, width );
+     data = D_CALLOC( height + 1, width );
 
      /* Generate the fire palette. */
      generate_palette();

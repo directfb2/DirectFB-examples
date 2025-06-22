@@ -109,7 +109,7 @@ static int width, height;
 
 /* default animation speed settings */
 #define CYCLE_LEN   60
-#define FRAME_DELAY 50
+#define FRAME_DELAY 16666
 
 /* color modulation */
 static bool colorize = true;
@@ -332,11 +332,11 @@ int main( int argc, char *argv[] )
                               break;
 
                          case DIKI_LEFT:
-                              frame_delay = MIN( 500, frame_delay + 5 );
+                              frame_delay = MIN( 500000, frame_delay + 5000 );
                               break;
 
                          case DIKI_RIGHT:
-                              frame_delay = frame_delay > 5 ? frame_delay - 5 : 0;
+                              frame_delay = frame_delay > 5000 ? frame_delay - 5000 : 0;
                               break;
 
                          case DIKI_ENTER:
@@ -361,7 +361,7 @@ int main( int argc, char *argv[] )
 
                direct_clock_stop( &clock );
 
-               delay = 1000 * frame_delay - direct_clock_diff( &clock );
+               delay = frame_delay - direct_clock_diff( &clock );
                if (delay > 0)
                     usleep( delay );
           }

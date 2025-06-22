@@ -74,7 +74,7 @@ static void dfb_shutdown( void )
           layer->SetCooperativeLevel( layer, DLSCL_SHARED );
           layer->Release( layer );
      }
-     if (dfb)             dfb->Release( dfb );
+     if (dfb) dfb->Release( dfb );
 }
 
 static void print_usage( void )

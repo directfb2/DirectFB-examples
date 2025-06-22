@@ -71,7 +71,7 @@ typedef struct {
 } Plane;
 
 /* planes array */
-static Plane planes[D_ARRAY_SIZE(colors)] = { 0 };
+static Plane planes[D_ARRAY_SIZE(colors)];
 
 /* number of planes currently on screen */
 static int plane_count = 0;

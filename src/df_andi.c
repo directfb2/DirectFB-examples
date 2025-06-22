@@ -136,7 +136,7 @@ static int *coords = NULL;
  */
 static void spawn_penguin( void )
 {
-     Penguin *new_penguin = calloc( 1, sizeof(Penguin) );
+     Penguin *new_penguin = D_CALLOC( 1, sizeof(Penguin) );
 
      new_penguin->x           = xres / 2;
      new_penguin->y           = yres / 2;
@@ -178,7 +178,7 @@ static void destroy_penguin( void )
 
      if (penguins) {
           penguins = penguins->next;
-          free( first_penguin );
+          D_FREE( first_penguin );
           population--;
      }
 }
@@ -332,7 +332,7 @@ static void destroy_all_penguins( void )
 
      while (p) {
           penguins = p->next;
-          free( p );
+          D_FREE( p );
           p = penguins;
      }
 }
@@ -360,7 +360,7 @@ static void read_destination_mask( void )
      int   pitch;
      void *ptr;
 
-     coords = calloc( DESTINATION_MASK_WIDTH * DESTINATION_MASK_HEIGHT, sizeof(int) );
+     coords = D_CALLOC( DESTINATION_MASK_WIDTH * DESTINATION_MASK_HEIGHT, sizeof(int) );
 
      DFBCHECK(destination_mask->Lock( destination_mask, DSLF_READ, &ptr, &pitch ));
 
@@ -391,7 +391,7 @@ static void initialize_direction_frames( PenguinFrame **direction_frames, int yo
           int i;
 
           for (i = 0; i < (XTUXSIZE / XSPRITESIZE - 1) ; i++) {
-               new_frame = malloc( sizeof(PenguinFrame) );
+               new_frame = D_MALLOC( sizeof(PenguinFrame) );
 
                new_frame->rect.x = XSPRITESIZE * i;
                new_frame->rect.y = YSPRITESIZE * yoffset;
@@ -401,14 +401,15 @@ static void initialize_direction_frames( PenguinFrame **direction_frames, int yo
                if (!*direction_frames) {
                     *direction_frames = new_frame;
                }
-               else {
+               else if (last_frame) {
                     last_frame->next = new_frame;
                }
 
                last_frame = new_frame;
           }
 
-          last_frame->next = *direction_frames;
+          if (last_frame) 
+               last_frame->next = *direction_frames;
      }
 }
 
@@ -445,7 +446,7 @@ static void deinit_resources( void )
 {
      destroy_all_penguins();
 
-     if (coords) free( coords );
+     if (coords) D_FREE( coords );
 
      if (destination_mask) destination_mask->Release( destination_mask );
      if (background)       background->Release( background );

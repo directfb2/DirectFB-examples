@@ -254,14 +254,14 @@ static void veTranslate( float x, float y, float z )
 
 static void vbNew( int num )
 {
-     vbuffer = calloc( 1, sizeof(VeVertexBuffer) );
+     vbuffer = D_CALLOC( 1, sizeof(VeVertexBuffer) );
 
      vbuffer->size         = num;
-     vbuffer->data         = malloc( vbuffer->size * sizeof(VeVertex) );
+     vbuffer->data         = D_MALLOC( vbuffer->size * sizeof(VeVertex) );
      vbuffer->max_vertices = vbuffer->size << 2;
      vbuffer->max_indices  = (vbuffer->size - 2) * 9;
-     vbuffer->vertices     = malloc( vbuffer->max_vertices * sizeof(DFBVertex) );
-     vbuffer->indices      = malloc( vbuffer->max_indices * sizeof(int) );
+     vbuffer->vertices     = D_MALLOC( vbuffer->max_vertices * sizeof(DFBVertex) );
+     vbuffer->indices      = D_MALLOC( vbuffer->max_indices * sizeof(int) );
 }
 
 static void vbAdd( float x, float y, float z, float s, float t )
@@ -506,10 +506,10 @@ static void vbExec( void )
 
 static void vbDestroy( void )
 {
-     free( vbuffer->indices );
-     free( vbuffer->vertices );
-     free( vbuffer->data );
-     free( vbuffer );
+     D_FREE( vbuffer->indices );
+     D_FREE( vbuffer->vertices );
+     D_FREE( vbuffer->data );
+     D_FREE( vbuffer );
 }
 
 /**********************************************************************************************************************/
@@ -745,7 +745,7 @@ int main( int argc, char *argv[] )
           vbExec();
 
           /* Flip display. */
-          primary->Flip( primary, NULL, DSFLIP_WAITFORSYNC );
+          primary->Flip( primary, NULL, DSFLIP_NONE );
 
           /* FPS calculations. */
           fps_count( &fps, 1000 );
