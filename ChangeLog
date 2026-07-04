@@ -1,3 +1,24 @@
+commit 27bc231caeb876bb89a1f81c14b233c597dd63aa
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Sat Jul 4 17:51:26 2026 +0200
+
+    df_glgears: Follow PortableGL API changes
+
+commit eecf1019b29933a45578e62aea5f08a884d30fbc
+Merge: f92a702 0a89949
+Author: DirectFB2 <80045286+directfb2@users.noreply.github.com>
+Date:   Sun Jun 22 20:35:22 2025 +0200
+
+    Merge pull request #42 from caramelli/master
+    
+    df_neo and df_video: Update FRAME_DELAY
+
+commit 0a8994952d30cde42772a612622608ba136a80f1
+Author: Nicolas Caramelli <caramelli.devel@gmail.com>
+Date:   Sun Jun 22 20:30:54 2025 +0200
+
+    Update ChangeLog
+
 commit 6f753d6bcfab35adfd39e92e14176e67fdcdb705
 Author: Nicolas Caramelli <caramelli.devel@gmail.com>
 Date:   Sun Jun 22 20:30:13 2025 +0200

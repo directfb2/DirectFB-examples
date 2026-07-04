@@ -367,18 +367,35 @@ static void delete_gear( Gear *gear )
 #define NORMAL   1
 #define COLOR    0
 
+#ifdef PGL_SMOOTH3
+void vertex_shader( float *vs_output, vec4 *vertex_attribs, Shader_Builtins *builtins, void *uniforms )
+#else
 void vertex_shader( float *vs_output, void *vertex_attribs, Shader_Builtins *builtins, void *uniforms )
+#endif
 {
      vec4 *v = (vec4*) vs_output;
      vec4 *a = vertex_attribs;
      Uniforms *u = uniforms;
+#ifdef pix_t
+     builtins->gl_Position = mult_m4_v4( u->ModelViewProjectionMatrix, a[POSITION] );
+#else
      builtins->gl_Position = mult_mat4_vec4( u->ModelViewProjectionMatrix, a[POSITION] );
+#endif
      vec4 l = { 0.2, 0.2, 0.2, 1 };
      vec3 L = { u->LightPos.x, u->LightPos.y, u->LightPos.z };
+#ifdef pix_t
+     vec4 n = mult_m4_v4( u->NormalMatrix, a[NORMAL] );
+#else
      vec4 n = mult_mat4_vec4( u->NormalMatrix, a[NORMAL] );
+#endif
      vec3 N = { n.x, n.y, n.z };
+#ifdef pix_t
+     float dot = dot_v3s( norm_v3( L ), norm_v3( N ) );
+     v[COLOR] = add_v4s( mult_v4s( u->Color, l ), scale_v4( u->Color, MAX( dot, 0.0 ) ) );
+#else
      float dot = dot_vec3s( norm_vec3( L ), norm_vec3( N ) );
      v[COLOR] = add_vec4s( mult_vec4s( u->Color, l ), scale_vec4( u->Color, MAX( dot, 0.0 ) ) );
+#endif
 }
 
 void fragment_shader( float *fs_input, Shader_Builtins *builtins, void *uniforms )
@@ -421,7 +438,11 @@ void gears_init( void )
      const float zFar  = 60;
 
 #ifdef __IDIRECTFBGL_PORTABLEGL_H__
+#ifdef PGL_SMOOTH3
+     GLenum interpolation[3] = { PGL_SMOOTH3 };
+#else
      GLenum interpolation[3] = { SMOOTH, SMOOTH, SMOOTH };
+#endif
 
      program = pglCreateProgram( vertex_shader, fragment_shader, 3, interpolation, GL_FALSE );
 #else
